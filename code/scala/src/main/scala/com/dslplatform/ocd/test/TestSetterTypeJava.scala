@@ -2,16 +2,15 @@ package com.dslplatform.ocd
 package test
 package java
 
-trait TestJavaFieldType
+trait TestJavaSetterType
     extends TestComponentJava
-    with types.TestFieldType {
+    with types.TestSetterType {
 
-  val testDesc = "Tests field type"
+  val testDesc = "Tests getter type"
 
   val imports = Seq(
     "com.dslplatform.ocd.test.TypeTester"
   , "static org.junit.Assert.*"
-  , "java.util.Set"
   )
 
   def javaClass: String
@@ -24,11 +23,13 @@ trait TestJavaFieldType
     case _ => ""
   }
 
+  private def setterName = "set" + fieldName.head.toUpper + fieldName.tail
+
   def testComponentBody = s"""
     @Test
-    public void testFieldType() throws NoSuchFieldException {
-        assertTrue(TypeTester.testField(${javaClass}.class, "${fieldName}")
-                .resultEquals(${fieldClass}.class${typeParameters}));
+    public void testSetterType() throws NoSuchMethodException {
+        assertTrue(TypeTester.testSetter(${javaClass}.class, "${setterName}", ${fieldClass}.class${typeParameters})
+                .resultEquals(${javaClass}.class));
     }
 """
 }

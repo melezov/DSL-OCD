@@ -1,6 +1,6 @@
 package com.dslplatform.ocd
-package `test.javas`
+package test
 
-trait TestJavaComponent {
+trait TestComponent {
   def testComponentBody: String
 }

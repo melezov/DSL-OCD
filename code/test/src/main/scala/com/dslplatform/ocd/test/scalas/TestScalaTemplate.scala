@@ -1,7 +1,7 @@
 package com.dslplatform.ocd
-package `test.javas`
+package `test.scalas`
 
-trait TestJavaTemplate {
+trait TestScalaTemplate {
   def packageName: String
   def testName: String
 
@@ -18,23 +18,26 @@ trait TestJavaTemplate {
   def testBody = {
     val sb = new StringBuilder
 
-    sb ++= s"package $packageName;\n\n"
+    sb ++= s"package $packageName\n\n"
 
     if (imports.nonEmpty) {
       imports foreach { imp =>
-        sb ++= "import " + imp + ";\n"
+        sb ++= "import " + imp + "\n"
       }
 
       sb += '\n'
     }
 
-    sb ++= s"public class ${testName} {\n"
+    sb ++= s"""class ${testName}
+    extends SpecExtensions {
+"""
 
     tests foreach { test =>
       sb ++= test.testComponentBody
     }
 
-    sb ++= "}\n"
+    sb ++= """}
+"""
     sb.toString
   }
 }

@@ -16,7 +16,7 @@ import com.dslplatform.ocd.scalas.OcdScala
 import com.dslplatform.ocd.`test.scalas`.property.TestScalaPropertyFieldType
 import com.dslplatform.ocd.`test.scalas`.TestScalaTemplate
 
-class SetupSinglePropertyInValueDsl(
+class PropertyInValueSetup(
     val propertyType: OcdDsl) {
 
   val PropertyName = propertyType.boxName + (
@@ -28,8 +28,8 @@ class SetupSinglePropertyInValueDsl(
 
   val propertyName = PropertyName.fcil
 
-  val ModuleName = "SinglePropertyInValue"
-  val ValueName = UniqueNames(PropertyName + "Value")
+  val ModuleName = "PropertyInValue"
+  val ValueName = UniqueNames(PropertyName)
 
   private val dslPath =
     s"values/${ModuleName}/${propertyType.typeName}/${ValueName}.dsl"
@@ -46,7 +46,65 @@ s"""module ${ModuleName}
   val dslFiles = Map(dslPath -> dslBody)
 }
 
-private object ValueSinglePropertyTests {
+class PropertyInValueTest(
+    setup: PropertyInValueSetup
+  ) extends ITest {
+
+  val packageName = "com.dslplatform.ocd.values"
+
+  private val modulePrefix =
+    packageName + '.' + setup.ModuleName + '.'
+
+  def dslFiles = setup.dslFiles
+
+  def javaTests = new TestJavaTemplate {
+    def packageName = modulePrefix + setup.propertyType.typeSingleName + "Tests"
+
+    def testName = "Test" + setup.ValueName
+
+    override def imports = Seq(
+      modulePrefix + setup.ValueName
+    )
+
+    val javaType = OcdJava.resolve(setup.propertyType)
+
+    def tests = Seq(
+      new TestJavaPropertyFieldType {
+        def conceptName = setup.ValueName
+        def propertyName = setup.propertyName
+        def propertyType = javaType
+      }
+    )
+  }
+
+  def scalaTests = new TestScalaTemplate {
+    def basePackageName = modulePrefix.init
+    def testPackageName = setup.propertyType.typeSingleName + "Tests"
+
+    def testName = "Test" + setup.ValueName
+
+    override def imports = Seq(
+      "scala.reflect.runtime.universe._"
+    )
+
+    val scalaType = OcdScala.resolve(setup.propertyType)
+
+    def tests = Seq(
+      new TestScalaPropertyFieldType {
+        def conceptName = setup.ValueName
+        def propertyName = setup.propertyName
+        def propertyType = scalaType
+      }
+    )
+  }
+
+  def testFiles = Map(
+    Language.JAVA -> Map(PathResolver.withJavaPath(javaTests.testBody))
+  , Language.SCALA -> Map(PathResolver.withScalaPath(scalaTests.testBody))
+  )
+}
+
+private object PropertyInValueTests {
   val types: IndexedSeq[OcdType] = IndexedSeq(
     `type.Binary`
   , `type.Bool`
@@ -94,72 +152,16 @@ private object ValueSinglePropertyTests {
   val setups = for {
     t <- types
     b <- boxes
-    d <- OcdDsl.resolveAll(t, b)
+    d <- OcdDsl.resolveAll(t, b).take(1) // don't compile aliases
   } yield {
-    new SetupSinglePropertyInValueDsl(d)
+    new PropertyInValueSetup(d)
   }
 }
 
-trait ValueSinglePropertyTests {
-  import ValueSinglePropertyTests._
+trait PropertyInValueTests {
+  import PropertyInValueTests._
 
-  def valueSinglePropertyTests = setups map { setup =>
-    new ITest { test =>
-      val packageName = "com.dslplatform.ocd.values"
-
-      def dslFiles = setup.dslFiles
-
-      private val modulePrefix =
-        test.packageName + '.' + setup.ModuleName + '.'
-
-      def javaTests =
-        new TestJavaTemplate {
-          def packageName = modulePrefix + setup.propertyType.typeSingleName + "Tests"
-
-          def testName = "Test" + setup.ValueName
-
-          override def imports = Seq(
-            modulePrefix + setup.ValueName
-          )
-
-          val javaType = OcdJava.resolve(setup.propertyType)
-
-          def tests = Seq(
-            new TestJavaPropertyFieldType {
-              def conceptName = setup.ValueName
-              def propertyName = setup.propertyName
-              def propertyType = javaType
-            }
-          )
-        }
-
-      def scalaTests =
-        new TestScalaTemplate {
-          def packageName =
-            modulePrefix + setup.propertyType.typeSingleName + "Tests"
-
-          def testName = "Test" + setup.ValueName
-
-          override def imports = Seq(
-            modulePrefix + setup.ValueName
-          , "scala.reflect.runtime.universe._"
-          )
-
-          val scalaType = OcdScala.resolve(setup.propertyType)
-
-          def tests = Seq(
-            new TestScalaPropertyFieldType {
-              def conceptName = setup.ValueName
-              def propertyName = setup.propertyName
-              def propertyType = scalaType
-            }
-          )
-        }
-
-      def testFiles = Map(
-        Language.JAVA -> Map(PathResolver.withJavaPath(javaTests.testBody))
-      , Language.SCALA -> Map(PathResolver.withScalaPath(scalaTests.testBody))
-      )
-    }
-  }
+  def propertyInValueTests =
+    setups.head.ModuleName ->
+    setups.map(new PropertyInValueTest(_))
 }

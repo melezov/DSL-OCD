@@ -1,15 +1,14 @@
-package com.dslplatform.ocd
-package config
+package com.dslplatform.ocd.projects
 
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
-import java.io.OutputStreamWriter
+import java.util.Properties
 
 case class ProjectIni(
   username: String
-, projectID: UUID
+, projectID: java.util.UUID
 , apiUrl: String
 , packageName: String) {
 
@@ -51,7 +50,7 @@ object ProjectIni {
   def fromProperties(props: Properties) =
     ProjectIni(
       username = props.getProperty("username")
-    , projectID = UUID(props.getProperty("project-id"))
+    , projectID = java.util.UUID.fromString(props.getProperty("project-id"))
     , apiUrl = props.getProperty("api-url")
     , packageName = props.getProperty("package-name")
     )

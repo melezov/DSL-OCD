@@ -4,31 +4,22 @@ val NGSPrivateSnapshots = "NGS Private Snapshots" at "http://ngs.hr/nexus/conten
 
 // ### BASIC SETTINGS ### //
 
-organization := "com.dslplatform"
+organization := "com.dslplatform.ocd"
 
-name := "DSL-OCD-Test-Generator"
+name := "DSL-OCD-Projects"
 
 version := "0.0.0-SNAPSHOT"
 
 unmanagedSourceDirectories in Compile :=
-  Seq("interfaces", "services").map {
-    baseDirectory.value / "src" / _ / "scala"
-  } :+ (scalaSource in Compile).value
+  (scalaSource in Compile).value ::
+  baseDirectory.value / "src" / "generated" / "scala" ::
+  Nil
 
-unmanagedSourceDirectories in Test := (scalaSource in Test).value :: Nil
+unmanagedSourceDirectories in Test := Nil
 
 // ### DEPENDENCIES ### //
 
-libraryDependencies ++= Seq(
-  "com.dslplatform.ocd" %% "dsl-ocd-projects" % "0.0.0-SNAPSHOT"
-, "com.dslplatform" %% "dsl-ocd-model" % "0.0.0-SNAPSHOT"
-, "com.dslplatform" % "dsl-compiler-client-cmdline" % "0.8.13"
-, "hr.element.etb" %% "etb-util" % "0.2.20"
-, "ch.qos.logback" % "logback-classic" % "1.0.13" % "compile->default"
-, "hr.ngs" %% "ngs-core" % "0.3.19"
-, "junit" % "junit" % "4.11" % "test"
-, "org.scalatest" %% "scalatest" % "2.0" % "test"
-)
+libraryDependencies += "com.dslplatform" %% "dsl-client-scala-http" % "0.1.2-SNAPSHOT"
 
 // ### RESOLVERS ### //
 
@@ -40,9 +31,10 @@ publishTo := Some(
   if (version.value endsWith "SNAPSHOT") NGSPrivateSnapshots else NGSPrivateReleases
 )
 
-credentials += Credentials(Path.userHome / ".config" / "DSL-OCD" / "nexus.config")
-
-publishArtifact in (Compile, packageDoc) := false
+credentials in ThisBuild ++= {
+  val creds = Path.userHome / ".config" / "DSL-OCD" / "nexus.config"
+  if (creds.exists) Some(Credentials(creds)) else None
+}.toSeq
 
 // ### COMPILE SETTINGS ### //
 
@@ -66,10 +58,8 @@ scalacOptions := Seq(
 , "-Ywarn-all"
 , "-feature"
 , "-language:postfixOps"
-, "-language:reflectiveCalls"
 , "-language:implicitConversions"
 , "-language:existentials"
-, "-language:dynamics"
 )
 
 javaHome := sys.env.get("JDK16_HOME").map(file(_))
@@ -87,7 +77,5 @@ net.virtualvoid.sbt.graph.Plugin.graphSettings
 // ### ECLIPSE ### //
 
 EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
-
-EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
 
 EclipseKeys.eclipseOutput := Some(".target")

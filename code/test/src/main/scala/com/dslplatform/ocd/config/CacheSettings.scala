@@ -3,5 +3,5 @@ package config
 
 private[config] object CacheSettings {
   val CacheProjects = true
-  val CacheCode = true
+  val CacheCode = false
 }

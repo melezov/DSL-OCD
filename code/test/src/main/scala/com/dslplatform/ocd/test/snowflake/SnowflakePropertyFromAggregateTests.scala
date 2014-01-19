@@ -1,6 +1,6 @@
 package com.dslplatform.ocd
 package test
-package aggregate
+package snowflake
 
 import config._
 import types._
@@ -16,7 +16,7 @@ import scalas.OcdScala
 import `test.scalas`.property.TestScalaPropertyFieldType
 import `test.scalas`.TestScalaTemplate
 
-class PrimaryKeyPropertyInAggregateSetup(
+class SnowflakePropertyFromAggregateSetup(
     val propertyType: OcdDsl) {
 
   val PropertyName = propertyType.boxName + (
@@ -28,17 +28,21 @@ class PrimaryKeyPropertyInAggregateSetup(
 
   val propertyName = PropertyName.fcil
 
-  val ModuleName = "PrimaryKeyPropertyInAggregateSetup"
+  val ModuleName = "SnowflakePropertyFromAggregateSetup"
   val AggregateName = UniqueNames(PropertyName)
 
   private val dslPath =
-    s"aggregates/${ModuleName}/${propertyType.typeName}/${AggregateName}.dsl"
+    s"snowflakes/${ModuleName}/${propertyType.typeName}/${AggregateName}.dsl"
 
   private val dslBody =
 s"""module ${ModuleName}
 {
-  aggregate ${AggregateName}(${propertyName}) {
+  aggregate ${AggregateName} {
     ${propertyType.dslName} ${propertyName};
+  }
+
+  snowflake ${AggregateName}Grid from ${AggregateName} {
+    ${propertyName};
   }
 }
 """
@@ -46,11 +50,11 @@ s"""module ${ModuleName}
   val dslFiles = Map(dslPath -> dslBody)
 }
 
-class PrimaryKeyPropertyInAggregateTest(
-    setup: PrimaryKeyPropertyInAggregateSetup
+class SnowflakePropertyFromAggregateTest(
+    setup: SnowflakePropertyFromAggregateSetup
   ) extends ITest {
 
-  val packageName = "com.dslplatform.ocd.aggregates"
+  val packageName = "com.dslplatform.ocd.snowflake"
 
   private val modulePrefix =
     packageName + '.' + setup.ModuleName + '.'
@@ -105,7 +109,7 @@ class PrimaryKeyPropertyInAggregateTest(
 }
 
 
-private object PrimaryKeyPropertyInAggregateTests {
+private object SnowflakePropertyFromAggregateTests {
   val types: IndexedSeq[OcdType] = IndexedSeq(
     `type.Binary`
   , `type.Bool`
@@ -118,19 +122,19 @@ private object PrimaryKeyPropertyInAggregateTests {
   , `type.Image`
   , `type.Integer`
   , `type.Ip`
-//  , `type.Location`  // data type point has no default operator class for access method "btree"
+  , `type.Location`
   , `type.Long`
   , `type.Map`
   , `type.Money`
-//  , `type.Point`     // data type point has no default operator class for access method "btree"
-//  , `type.Rectangle` // data type box has no default operator class for access method "btree"
-//  , `type.S3`        // TODO: Missing implementation
+  , `type.Point`
+  , `type.Rectangle`
+//  , `type.S3`       // TODO: Missing implementation
   , `type.String`
   , `type.String(9)`
   , `type.Text`
   , `type.Timestamp`
   , `type.Url`
-//  , `type.Xml`       // data type xml has no default operator class for access method "btree"
+  , `type.Xml`
   )
 
   val boxes: IndexedSeq[OcdBox] = IndexedSeq(
@@ -141,6 +145,13 @@ private object PrimaryKeyPropertyInAggregateTests {
   , `box.OneListOfNullable`
   , `box.OneSetOfOne`
   , `box.OneSetOfNullable`
+  , `box.Nullable`
+  , `box.NullableArrayOfOne`
+  , `box.NullableArrayOfNullable`
+  , `box.NullableListOfOne`
+  , `box.NullableListOfNullable`
+  , `box.NullableSetOfOne`
+  , `box.NullableSetOfNullable`
   )
 
   val setups = for {
@@ -148,14 +159,14 @@ private object PrimaryKeyPropertyInAggregateTests {
     b <- boxes
     d <- OcdDsl.resolveAll(t, b).take(1) // don't compile aliases
   } yield {
-    new PrimaryKeyPropertyInAggregateSetup(d)
+    new SnowflakePropertyFromAggregateSetup(d)
   }
 }
 
-trait PrimaryKeyPropertyInAggregateTests {
-  import PrimaryKeyPropertyInAggregateTests._
+trait SnowflakePropertyFromAggregateTests {
+  import SnowflakePropertyFromAggregateTests._
 
-  def primaryKeyPropertyInAggregateTests =
+  def snowflakePropertyFromAggregateTests =
     setups.head.ModuleName ->
-    setups.map(new PrimaryKeyPropertyInAggregateTest(_))
+    setups.map(new SnowflakePropertyFromAggregateTest(_))
 }

@@ -1,6 +1,6 @@
 package com.dslplatform.ocd
 package test
-package aggregate
+package calculation
 
 import config._
 import types._
@@ -16,7 +16,7 @@ import scalas.OcdScala
 import `test.scalas`.property.TestScalaPropertyFieldType
 import `test.scalas`.TestScalaTemplate
 
-class PrimaryKeyPropertyInAggregateSetup(
+class CalculatedPropertyInValueSetup(
     val propertyType: OcdDsl) {
 
   val PropertyName = propertyType.boxName + (
@@ -28,17 +28,21 @@ class PrimaryKeyPropertyInAggregateSetup(
 
   val propertyName = PropertyName.fcil
 
-  val ModuleName = "PrimaryKeyPropertyInAggregateSetup"
-  val AggregateName = UniqueNames(PropertyName)
+  val ModuleName = "CalculatedPropertyInValueSetup"
+  val ValueName = UniqueNames(PropertyName)
 
   private val dslPath =
-    s"aggregates/${ModuleName}/${propertyType.typeName}/${AggregateName}.dsl"
+    s"calculations/${ModuleName}/${propertyType.typeName}/${ValueName}.dsl"
 
   private val dslBody =
 s"""module ${ModuleName}
 {
-  aggregate ${AggregateName}(${propertyName}) {
+  value ${ValueName} {
     ${propertyType.dslName} ${propertyName};
+
+    calculated ${propertyType.dslName} calculated${PropertyName} from 'it => it.${propertyName}';
+
+    calculated ${propertyType.dslName} persisted${PropertyName} from 'it => it.${propertyName}' { persisted; }
   }
 }
 """
@@ -46,11 +50,11 @@ s"""module ${ModuleName}
   val dslFiles = Map(dslPath -> dslBody)
 }
 
-class PrimaryKeyPropertyInAggregateTest(
-    setup: PrimaryKeyPropertyInAggregateSetup
+class CalculatedPropertyInValueTest(
+    setup: CalculatedPropertyInValueSetup
   ) extends ITest {
 
-  val packageName = "com.dslplatform.ocd.aggregates"
+  val packageName = "com.dslplatform.ocd.calculation"
 
   private val modulePrefix =
     packageName + '.' + setup.ModuleName + '.'
@@ -60,17 +64,17 @@ class PrimaryKeyPropertyInAggregateTest(
   def javaTests = new TestJavaTemplate {
     def packageName = modulePrefix + setup.propertyType.typeSingleName + "Tests"
 
-    def testName = "Test" + setup.AggregateName
+    def testName = "Test" + setup.ValueName
 
     override def imports = Seq(
-      modulePrefix + setup.AggregateName
+      modulePrefix + setup.ValueName
     )
 
     val javaType = OcdJava.resolve(setup.propertyType)
 
     def tests = Seq(
       new TestJavaPropertyFieldType {
-        def conceptName = setup.AggregateName
+        def conceptName = setup.ValueName
         def propertyName = setup.propertyName
         def propertyType = javaType
       }
@@ -81,7 +85,7 @@ class PrimaryKeyPropertyInAggregateTest(
     def basePackageName = modulePrefix.init
     def testPackageName = setup.propertyType.typeSingleName + "Tests"
 
-    def testName = "Test" + setup.AggregateName
+    def testName = "Test" + setup.ValueName
 
     override def imports = Seq(
       "scala.reflect.runtime.universe._"
@@ -91,7 +95,7 @@ class PrimaryKeyPropertyInAggregateTest(
 
     def tests = Seq(
       new TestScalaPropertyFieldType {
-        def conceptName = setup.AggregateName
+        def conceptName = setup.ValueName
         def propertyName = setup.propertyName
         def propertyType = scalaType
       }
@@ -105,7 +109,7 @@ class PrimaryKeyPropertyInAggregateTest(
 }
 
 
-private object PrimaryKeyPropertyInAggregateTests {
+private object CalculatedPropertyInValueTests {
   val types: IndexedSeq[OcdType] = IndexedSeq(
     `type.Binary`
   , `type.Bool`
@@ -118,19 +122,19 @@ private object PrimaryKeyPropertyInAggregateTests {
   , `type.Image`
   , `type.Integer`
   , `type.Ip`
-//  , `type.Location`  // data type point has no default operator class for access method "btree"
+  , `type.Location`
   , `type.Long`
   , `type.Map`
   , `type.Money`
-//  , `type.Point`     // data type point has no default operator class for access method "btree"
-//  , `type.Rectangle` // data type box has no default operator class for access method "btree"
-//  , `type.S3`        // TODO: Missing implementation
+  , `type.Point`
+  , `type.Rectangle`
+//  , `type.S3`       // TODO: Missing implementation
   , `type.String`
   , `type.String(9)`
   , `type.Text`
   , `type.Timestamp`
   , `type.Url`
-//  , `type.Xml`       // data type xml has no default operator class for access method "btree"
+  , `type.Xml`
   )
 
   val boxes: IndexedSeq[OcdBox] = IndexedSeq(
@@ -141,21 +145,29 @@ private object PrimaryKeyPropertyInAggregateTests {
   , `box.OneListOfNullable`
   , `box.OneSetOfOne`
   , `box.OneSetOfNullable`
+  , `box.Nullable`
+  , `box.NullableArrayOfOne`
+  , `box.NullableArrayOfNullable`
+  , `box.NullableListOfOne`
+  , `box.NullableListOfNullable`
+  , `box.NullableSetOfOne`
+  , `box.NullableSetOfNullable`
   )
 
   val setups = for {
     t <- types
     b <- boxes
+//    if !(t == `type.Money` && b.areElementsNullable == Some(true)) // NullableCollections of Monies don't compile
     d <- OcdDsl.resolveAll(t, b).take(1) // don't compile aliases
   } yield {
-    new PrimaryKeyPropertyInAggregateSetup(d)
+    new CalculatedPropertyInValueSetup(d)
   }
 }
 
-trait PrimaryKeyPropertyInAggregateTests {
-  import PrimaryKeyPropertyInAggregateTests._
+trait CalculatedPropertyInValueTests {
+  import CalculatedPropertyInValueTests._
 
-  def primaryKeyPropertyInAggregateTests =
+  def calculatedPropertyInValueTests =
     setups.head.ModuleName ->
-    setups.map(new PrimaryKeyPropertyInAggregateTest(_))
+    setups.map(new CalculatedPropertyInValueTest(_))
 }

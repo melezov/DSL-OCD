@@ -6,11 +6,11 @@ import config._
 import test._
 import javatest._
 
-class OcdJavaTurtle
+class OcdJavaDefaultsModifiersTurtle
     extends ITestProject {
 
-  def projectPath = "turtles/defaults"
-  def projectName = "OCD Java Defaults Turtle"
+  def projectPath = "turtles/defaults-modifiers"
+  def projectName = "OCD Java Defaults Modifiers Turtle"
 
   def dslFiles = Map.empty
   def testFiles = Map(
@@ -29,8 +29,6 @@ class OcdJavaTurtle
 
       val clazz = oj.javaClass
 
-      override def classDecorations = Seq("""SuppressWarnings({ "serial", "rawtypes", "unchecked" })""")
-
       override def leadingBlocks = s"""
     public static final ${oj.javaClass} defaultValue = ${oj.defaultValue};
 """ +: (oj.nonDefaultValues.zipWithIndex.map { case (ndv, index) => s"""
@@ -43,13 +41,13 @@ class OcdJavaTurtle
     /* Accesses all the static values to ensure that initialization was performed successfully */
     @org.junit.Test
     public void testValues() {""" +
-        (if (oj.defaultValue == "null") { """
+        (if (oj.defaultValue.toString == "null") { """
         org.junit.Assert.assertNull(defaultValue);"""
         }
         else { s"""
         org.junit.Assert.assertNotNull(defaultValue);"""
         }) + (oj.nonDefaultValues.zipWithIndex map { case (ndv, index) =>
-          if (ndv == "null") { s"""
+          if (ndv.toString == "null") { s"""
         org.junit.Assert.assertNull(nonDefaultValue${index + 1});"""
           }
           else { s"""

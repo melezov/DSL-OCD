@@ -11,7 +11,7 @@ import javatest.TestJavaTemplate
 import javatest.JavaInfo
 import javatest.property._
 
-object AggregateWithSurrogatePrimaryKeyAndOnePropertySetup {
+object AggregateWithOnePropertySetup {
   val types: IndexedSeq[OcdType] = IndexedSeq(
     `type.Binary`
   , `type.Bool`
@@ -46,13 +46,6 @@ object AggregateWithSurrogatePrimaryKeyAndOnePropertySetup {
   , `box.OneListOfNullable`
   , `box.OneSetOfOne`
   , `box.OneSetOfNullable`
-  , `box.Nullable`
-  , `box.NullableArrayOfOne`
-  , `box.NullableArrayOfNullable`
-  , `box.NullableListOfOne`
-  , `box.NullableListOfNullable`
-  , `box.NullableSetOfOne`
-  , `box.NullableSetOfNullable`
   )
 
   val setups = for {
@@ -60,11 +53,11 @@ object AggregateWithSurrogatePrimaryKeyAndOnePropertySetup {
     b <- boxes
     d <- OcdDsl.resolveAll(t, b).take(1) // don't compile aliases
   } yield {
-    new AggregateWithSurrogatePrimaryKeyAndOnePropertySetup(d)
+    new AggregateWithOnePropertySetup(d)
   }
 }
 
-class AggregateWithSurrogatePrimaryKeyAndOnePropertySetup(
+class AggregateWithOnePropertySetup(
     val propertyType: OcdDsl) {
 
   val PropertyName = propertyType.boxName + (
@@ -76,7 +69,7 @@ class AggregateWithSurrogatePrimaryKeyAndOnePropertySetup(
 
   val propertyName = PropertyName.fcil
 
-  val ModuleName = "AggregateWithSurrogatePrimaryKeyAndOneProperty"
+  val ModuleName = "AggregateWithOneProperty"
   val AggregateName = UniqueNames(ModuleName, PropertyName)
 
   private val dslPath =
@@ -85,7 +78,7 @@ class AggregateWithSurrogatePrimaryKeyAndOnePropertySetup(
   private val dslBody =
 s"""module ${ModuleName}
 {
-  aggregate ${AggregateName} {
+  aggregate ${AggregateName}(${propertyName}) {
     ${propertyType.dslName} ${propertyName};
   }
 }
@@ -94,12 +87,12 @@ s"""module ${ModuleName}
   val dslFiles = Map(dslPath -> dslBody)
 }
 
-class AggregateWithSurrogatePrimaryKeyAndOnePropertyTestProject(
-    setup: AggregateWithSurrogatePrimaryKeyAndOnePropertySetup
+class AggregateWithOnePropertyTestProject(
+    setup: AggregateWithOnePropertySetup
   ) extends ITestProject {
 
-  def projectPath = "aggregate/surrogate-single-" + setup.AggregateName
-  def projectName = "OCD Single Property in Aggregate With Surrogate Key Tests (" + setup.AggregateName + ")"
+  def projectPath = "aggregate/primary-single-" + setup.AggregateName
+  def projectName = "OCD Single Property in Aggregate Tests (" + setup.AggregateName + ")"
 
   def dslFiles = setup.dslFiles
 
@@ -114,7 +107,7 @@ class AggregateWithSurrogatePrimaryKeyAndOnePropertyTestProject(
 
   private def makeTemplate(oj: OcdJava) = new TestJavaTemplate {
     def packageName = "com.dslplatform.ocd.aggregates"
-    def testName = "AggregateWithSurrogatePrimaryKeyAnd" + setup.PropertyName + "PropertyTest"
+    def testName = "AggregateWith" + setup.PropertyName + "PropertyTest"
 
     override def imports = Seq("java.io.IOException")
 
@@ -177,14 +170,14 @@ class AggregateWithSurrogatePrimaryKeyAndOnePropertyTestProject(
   }
 }
 
-object AggregateWithSurrogatePrimaryKeyAndOnePropertyTestProject {
-  val setups = AggregateWithSurrogatePrimaryKeyAndOnePropertySetup.setups
+object AggregateWithOnePropertyTestProject {
+  val setups = AggregateWithOnePropertySetup.setups
 
   val projects =
     (setups.groupBy(_.propertyType.typeName) map { case (tipe, typeSetups) =>
     new ITestProject {
-      def projectPath = "aggregate/surrogate-single-" + tipe.replaceAll("[^-\\w]+", "")
-      def projectName = "OCD Single Property in Aggregate With Surrogate Key Tests (" + tipe + ")"
+      def projectPath = "aggregate/primary-single-" + tipe.replaceAll("[^-\\w]+", "")
+      def projectName = "OCD Single Property in Aggregate Tests (" + tipe + ")"
 
       val dslFiles =
         typeSetups.foldLeft(new MFiles){ _ ++= _.dslFiles }.toMap
@@ -192,7 +185,7 @@ object AggregateWithSurrogatePrimaryKeyAndOnePropertyTestProject {
       val testFiles = {
         val testFilesBuilder = new MMap[Language, MFiles]
 
-        typeSetups.map(new AggregateWithSurrogatePrimaryKeyAndOnePropertyTestProject(_)) foreach { project =>
+        typeSetups.map(new AggregateWithOnePropertyTestProject(_)) foreach { project =>
           project.testFiles foreach { case (language, testFiles) =>
             testFilesBuilder.getOrElse(language, {
               val mFiles = new MFiles

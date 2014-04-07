@@ -1,79 +1,40 @@
 package com.dslplatform.ocd
 package test
-package aggregate
+package aggregates
 
 import types._
 import boxes._
 import dsls.OcdDsl
 import javas.OcdJava
+
 import config.ITestProject
-import javatest.TestJavaTemplate
-import javatest.JavaInfo
+
+import javatest._
 import javatest.property._
 
 object AggregateWithOnePropertySetup {
-  val types: IndexedSeq[OcdType] = IndexedSeq(
-    `type.Binary`
-  , `type.Bool`
-  , `type.Date`
-  , `type.Decimal`
-  , `type.Decimal(9)`
-  , `type.Double`
-  , `type.Float`
-  , `type.Guid`
-//  , `type.Image`
-  , `type.Integer`
-  , `type.Ip`
-  , `type.Location`
-  , `type.Long`
-  , `type.Map`
-  , `type.Money`
-  , `type.Point`
-  , `type.Rectangle`
-  , `type.String`
-  , `type.String(9)`
-  , `type.Text`
-  , `type.Timestamp`
-  , `type.Url`
-  , `type.Xml`
-  )
-
-  val boxes: IndexedSeq[OcdBox] = IndexedSeq(
-    `box.One`
-  , `box.OneArrayOfOne`
-  , `box.OneArrayOfNullable`
-  , `box.OneListOfOne`
-  , `box.OneListOfNullable`
-  , `box.OneSetOfOne`
-  , `box.OneSetOfNullable`
-  )
-
   val setups = for {
-    t <- types
-    b <- boxes
-    d <- OcdDsl.resolveAll(t, b).take(1) // don't compile aliases
+    t <- OcdType.useCaseValues
+    b <- OcdBox.values
+    if !b.isNullable                                // Primary keys cannot be nullable
+    if b.collectionType != Some(CollectionType.Set) // URIs from Set PKs are currently behaving erratically
+    d = OcdDsl.resolve(t, b)
   } yield {
     new AggregateWithOnePropertySetup(d)
   }
 }
 
 class AggregateWithOnePropertySetup(
-    val propertyType: OcdDsl) {
+    val propertyType: OcdDsl) extends TestSetup {
 
-  val PropertyName = propertyType.boxName + (
-    if (propertyType.areElementsNullable.isEmpty)
-      propertyType.typeSingleName
-    else
-      propertyType.typePluralName
-  )
-
+  val PropertyName = propertyType.typeDescription
   val propertyName = PropertyName.fcil
 
   val ModuleName = "AggregateWithOneProperty"
-  val AggregateName = UniqueNames(ModuleName, PropertyName)
+  val AggregateName = "RootWith" + PropertyName
 
   private val dslPath =
-    s"aggregates/${ModuleName}/${propertyType.typeName}/${AggregateName}.dsl"
+    s"aggregates/${ModuleName}/${propertyType.safeTypeName}/${AggregateName}.dsl"
 
   private val dslBody =
 s"""module ${ModuleName}
@@ -91,21 +52,21 @@ class AggregateWithOnePropertyTestProject(
     setup: AggregateWithOnePropertySetup
   ) extends ITestProject {
 
-  def projectPath = "aggregate/primary-single-" + setup.AggregateName
-  def projectName = "OCD Single Property in Aggregate Tests (" + setup.AggregateName + ")"
+  def projectPath = "aggregates/primary-single-" + setup.AggregateName
+  def projectName = "OCD Single PK Property in Aggregate Tests (" + setup.AggregateName + ")"
 
   def dslFiles = setup.dslFiles
 
   def testFiles = Map(
     JAVA -> Map{
       val javaType = OcdJava.resolve(setup.propertyType)
-      val template = makeTemplate(javaType)
+      val template = makeJavaTemplate(javaType)
       val body = template.testBody
       JavaInfo(body).toEntry
     }
   )
 
-  private def makeTemplate(oj: OcdJava) = new TestJavaTemplate {
+  private def makeJavaTemplate(oj: OcdJava) = new TestJavaTemplate {
     def packageName = "com.dslplatform.ocd.aggregates"
     def testName = "AggregateWith" + setup.PropertyName + "PropertyTest"
 
@@ -194,32 +155,15 @@ class AggregateWithOnePropertyTestProject(
 }
 
 object AggregateWithOnePropertyTestProject {
-  val setups = AggregateWithOnePropertySetup.setups
+  private val setups = AggregateWithOnePropertySetup.setups
 
   val projects =
-    (setups.groupBy(_.propertyType.typeName) map { case (tipe, typeSetups) =>
-    new ITestProject {
-      def projectPath = "aggregate/primary-single-" + tipe.replaceAll("[^-\\w]+", "")
-      def projectName = "OCD Single Property in Aggregate Tests (" + tipe + ")"
-
-      val dslFiles =
-        typeSetups.foldLeft(new MFiles){ _ ++= _.dslFiles }.toMap
-
-      val testFiles = {
-        val testFilesBuilder = new MMap[Language, MFiles]
-
-        typeSetups.map(new AggregateWithOnePropertyTestProject(_)) foreach { project =>
-          project.testFiles foreach { case (language, testFiles) =>
-            testFilesBuilder.getOrElse(language, {
-              val mFiles = new MFiles
-              testFilesBuilder(language) = mFiles
-              mFiles
-            }) ++= testFiles
-          }
-        }
-
-        testFilesBuilder.map(e => e.copy(_2 = e._2.toMap)).toMap
+    (setups.groupBy(_.propertyType.safeTypeName) map { case (tipe, typeSetups) =>
+      new ITestProject {
+        def projectPath = "aggregates/primary-single-" + tipe
+        def projectName = "OCD Single PK Property in Aggregate Tests (" + tipe + ")"
+        val dslFiles = typeSetups.dslFiles
+        val testFiles = typeSetups.map(new AggregateWithOnePropertyTestProject(_)).testFiles
       }
-    }
-  }) toSeq
+    }) toSeq
 }

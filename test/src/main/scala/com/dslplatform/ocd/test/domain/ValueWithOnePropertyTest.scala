@@ -1,9 +1,8 @@
 package com.dslplatform.ocd
 package test
-package values
+package domain
 
-import config.ITestProject
-
+import config._
 import types._
 import boxes._
 import dsls._
@@ -26,11 +25,12 @@ class ValueWithOnePropertySetup(
     val propertyType: OcdDslBoxType
   ) extends TestSetup {
 
-  def valueComment = "ValueWith" + propertyType.dslDesc
-
   def ModuleName = "ValueSingle" + propertyType.typeNameSafe
-  def ValueName = "V" + propertyType.dslDescShort
-  def propertyName = "p" + propertyType.dslDescShort
+  def valueComment = "ValueWith" + propertyType.dslDesc + "Property"
+
+  def shortName = propertyType.dslDescShort
+  def ValueName = "V" + shortName
+  def propertyName = "p" + shortName
   def PropertyName = propertyName.fciu
 
   private val dslPath = s"values/${ModuleName}/${ValueName}.dsl"
@@ -53,7 +53,7 @@ class ValueWithOnePropertyTestProject(
   ) extends ITestProject {
 
   def projectPath = "values/value-single-" + setup.ValueName
-  def projectName = "OCD Value with Single Property Tests (" + setup.ValueName + ")"
+  def projectName = s"OCD Value with Single Property Tests (${setup.ValueName})"
 
   def dslFiles = setup.dslFiles
 
@@ -84,31 +84,27 @@ class ValueWithOnePropertyTestProject(
 """)
 
     val valueConcept = "ocd." + setup.ModuleName + "." + setup.ValueName
+    val javaProperty = OcdJavaBoxTypeProperty(setup.propertyName, ojbt)
 
     override def tests = Seq(
       new TestJavaPropertyFieldType {
         def conceptName = valueConcept
-        def property = OcdJavaBoxTypeProperty(setup.propertyName, ojbt)
+        def property = javaProperty
         def visibility = Visibility.Private
-        def modifiers = Set.empty
       }
     , new TestJavaPropertyGetterType {
         def conceptName = valueConcept
-        def property = OcdJavaBoxTypeProperty(setup.propertyName, ojbt)
+        def property = javaProperty
         def visibility = Visibility.Public
-        def modifiers = Set.empty
       }
     , new TestJavaPropertySetterType {
         def conceptName = valueConcept
-        def property = OcdJavaBoxTypeProperty(setup.propertyName, ojbt)
+        def property = javaProperty
         def visibility = Visibility.Public
-        def modifiers = Set.empty
       }
     , new TestJavaPropertyInValue {
         def conceptName = valueConcept
-        def property = OcdJavaBoxTypeProperty(setup.propertyName, ojbt)
-        def visibility = Visibility.Public
-        def modifiers = Set.empty
+        def property = javaProperty
         def isDefault = true
         def testID = "Default"
         def testValue = ojbt.defaultValue
@@ -116,9 +112,7 @@ class ValueWithOnePropertyTestProject(
     ) ++ ojbt.nonDefaultValues.zipWithIndex.map { case (ndv, index) =>
       new TestJavaPropertyInValue {
         def conceptName = valueConcept
-        def property = OcdJavaBoxTypeProperty(setup.propertyName, ojbt)
-        def visibility = Visibility.Public
-        def modifiers = Set.empty
+        def property = javaProperty
         def isDefault = false
         def testID = "NonDefault" + (index + 1)
         def testValue = ndv
@@ -134,7 +128,7 @@ object ValueWithOnePropertyTestProject {
     (setups.groupBy(_.propertyType.typeNameSafe) map { case (typeNameSafe, typeSetups) =>
     new ITestProject {
       def projectPath = "values/value-single-" + typeNameSafe
-      def projectName = "OCD Value with Single Property Tests (" + typeNameSafe + ")"
+      def projectName = s"OCD Value with Single Property Tests (${typeNameSafe})"
       val dslFiles = typeSetups.dslFiles
       val testFiles = typeSetups.map(new ValueWithOnePropertyTestProject(_)).testFiles
     }

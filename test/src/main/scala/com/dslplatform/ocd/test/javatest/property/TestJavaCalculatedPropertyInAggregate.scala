@@ -6,7 +6,7 @@ package property
 import types._
 import javas._
 
-trait TestJavaPropertyInAggregate
+trait TestJavaCalculatedPropertyInAggregate
     extends TestComponentWithProperty {
 
   def testID: String
@@ -14,51 +14,25 @@ trait TestJavaPropertyInAggregate
   def testValue: JavaValue
   def setupBlock: String = ""
 
+  def clonePropertyName: String
+  val ClonePropertyName = clonePropertyName.fciu
+
   def testComponentBody = (
-    jsonSerializationTest
-  + (!isDisallowed(isDefault)).ifTrue(activeRecordPersistTest)
+    (!isDisallowed(isDefault)).ifTrue(activeRecordPersistTest)
   )
 
   private def assertEquals(target: String) = property match {
     case _ if isDisallowed(isDefault) =>
       s"""// special null check for dissalowed null value in a non-nullable property
-        org.junit.Assert.assertNull(${target}.get${PropertyName}());"""
+        org.junit.Assert.assertNull(${target});"""
 
     case p: OcdJavaBoxTypeProperty =>
       s"""com.dslplatform.ocd.javaasserts.${p.boxType.typeSingleName}Asserts.assert${p.box.boxName}Equals(
                 testValue,
-                ${target}.get${PropertyName}());"""
+                ${target});"""
 
     case _ => ???
   }
-
-  def jsonSerializationTest = s"""
-    /* Testing the "${propertyName}" ${testID} aggregate property JSON serialization */
-    @org.junit.Test
-    public void test${PropertyName}${testID}PropertyInAggregateJsonSerialization() throws java.io.IOException {${isDefault match {
-           case true => s"""
-        final ${conceptName} aggregate =
-                new ${conceptName}();
-        final ${propertyType.javaClass} testValue = aggregate.get${PropertyName}();"""
-
-           case _ => s"""
-        final ${propertyType.javaClass} testValue = ${testValue};
-        final ${conceptName} aggregate =
-                new ${conceptName}()
-                .set${PropertyName}(testValue);"""}}
-
-        // check that the property was properly assigned
-        ${assertEquals("aggregate")}
-
-        final String serialized = com.dslplatform.client.JsonSerialization.serialize(aggregate);
-        final ${conceptName} aggregateDeserialized = jsonSerialization.deserialize(
-                com.dslplatform.client.JsonSerialization.buildType(${conceptName}.class),
-                serialized);
-
-        // check that the property was properly deserialized
-        ${assertEquals("aggregateDeserialized")}
-    }
-"""
 
   def activeRecordPersistTest = s"""
     /* Testing the "${propertyName}" ${testID} property value after active record persist */
@@ -81,14 +55,17 @@ trait TestJavaPropertyInAggregate
         // check that the property retrieved from revenj (persist will mutate the aggregate)
         ${assertEquals(s"aggregate.get${PropertyName}()")}
 
-        final ${conceptName} aggregateFound =
-                ${conceptName}.find(aggregate.getURI());
+        // check the calculated property clone
+        ${assertEquals(s"aggregate.get${ClonePropertyName}()")}
 
         final ${conceptName} aggregateFound =
                 ${conceptName}.find(aggregate.getURI());
 
         // check the property retrieved from the database
-        ${assertEquals("aggregateFound")}
+        ${assertEquals(s"aggregateFound.get${PropertyName}()")}
+
+        // ditto for the calculated property clone
+        ${assertEquals(s"aggregateFound.get${ClonePropertyName}()")}
 
         // aggregates are compared via URI equality - both URIs have be initialized at this point
         org.junit.Assert.assertEquals(aggregate, aggregateFound);

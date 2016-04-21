@@ -7,8 +7,6 @@
   <property name="java.test.dir" location="src/test/java" />
   <property name="resources.test.dir" location="src/test/resources" />
 
-  <property name="revenj.exe.name" value="Revenj.Http.exe" />
-
   <property name="client.tmp" location="client.tmp" />
   <property name="server.tmp" location="server.tmp" />
   <property name="migration.tmp" location="migration.tmp" />

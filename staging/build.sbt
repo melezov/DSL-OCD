@@ -5,7 +5,7 @@ libraryDependencies ++= Seq(
   "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3-1"
 , "com.github.nscala-time"        %% "nscala-time"   % "2.12.0"
 
-, "com.typesafe.scala-logging" %% "scala-logging"  % "3.1.0" 
+, "com.typesafe.scala-logging" %% "scala-logging"  % "3.1.0"
 , "ch.qos.logback"             % "logback-classic" % "1.1.7"
 )
 

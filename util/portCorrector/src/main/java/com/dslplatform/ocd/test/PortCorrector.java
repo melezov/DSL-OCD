@@ -3,9 +3,7 @@ package com.dslplatform.ocd.test;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * An ad-hoc class to be used at runtime to check if any of the predefined ports
@@ -13,7 +11,9 @@ import java.util.Properties;
  */
 public class PortCorrector {
 
-	private static final Map<String, Integer> sequences = new HashMap<String, Integer>();
+	private static final Random random = new Random();
+	private final String propertiesFilename;
+	private final Properties props;
 
 	public static void main(String[] args) throws Exception {
 		if(args.length <1) {
@@ -22,31 +22,36 @@ public class PortCorrector {
 		}
 
 		String propertiesFilename = args[0];
-		Properties props = new Properties();
-		props.load(new FileInputStream(propertiesFilename));
 
-		new PortCorrector().sanitizePorts(props);
-
-		props.store(new java.io.FileOutputStream(propertiesFilename), "Generated mappings for project names to their server ports.");
+		new PortCorrector(propertiesFilename).sanitizePorts();
 	}
 
-	private void sanitizePorts(Properties props) {
-		maximizeSequences(props);
+	public PortCorrector(String propertiesFilename) throws IOException {
+		this.propertiesFilename = propertiesFilename;
+		this.props = new Properties();
+		props.load(new FileInputStream(propertiesFilename));
+	}
 
+	private void sanitizePorts() throws IOException {
 		Map<String, String> newValues = new HashMap<String, String>();
+		Set<String> encountered = new HashSet<String>();
 		for(Object key : props.keySet()) {
 			try {
 				String projectShortName = projectShortName(props, (String) key);
 				String host = host(props, (String) key);
 				Integer port = port(props, (String) key);
+				Integer oldPort = port;
 				if(eitherNull(projectShortName, host, port)) continue;
 
-				if(!portIsFree(host, port)) {
-					while (!portIsFree(host, port)) {
-						port = nextFreePort(projectShortName);
+				if(encountered.contains(projectShortName)) continue;
+				encountered.add(projectShortName);
+
+				if(!portIsFree(projectShortName, host, port)) {
+					while (!portIsFree(projectShortName, host, port)) {
+						port = freeRandomPort(projectShortName, host);
 					}
-					System.out.println("Port clash detected. New port for project: " + projectShortName + " is " + port);
-					newValues.put(projectShortName+".revenjHost", port.toString());
+					System.out.println("Port clash detected. Port for project: " + projectShortName + " at host: " + host + " changed from: " + oldPort + " to " + port);
+					newValues.put(projectShortName+".revenjPort", port.toString());
 				}
 			} catch(Exception e) {
 				continue;
@@ -54,10 +59,29 @@ public class PortCorrector {
 		}
 
 		props.putAll(newValues);
-
+		props.store(new java.io.FileOutputStream(propertiesFilename), "Generated mappings for project names to their server ports.");
 	}
 
-	private static boolean portIsFree(String host, int port) {
+	private boolean portIsFree(String projectShortName, String host, int port) {
+		return portIsNotReservedInOCDConfig(projectShortName, host, port)
+				&& socketIsFree(host, port);
+	}
+
+	private boolean portIsNotReservedInOCDConfig(String projectShortName, String host, int port) {
+		for(Map.Entry<Object, Object> e : props.entrySet()) {
+			String key = (String) e.getKey();
+			String value = (String) e.getValue();
+			if(!projectShortName.equals(projectShortName(props, key))
+					&& host.equals(host(props, key))
+					&& port == port(props, key)) {
+				// Port is reserved
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean socketIsFree(String host, int port) {
 		Socket s = null;
 		try {
 			s = new Socket(host, port);
@@ -75,36 +99,11 @@ public class PortCorrector {
 		}
 	}
 
-	private void maximizeSequences(Properties props) {
-		for(Map.Entry<Object, Object> e : props.entrySet()) {
-			try {
-				String key = (String) e.getKey();
-				String value = (String) e.getValue();
-
-				String projectShortName = projectShortName(props, key);
-				String host = host(props, key);
-				Integer port = port(props, key);
-				if(eitherNull(projectShortName, host, port)) continue;
-				sequences.put(projectShortName, Math.max(nextFreePort(host), port));
-
-			} catch(Exception ex) {
-				continue;
-			}
-		}
-	}
-
-	private static int nextFreePort(String projectShortName) {
-		if(!sequences.containsKey(projectShortName))
-			sequences.put(projectShortName, 10000);
-
-		int sequence = sequences.get(projectShortName);
-		if(portIsFree(projectShortName, sequence)) {
-			sequences.put(projectShortName, sequence + 1);
-			return sequence;
-		} else {
-			sequences.put(projectShortName, sequence + 1);
-			return nextFreePort(projectShortName);
-		}
+	private int freeRandomPort(String projectShortName, String host) {
+		int nextPort = random.nextInt(10000) + 10000;
+		if(portIsFree(projectShortName, host, nextPort))
+			return nextPort;
+		return freeRandomPort(projectShortName, host);
 	}
 
 	private static String projectShortName(Properties props, String key) {

@@ -14,7 +14,7 @@ trait TestJavaTemplate {
 
   def isSuite = this match { case _: TestSuiteCreator => true; case _ => false }
 
-  def testBody = {
+  def testBody: String = {
     val sb = new StringBuilder
 
     sb ++= "package " ++= packageName ++= ";\n\n"

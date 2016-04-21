@@ -86,6 +86,7 @@ private[config] class TestDeployer(
       classOf[TestDeployer].getResourceAsStream("/placeholder.dsl"))
 
     private def deployDsl(): Unit = {
+      logger.trace("Deploying dsl...")
       val dsls = testProject.dslFiles
 
       // ugly hack to make turtles compile (doesn't work with empty DSL)
@@ -102,6 +103,7 @@ private[config] class TestDeployer(
     }
 
     private def deployGenerated(): Unit =
+      logger.trace("Deploying generated files...")
       testProject.testFiles foreach { case (language, files) =>
         val generatedRoot = generatedCode(language)
         if (!generatedRoot.exists) {
@@ -117,6 +119,7 @@ private[config] class TestDeployer(
      }
 
     private def deployMain(): Unit =
+      logger.trace("Deploying main code...")
       testProject.testFiles foreach { case (language, files) =>
         val mainRoot = mainCode(language)
         if (!mainRoot.exists) {
@@ -132,6 +135,7 @@ private[config] class TestDeployer(
       }
 
     private def cleanTests(): Unit = {
+      logger.trace("Cleaning tests...")
       val languages = testProject.testFiles.keys.toSet
 
       languages foreach { language =>
@@ -145,7 +149,8 @@ private[config] class TestDeployer(
       }
     }
 
-    private def deployTests(): Unit =
+    private def deployTests(): Unit = {
+      logger.trace("Deploying tests...")
       testProject.testFiles foreach { case (language, files) =>
         val languageRoot = testRoot(language)
 
@@ -153,7 +158,9 @@ private[config] class TestDeployer(
         val suite = JavaInfo(
           new TestSuiteCreator {
             def packageName = "com.dslplatform.ocd.test"
+
             def testName = testProject.ProjectNameCamel
+
             def testClasses = classes
           } testBody
         )
@@ -161,7 +168,7 @@ private[config] class TestDeployer(
         val suiteWithTests = files + suite.toEntry
 
         suiteWithTests.par foreach { case (filename, body) =>
-          val path = languageRoot / (filename, '/')
+          val path = languageRoot /(filename, '/')
           logger.trace("Deploying test: " + path.path)
           path.write(Patches.fixTests(body))
         }
@@ -170,24 +177,26 @@ private[config] class TestDeployer(
         logger.trace("Creating the test resource path: " + resourcePath.path)
         resourcePath.createDirectory(true, false)
 
-        {
-          val resourceLogback = resourcePath / "logback-test.xml"
-          logger.trace("Writing logback-test.xml: " + resourceLogback.path)
-          val logbackBody = applyTemplates(IOUtils.toString(
-                classOf[TestDeployer].getResourceAsStream("/template.logback-test.xml")))
-          resourceLogback.write(logbackBody)
-        }
-        {
-          val resourceDslProjectIni = testResources(language) / DSL_PROJECT_INI
-          logger.trace(s"Writing $DSL_PROJECT_INI: " + resourceDslProjectIni.path)
-          val dslProjectIniBody = applyTemplates(IOUtils.toString(
-                classOf[TestDeployer].getResourceAsStream(s"/template.$DSL_PROJECT_INI")));
-          resourceDslProjectIni.write(dslProjectIniBody)
-        }
+      {
+        val resourceLogback = resourcePath / "logback-test.xml"
+        logger.trace("Writing logback-test.xml: " + resourceLogback.path)
+        val logbackBody = applyTemplates(IOUtils.toString(
+          classOf[TestDeployer].getResourceAsStream("/template.logback-test.xml")))
+        resourceLogback.write(logbackBody)
       }
+      {
+        val resourceDslProjectIni = testResources(language) / DSL_PROJECT_INI
+        logger.trace(s"Writing $DSL_PROJECT_INI: " + resourceDslProjectIni.path)
+        val dslProjectIniBody = applyTemplates(IOUtils.toString(
+          classOf[TestDeployer].getResourceAsStream(s"/template.$DSL_PROJECT_INI")));
+        resourceDslProjectIni.write(dslProjectIniBody)
+      }
+      }
+    }
 
     private def deployCompilerScript(): Unit =
       testProject.testFiles.keys foreach { case language =>
+        logger.trace("Deploying compiler scripts for language: " + language)
         val languageRoot = languageProjectRoot(language)
         language match {
           case JAVA =>
@@ -198,6 +207,7 @@ private[config] class TestDeployer(
       }
 
     private def copyTemplate(scriptName: String, target: Path, permissions: PosixFilePermission*) = {
+        logger.trace("Copying templates...")
         val path = target / scriptName
         logger.trace("Creating the " + scriptName + " script: " + path.path)
 
@@ -218,6 +228,7 @@ private[config] class TestDeployer(
     private val JarExpansion = """(.*?path=")(.*)/\*\*\.jar(".*)""".r
 
     private def deployEclipseProject(): Unit = {
+      logger.trace("Deploying the eclipse project...")
       testProject.testFiles.keys foreach { case language =>
         val languageRoot = languageProjectRoot(language)
 
@@ -242,7 +253,7 @@ private[config] class TestDeployer(
               (classpathBody.split("\n") map {
                 case JarExpansion(before, path, after) =>
                   val src = if (path == "#{toolsPath}/lib") "lib" else path
-                  ((templateToolsPath / src ** "*.jar").toSeq map { jar =>
+                  ((templateToolsPath / Path.fromString(src) ** "*.jar").toSeq map { jar =>
                     before + path + '/' + jar.name + after
                   }).sorted.mkString("\n")
 
@@ -286,8 +297,8 @@ private[config] class TestDeployer(
         , "dbPassword" -> "ocdpassword"
         , "dbOwner" -> "postgres"
         , "dbOwnerPassword" -> "ocdpassword"
-        , "revenjHost" -> "127.0.0.1" // "[::1]"
-        , "revenjPort" -> projectNamesAndPortsRepository.generateProjectRevenjPort(projectShortName, "127.0.0.1").toString()
+        , "serverHost" -> "127.0.0.1" // "[::1]"
+        , "serverPort" -> projectNamesAndPortsRepository.generateProjectRevenjPort(projectShortName, "127.0.0.1").toString()
         , "toolsPath" -> (testSettings.workspace.path.path.replace('\\', '/') + "/tools")
         , "dslSource" -> dslSource.path
         , "revenjPath" -> revenjConfigTemplateTargetPath.path
@@ -304,43 +315,37 @@ private[config] class TestDeployer(
    * Copy the static tools resources common to all generated projects to the target directory
    */
   private def copyStatic() {
-      // Copy the tools resources
-      val toolsTargetDir = new java.io.File((toolsTargetPath).toURI)
+      logger.trace("Copying the static tools and resources...")
 
+      logger.trace("Copying the tools resources...")
+      val toolsTargetDir = new java.io.File((toolsTargetPath).toURI)
       if (!toolsTargetPath.exists) {
           logger.trace("Creating the tools target path: " + toolsTargetPath.path)
           toolsTargetPath.createDirectory(true, false)
         }
-
       if(!configTargetPath.exists) {
           logger.trace("Creating the config target path: " + configTargetPath.path)
           configTargetPath.createDirectory(true, false)
       }
-
       copyPath(templateToolsPath.jfile.toPath, toolsTargetDir.toPath)
 
-      /* Copy the xsl sheets for JUnit report transformation: */
-      val xslTemplateDir = new java.io.File(classOf[TestDeployer].getResource("/template.report").toURI)
-      val xslTargetDir = new java.io.File((root / "report").toURI)
-      copyPath(xslTemplateDir.toPath, xslTargetDir.toPath)
-
-      // Copy the master build.xml
+      logger.trace("Copying the master build.xml...")
       val masterReportBuilder = new java.io.File(classOf[TestDeployer].getResource("/template.master-build.xml").toURI)
       val masterReportBuilderTarget = new java.io.File((root / "build.xml").toURI)
       copyPath(masterReportBuilder.toPath, masterReportBuilderTarget.toPath)
 
-      // Copy the macrodef.xml
+      logger.trace("Copying the macrodef.xml...")
       val macrodef = new java.io.File(classOf[TestDeployer].getResource("/template.macrodef.xml").toURI)
       val macrodefTarget = new java.io.File((root / "macrodef.xml").toURI)
       copyPath(macrodef.toPath, macrodefTarget.toPath)
 
-      // Copy the common build template file
+      logger.trace("Copying the common build template...")
       val commonBuildTemplateName = s"/template.build-common-template-${testSettings.revenj.templateName}-${testSettings.database.templateName}.xml"
       val commonTemplate = new java.io.File(classOf[TestDeployer].getResource(commonBuildTemplateName).toURI)
       val commonTemplateTarget = new java.io.File((root / "build-common-template.xml").toURI)
       copyPath(commonTemplate.toPath, commonTemplateTarget.toPath)
 
-      // Copy the revenj config template file
+      logger.trace("Copying the Revenj configuration template...")
       val revenjConfigTemplate = new java.io.File(classOf[TestDeployer].getResource(s"/template.revenj.${testSettings.database.templateName}/${testSettings.revenj.configName}").toURI)
       val revenjConfigTemplateTarget = new java.io.File((configTargetPath / testSettings.revenj.configName).toURI)
       copyPath(revenjConfigTemplate.toPath, revenjConfigTemplateTarget.toPath)
@@ -352,6 +357,7 @@ private[config] class TestDeployer(
   }
 
   def deployTests(tests: Seq[ITestProject]): Unit = {
+    logger.trace("Deploying tests...")
     val projectNamesAndPortsRepository = new ProjectNamesAndPortsRepository(logger, testSettings)
     copyStatic()
     tests.par foreach(new TestSetup(_, projectNamesAndPortsRepository).deploy())
@@ -380,6 +386,7 @@ private class CopyDirVisitor(logger: Logger, sourcePath: java.nio.file.Path, tar
       }
 
       if (!SystemUtils.IS_OS_WINDOWS) {
+        // TODO: Check if this whole block is obsolete, and remove if so indeed
         val perms = Files.getPosixFilePermissions(file)
         /* TODO: Fix, for some reason the 'executable' permissions are never retrieved here, rendering all
          * binaries copied non-executable. As a quickfix we try a chmod in the script, but it ought to be done here.
@@ -400,6 +407,7 @@ private class CopyDirVisitor(logger: Logger, sourcePath: java.nio.file.Path, tar
  * On the first run the mappings are persisted in an on-disk .properties file.
  */
 private class ProjectNamesAndPortsRepository(logger: Logger, testSettings: ITestSettings) {
+  // TODO: Move this class into the portCorrector and reference as external library
   val propertiesSourceFile = testSettings.workspace.path / "projectNamesAndPortsRepository.properties"
   var portSequence = 10000
 
@@ -419,12 +427,12 @@ private class ProjectNamesAndPortsRepository(logger: Logger, testSettings: ITest
   }
 
   def generateProjectRevenjPort(projectShortName: String, projectHost: String) = {
-    this.props.setProperty(projectShortName + ".revenjHost", projectHost);
+    this.props.setProperty(projectShortName + ".host", projectHost);
     if(this.props.containsKey(projectShortName)) {
-      this.apply(projectShortName + ".revenjPort");
+      this.apply(projectShortName + ".port");
     }else{
       this.portSequence += 1
-      this.update(projectShortName + ".revenjPort", portSequence)
+      this.update(projectShortName + ".port", portSequence)
       this.portSequence
     }
   }

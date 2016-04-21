@@ -7,9 +7,9 @@
   <classpathentry kind="src" path="src/test/java"/>
   <classpathentry kind="src" path="src/test/resources"/>
 
-  <classpathentry kind="lib" path="java_client/**.jar"/>
-
-  <classpathentry kind="lib" path="#{toolsPath}/lib/**.jar"/>
+  <classpathentry kind="lib" path="build/**.jar"/>
+  <classpathentry kind="lib" path="compile/java_client/**.jar"/>
+  <classpathentry kind="lib" path="compile/revenj.java/**.jar"/>
 
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
   <classpathentry kind="output" path="target"/>

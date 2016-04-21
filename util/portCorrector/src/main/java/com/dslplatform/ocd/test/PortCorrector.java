@@ -51,7 +51,7 @@ public class PortCorrector {
 						port = freeRandomPort(projectShortName, host);
 					}
 					System.out.println("Port clash detected. Port for project: " + projectShortName + " at host: " + host + " changed from: " + oldPort + " to " + port);
-					newValues.put(projectShortName+".revenjPort", port.toString());
+					newValues.put(projectShortName+".port", port.toString());
 				}
 			} catch(Exception e) {
 				continue;
@@ -108,11 +108,11 @@ public class PortCorrector {
 
 	private static String projectShortName(Properties props, String key) {
 		String projectShortName = null;
-		if(key.endsWith(".revenjHost")) {
-			projectShortName = key.replaceAll("\\.revenjHost$", "");
+		if(key.endsWith(".host")) {
+			projectShortName = key.replaceAll("\\.host$", "");
 		}
-		if(key.endsWith(".revenjPort")) {
-			projectShortName = key.replaceAll("\\.revenjPort$", "");
+		if(key.endsWith(".port")) {
+			projectShortName = key.replaceAll("\\.port$", "");
 		}
 		return projectShortName;
 	}
@@ -120,13 +120,13 @@ public class PortCorrector {
 	private static String host(Properties props, String key) {
 		String projectShortName = projectShortName(props, key);
 		if(projectShortName == null) return null;
-		return (String) props.get(projectShortName + ".revenjHost");
+		return (String) props.get(projectShortName + ".host");
 	}
 
 	private static Integer port(Properties props, String key) {
 		String projectShortName = projectShortName(props, key);
 		if(projectShortName == null) return null;
-		return Integer.parseInt((String) props.get(projectShortName + ".revenjPort"));
+		return Integer.parseInt((String) props.get(projectShortName + ".port"));
 	}
 
 	private static boolean eitherNull(Object ... objs) {

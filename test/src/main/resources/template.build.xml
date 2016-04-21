@@ -6,12 +6,12 @@
   <property name="testName" value="com.dslplatform.ocd.test.#{ProjectNameCamel}" />
 
   <property name="dbName" value="#{dbName}" />
-  <property name="revenjHost" value="#{revenjHost}" />
-  <property name="revenjPort" value="#{revenjPort}" />
+  <property name="serverHost" value="#{revenjHost}" />
+  <property name="serverPort" value="#{revenjPort}" />
 
   <filter token="dbName" value="${dbName}" />
-  <filter token="revenjHost" value="${revenjHost}" />
-  <filter token="revenjPort" value="${revenjPort}" />
+  <filter token="serverHost" value="${serverHost}" />
+  <filter token="serverPort" value="${serverPort}" />
 
   <property name="tools" location="../../../tools" />
 

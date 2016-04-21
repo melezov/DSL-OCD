@@ -1,7 +1,7 @@
 package com.dslplatform.ocd
 package config
 
-private[config] class TestSettingsLoader(logger: Logger) {
+private[config] class TestSettings(logger: Logger) {
   def load(relativePath: String) = {
     val testIni = Path(
       sys.props("user.home")
@@ -19,16 +19,32 @@ private[config] class TestSettingsLoader(logger: Logger) {
         props
       }
 
-    val settings = new ITestSettings {
-      val workspace = {
-        val workspace = properties getProperty "test-projects"
-        logger.debug("Reading test workspace: " + workspace)
-        require(workspace ne null, "Workspace could not be read!")
-        Workspace(workspace)
-      }
+    def fromPath(path: String): Path = Path(new java.io.File(path).getAbsoluteFile)
 
+    val settings = new ITestSettings {
       val xkcd = XKCD.now
       logger.debug("Test XKCD: " + xkcd)
+
+      val workspace = {
+        val tmp = properties getProperty "test-projects"
+        require(tmp ne null, "Workspace could not be read!")
+        val path = fromPath(tmp)
+        logger.debug("Read test workspace path: " + path)
+        Workspace(path)
+      }
+
+      val templates = {
+        val tmp = properties getProperty "test-projects"
+        tmp match {
+          case null =>
+            val path = workspace / ".." / "templates" path;
+            logger.warn("Templates path is not defined, deriving from workspace: " + path.path)
+            path
+          case path =>
+            logger.debug("Read templates path: " + path)
+            fromPath(path)
+        }
+      }
 
       val revenj = Revenj.find(properties getProperty "targetRevenj")
       logger.debug("Target Revenj: " + revenj)

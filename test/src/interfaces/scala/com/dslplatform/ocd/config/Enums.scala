@@ -10,7 +10,7 @@ trait EnumObj[T <: Enum] {
   val values: IndexedSeq[T]
   def enumName = this.getClass.getSimpleName.stripSuffix("$")
   def find(name: String): T = {
-    values.find(_.name.toLowerCase == name.toLowerCase).getOrElse {
+    values find(_.name.toLowerCase == name.toLowerCase) getOrElse {
       throw new NoSuchElementException(s"Element named '$name' in enum '$enumName' not found! Available elements: " + values.mkString(", "))
     }
   }
@@ -36,6 +36,7 @@ object Revenj extends EnumObj[Revenj] {
 sealed trait Database extends Enum { val templateName: String }
 object Database extends EnumObj[Database] {
   case object PostgreSQL extends Database { val templateName = "postgres" }
-  case object Oracle     extends Database { val templateName = "oracle"   }
-  val values = IndexedSeq(PostgreSQL, Oracle)
+  case object Oracle32   extends Database { val templateName = "oracle"   }
+  case object Oracle64   extends Database { val templateName = "oracle"   }
+  val values = IndexedSeq(PostgreSQL, Oracle32, Oracle64)
 }

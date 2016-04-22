@@ -1,3 +1,0 @@
-module Placeholder {
-    value Empty;
-}

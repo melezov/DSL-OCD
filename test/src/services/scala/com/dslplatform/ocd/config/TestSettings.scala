@@ -29,12 +29,12 @@ private[config] class TestSettings(logger: Logger) {
         val tmp = properties getProperty "test-projects"
         require(tmp ne null, "Workspace could not be read!")
         val path = fromPath(tmp)
-        logger.debug("Read test workspace path: " + path)
+        logger.debug("Read test workspace path: " + path.path)
         Workspace(path)
       }
 
       val templates = {
-        val tmp = properties getProperty "test-projects"
+        val tmp = properties getProperty "templates"
         tmp match {
           case null =>
             val path = workspace / ".." / "templates" path;

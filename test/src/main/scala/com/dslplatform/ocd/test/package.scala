@@ -26,7 +26,7 @@ package object test {
   import types._
 
   val overrideTypes = Seq(
-//    `type.Integer`
+    `type.Integer`
 //    `type.Double`
 //    `type.Point`
   )
@@ -111,7 +111,8 @@ package object test {
     def useCaseValues(testSettings: ITestSettings): Seq[types.OcdType] = overrideTypes match {
       case overrides if overrides.nonEmpty => overrides
       case _ => testSettings.database match {
-        case Database.Oracle => oracleSupportedTyes
+        case Database.Oracle32
+           | Database.Oracle64 => oracleSupportedTyes
         case Database.PostgreSQL => postgresSupportedTyes
       }
     }

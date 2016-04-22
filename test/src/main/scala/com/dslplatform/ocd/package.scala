@@ -3,7 +3,8 @@ package com.dslplatform
 package object ocd
     extends com.github.nscala_time.time.Imports
     with io.jvm.uuid.Imports
-    with hr.element.etb.Pimps {
+    with hr.element.etb.Pimps
+    with scala.collection.convert.DecorateAsScala {
 
   lazy val Locator = config.ServiceLocator.locator
 
@@ -23,6 +24,8 @@ package object ocd
 
   val XKCD = hr.element.etb.XKCD
   val Workspace = hr.element.etb.Workspace
+
+  type Random = scala.util.Random
 
   implicit class RichBoolean(val value: Boolean) extends AnyVal {
     def ifTrue(trueText: String, falseText: String = "") = if (value) trueText else falseText

@@ -99,3 +99,5 @@ javacOptions := Seq(
 EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE18)
 EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
 EclipseKeys.eclipseOutput := Some(".target")
+
+fork in run := true

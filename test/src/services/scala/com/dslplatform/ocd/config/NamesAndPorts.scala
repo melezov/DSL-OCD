@@ -11,7 +11,7 @@ class NamesAndPorts(
   val random = new Random
 
   // TODO: Move this class into the portCorrector and reference as external library
-  val propertiesSourceFile = testSettings.workspace.path / "projectNamesAndPortsRepository.properties"
+  val propertiesSourceFile = testSettings.workspace.path / "namesAndPorts.properties"
   var portSequence = 10000 + 1000 * random.nextInt(50)
 
   private val props = new Properties()

@@ -1,7 +1,8 @@
-package com.dslplatform.ocd.config
+package com.dslplatform.ocd
+package config
 
 private[config] object Patches {
-  def fixTests(body: String) = {
+  def fixTests(body: String): String = {
     body
   }
 }

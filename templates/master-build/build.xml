@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project name="Master test report builder" xmlns:ocd="com.dslplatform.ocd">
 
-  <loadproperties srcFile="projectNamesAndPortsRepository.properties" />
+  <loadproperties srcFile="namesAndPorts.properties" />
 
   <property name="report.root" location="report" />
   <property name="report.src" location="report/OCD-Tests-Summary.xml" />

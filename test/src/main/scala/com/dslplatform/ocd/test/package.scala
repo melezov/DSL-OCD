@@ -1,6 +1,6 @@
 package com.dslplatform.ocd
 
-import com.dslplatform.ocd.config.{Database, ITestSettings}
+import config.{Database, ITestSettings}
 
 package object test {
   implicit class DslFilesCollage(val setups: Traversable[TestSetup]) extends AnyVal {
@@ -32,7 +32,7 @@ package object test {
   )
 
   object OcdTypeSingletonExtender {
-    private val postgresSupportedTyes = Seq(
+    private val postgresSupportedTypes = Seq(
       `type.Binary`
 //    , `type.Bits`
     , `type.Boolean`
@@ -68,7 +68,7 @@ package object test {
     , `type.Xml`
     )
 
-    private val oracleSupportedTyes = Seq(
+    private val oracleSupportedTypes = Seq(
       `type.Binary`
 //    , `type.Bits`
     , `type.Boolean`
@@ -112,8 +112,8 @@ package object test {
       case overrides if overrides.nonEmpty => overrides
       case _ => testSettings.database match {
         case Database.Oracle32
-           | Database.Oracle64 => oracleSupportedTyes
-        case Database.PostgreSQL => postgresSupportedTyes
+           | Database.Oracle64 => oracleSupportedTypes
+        case Database.PostgreSQL => postgresSupportedTypes
       }
     }
   }

@@ -25,7 +25,7 @@
     <macrodef name="sanitize-ports">
         <sequential>
             <java jar="${tools.port-corrector}" fork="true">
-                <arg value="projectNamesAndPortsRepository.properties" />
+                <arg value="namesAndPorts.properties" />
             </java>
         </sequential>
     </macrodef>

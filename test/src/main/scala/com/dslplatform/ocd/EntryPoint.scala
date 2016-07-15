@@ -48,5 +48,8 @@ class EntryPoint(
       turtles ++
       projects.flatMap(_.projects)
     )
+
+    logger.debug("Finished!")
+    sys.exit(0)
   }
 }

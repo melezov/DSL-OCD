@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="common" default="all" xmlns:if="ant:if" xmlns:unless="ant:unless">
-  <loadproperties srcFile="${user.home}\.config\DSL-OCD\test.config"/>
+  <loadproperties srcFile="${user.home}/.config/DSL-OCD/test.config"/>
 
   <property name="temp" location="temp"/>
   <property name="temp.client" location="${temp}/client"/>
   <property name="temp.server" location="${temp}/server"/>
   <property name="temp.migration" location="${temp}/migration"/>
 
-  <property name="dsl" location="..\dsl"/>
+  <property name="dsl" location="../dsl"/>
   <property name="namespace" value="ocd"/>
 
   <property name="src" location="src"/>
@@ -58,8 +58,9 @@
   <property name="server.log" location="${server.runtime}/log"/>
   <property name="server.config.template" location="${tools.config}/revenj.properties.template"/>
 
-  <property name="dbUser" value="${ProjectNameCamel}User"/>
-  <property name="dbPassword" value="${ProjectNameCamel}Password"/>
+  <property name="dbName" value="${projectShortName}"/>
+  <property name="dbUser" value="${projectShortName}-user"/>
+  <property name="dbPassword" value="${projectShortName}-password"/>
 
   <path id="postgres.classpath" location="${tools.build}/postgresql-9.4.1208.jre6.jar"/>
 
@@ -67,10 +68,11 @@
   <!-- # FILTERS # -->
   <!-- ########### -->
 
-  <filter token="dbUser" value="${dbUser}"/>
-  <filter token="dbPassword" value="${dbPassword}"/>
   <filter token="dbHost" value="${dbHost}"/>
   <filter token="dbPort" value="${dbPort}"/>
+  <filter token="dbName" value="${dbName}"/>
+  <filter token="dbUser" value="${dbUser}"/>
+  <filter token="dbPassword" value="${dbPassword}"/>
 
   <!-- ############### -->
   <!-- # JDK16 CHECK # -->
@@ -120,6 +122,42 @@
     </sql>
   </target>
 
+  <!-- #################### -->
+  <!-- # DATABASE MIGRATE # -->
+  <!-- #################### -->
+
+  <target name="db-migrate"
+      description="Creates database migration and applies it">
+
+    <delete dir="${temp.migration}"/>
+    <mkdir dir="${workspace.migration}"/>
+
+    <sql driver="org.postgresql.Driver" url="jdbc:postgresql://${dbHost}:${dbPort}/postgres" userid="${dbSuperUser}" password="${dbSuperPassword}" autocommit="true" onerror="continue">
+      <classpath refid="postgres.classpath"/>
+<![CDATA[
+      ALTER USER "${dbUser}" WITH SUPERUSER;
+]]>
+    </sql>
+
+    <echo>Creating and applying migration ...</echo>
+    <java jar="${tools.dsl-clc}" fork="true" timeout="300000">
+      <arg value="dsl=${dsl}"/>
+      <arg value="compiler=${tools.dsl-compiler}"/>
+      <arg value="temp=${workspace.migration}"/>
+      <arg value="postgres=${dbHost}:${dbPort}/${dbName}?user=${dbUser}&amp;password=${dbPassword}"/>
+      <arg value="sql=${temp.migration}"/>
+      <arg value="force"/>
+      <arg value="apply"/>
+    </java>
+
+    <sql driver="org.postgresql.Driver" url="jdbc:postgresql://${dbHost}:${dbPort}/postgres" userid="${dbSuperUser}" password="${dbSuperPassword}" autocommit="true" onerror="continue">
+      <classpath refid="postgres.classpath"/>
+<![CDATA[
+      ALTER USER "${dbUser}" WITH NOSUPERUSER;
+]]>
+    </sql>
+  </target>
+  
   <!-- ################# -->
   <!-- # CREATE CLIENT # -->
   <!-- ################# -->
@@ -211,48 +249,12 @@
       <arg value="namespace=${namespace}"/>
     </java>
 
-    <move file="${workspace.server}/server-model.jar" todir="${server.runtime}"/>
+    <move file="${workspace.server}/server-model.jar" todir="${server.runtime}/plugins"/>
     <copy todir="${server.runtime}">
       <fileset dir="${server.runtime.template}"/>
     </copy>
 
     <copy file="${server.config.template}" toFile="${server.runtime}/revenj.properties" overwrite="true" filtering="true"/>
-  </target>
-
-  <!-- #################### -->
-  <!-- # DATABASE MIGRATE # -->
-  <!-- #################### -->
-
-  <target name="db-migrate"
-      description="Creates database migration and applies it">
-
-    <delete dir="${temp.migration}"/>
-    <mkdir dir="${workspace.migration}"/>
-
-    <sql driver="org.postgresql.Driver" url="jdbc:postgresql://${dbHost}:${dbPort}/postgres" userid="${dbSuperUser}" password="${dbSuperPassword}" autocommit="true" onerror="continue">
-      <classpath refid="postgres.classpath"/>
-<![CDATA[
-      ALTER USER "${dbUser}" WITH SUPERUSER;
-]]>
-    </sql>
-
-    <echo>Creating and applying migration ...</echo>
-    <java jar="${tools.dsl-clc}" fork="true" timeout="300000">
-      <arg value="dsl=${dsl}"/>
-      <arg value="compiler=${tools.dsl-compiler}"/>
-      <arg value="temp=${workspace.migration}"/>
-      <arg value="postgres=${dbHost}:${dbPort}/${dbName}?user=${dbUser}&amp;password=${dbPassword}"/>
-      <arg value="sql=${temp.migration}"/>
-      <arg value="force"/>
-      <arg value="apply"/>
-    </java>
-
-    <sql driver="org.postgresql.Driver" url="jdbc:postgresql://${dbHost}:${dbPort}/postgres" userid="${dbSuperUser}" password="${dbSuperPassword}" autocommit="true" onerror="continue">
-      <classpath refid="postgres.classpath"/>
-<![CDATA[
-      ALTER USER "${dbUser}" WITH NOSUPERUSER;
-]]>
-    </sql>
   </target>
 
   <!-- ################ -->

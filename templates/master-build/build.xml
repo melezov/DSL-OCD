@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <project name="Master test report builder" xmlns:ocd="com.dslplatform.ocd">
 
-  <loadproperties srcFile="namesAndPorts.properties" />
-
   <property name="report.root" location="report" />
   <property name="report.src" location="report/OCD-Tests-Summary.xml" />
   <property name="report.target" location="report/site/" />
@@ -46,150 +44,22 @@
     <antcall target="generate-html-report" />
   </target>
 
-  <target name="clean-revenj-template" description="Deletes the downloaded Revenj template">
-    <delete dir="${tools.revenj}" />
-  </target>
-  <target name="clean-java-client-template" description="Deletes the downloaded Java client static deps">
-    <delete dir="${tools.java_client}" />
-  </target>
-  <target name="clean-dsl-compiler-template" description="Deletes the downloaded dsl-compiler template">
-    <delete file="${tools.dsl-compiler}" />
+  <!-- Subproject goals -->
+  <target name="db-create" description="Creates a database and role for all projects">
+    <subant failonerror="false">
+      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
+      <target name="db-create" />
+    </subant>
   </target>
 
-  <!-- Subproject goals -->
-  <target name="create-db" description="Tries to create this project's database. Does not fail the build on failure, since the database might already exist.">
+  <target name="db-drop" description="Terminates connections and then drops the database and role for all projects">
     <subant failonerror="false">
       <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="create-db" />
+      <target name="db-drop" />
     </subant>
   </target>
-  <target name="drop-db" description="Tries to drop this project's database. Does not fail the build on failure, since the database might already be dropped.">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="drop-db" />
-    </subant>
-  </target>
-  <target name="clean-test" description="Deletes the projects test results">
-      <subant failonerror="false">
-        <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-        <target name="clean-test" />
-      </subant>
-    </target>
-  <target name="clean-revenj-project" description="Deletes the project Revenj copies">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="clean-revenj-project" />
-    </subant>
-  </target>
-  <target name="clean-java-client-project" description="Deletes the downloaded Java client static deps">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="clean-java-client-project" />
-    </subant>
-  </target>
-  <target name="clean-dsl-compiler-project" description="Deletes the project dsl-compiler copy">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="clean-dsl-compiler-project" />
-    </subant>
-  </target>
-  <target name="clean-all" description="Performs a hard clean, including all downloaded static dependencies (i.e. Revenj)">
-    <delete dir="${report.generated}" />
-    <delete file="${report.target}/index.html" />
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="clean" />
-      <target name="clean-test" />
-    </subant>
-    <antcall target="clean-revenj-template" />
-    <antcall target="clean-java-client-template" />
-    <antcall target="clean-dsl-compiler-template" />
-  </target>
-  <target name="clean" description="Performs a project clean, but tries to save time by not deleting the downloaded static dependencies (i.e. the instance of Revenj for this project)">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="clean" />
-    </subant>
-  </target>
-  <target name="setup" description="Sets up the project directory structure">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="setup" />
-    </subant>
-  </target>
-  <target name="compile-revenj" description="Calls the DSL command line client and tries to compile the Revenj server code">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="compile-revenj" />
-    </subant>
-  </target>
-  <target name="copy-revenj-config-template" description="Copy the template Revenj configuration file, and replace the template strings with actual configuration values.">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="copy-revenj-config-template" />
-    </subant>
-  </target>
-  <target name="compile-java-client" description="Calls the DSL command line client and tries to compile the Java client code to be used for testing">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="compile-java-client" />
-    </subant>
-  </target>
-  <target name="dsl-deploy" description="Moves the generated model DLL and Java files to their respective directories. Also applies the Revenj template configuration for this project.">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="dsl-deploy" />
-    </subant>
-  </target>
-  <target name="compile-generated" description="Compiles the generated Java client sources.">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="compile-generated" />
-    </subant>
-  </target>
-  <target name="package-generated" description="Packages the generated java client sources in one common JAR.">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="package-generated" />
-    </subant>
-  </target>
-  <target name="compile-tests" description="Compiles the test sources">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="compile-tests" />
-    </subant>
-  </target>
-  <target name="package-tests" description="Packages the compiled test sources in one common JAR.">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="package-tests" />
-    </subant>
-  </target>
-  <target name="run-revenj" description="Tries to invoke mono on our local Revenj instance, if it exists.">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="run-revenj" />
-    </subant>
-  </target>
-  <target name="kill-revenj" description="Tries to kill our instance of revenj (Linux only)">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="kill-revenj" />
-    </subant>
-  </target>
-  <target name="run-junit-suite" description="Runs the generated JUnit test suite">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="run-junit-suite" />
-    </subant>
-  </target>
-  <target name="run-tests" description="Starts the project's Revenj instance, runs the generated JUnit test suite, and then kills the Revenj instance">
-    <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="run-tests" />
-    </subant>
-  </target>
-  <target name="all" description="Runs the full build and test suite">
+
+  <target name="all" description="Runs the full build and test suite for all projects">
     <sanitize-ports />
     <subant failonerror="false">
       <fileset dir="." includes="**/build.xml" excludes="build.xml" />

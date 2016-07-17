@@ -38,10 +38,16 @@ class NamesAndPorts(
     }
   }
 
-  def update(projectDatabase: String, port: Int): Unit = {
-    props.setProperty(projectDatabase, port.toString)
-    this.propertiesSourceFile.outputStream() acquireAndGet {
-      props.store(_, "Generated mappings for project names to their server ports.")
+  private[this] def update(projectDatabase: String, port: Int): Unit = {
+    props synchronized {
+      props.setProperty(projectDatabase, port.toString)
+      this.propertiesSourceFile.outputStream() acquireAndGet {
+        val orderedProps = new Properties {
+          override def keys() = java.util.Collections.enumeration(new java.util.TreeSet[AnyRef](super.keySet()))
+        }
+        orderedProps.putAll(props)
+        orderedProps.store(_, "Generated mappings for project names to their server ports")
+      }
     }
   }
 

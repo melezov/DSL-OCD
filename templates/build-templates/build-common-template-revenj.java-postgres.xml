@@ -55,8 +55,10 @@
   <property name="client.runtime" location="lib"/>
   <property name="server.runtime" location="server"/>
 
-  <property name="server.log" location="${server.runtime}/log"/>
+  <property name="client.config.template" location="${tools.config}/dsl-project.properties.template"/>
   <property name="server.config.template" location="${tools.config}/revenj.properties.template"/>
+
+  <property name="server.log" location="${server.runtime}/log"/>
 
   <property name="dbName" value="${projectShortName}"/>
   <property name="dbUser" value="${projectShortName}-user"/>
@@ -194,6 +196,8 @@
     <copy todir="${src.generated.java}/${namespace}">
       <fileset dir="${workspace.client}/JAVA_CLIENT/${namespace}"/>
     </copy>
+
+    <copy file="${client.config.template}" toFile="${src.test.resources}/dsl-project.properties" overwrite="true" filtering="true"/>
   </target>
 
   <path id="client.compile.classpath">

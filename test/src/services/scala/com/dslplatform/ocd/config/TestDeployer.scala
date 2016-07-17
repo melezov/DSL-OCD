@@ -121,8 +121,9 @@ private[config] class TestDeployer(
 
     private def prepareGeneratedCodePath(): Unit = {
       logger.trace("Preparing the generated code paths ...")
+      val languages = testProject.testFiles.keys
 
-      testProject.testFiles foreach { case (language, _) =>
+      languages foreach { case language =>
         val generatedRoot = generatedCode(language)
         if (!generatedRoot.exists) {
           logger.trace("Creating the generated path: " + generatedRoot.path)
@@ -136,7 +137,7 @@ private[config] class TestDeployer(
         }
       }
 
-      testProject.testFiles foreach { case (language, _) =>
+      languages foreach { case language =>
         val mainRoot = mainCode(language)
         if (!mainRoot.exists) {
           logger.trace("Creating the main path: " + mainRoot.path)
@@ -238,11 +239,19 @@ private[config] class TestDeployer(
 
     private val JarExpansionPattern = """(.*?path=")(.*)/\*\*\.jar(".*)""".r
     private val jarExpansion = (classpathWithTemplateProperties: String) => {
+      if ((classpathWithTemplateProperties indexOf '\r') != -1) {
+        sys.error("Windows newline found in project settings!")
+      }
       val expanded = (classpathWithTemplateProperties.split("\n") map {
         case JarExpansionPattern(before, path, after) =>
-          val src = if (path == "#{toolsPath}/lib") "lib" else path
-          ((toolsTemplate / Path.fromString(src) ** "*.jar").toSeq map { jar =>
-            before + path + '/' + jar.name + after
+          val pathFix = path match {
+            case "test" => "../../../tools/test"
+            case "compile/java_client" => "temp/client/dependencies"
+            case "compile/revenj.java" => "temp/server/dependencies"
+            case other => sys.error("Unknown classpath reference: " + other)
+          }
+          ((toolsTemplate / Path.fromString(path) ** "*.jar").toSeq map { jar =>
+            before + pathFix + '/' + jar.name + after
           }).sorted.mkString("\n")
         case line =>
           line

@@ -86,7 +86,7 @@ class ValueWithOnePropertyInAggregateWithSurrogateKeyTestProject(
 
     @org.junit.BeforeClass
     public static void initialize() throws IOException {
-        locator = com.dslplatform.client.Bootstrap.init(${testName}.class.getResourceAsStream("/dsl-project.ini"));
+        locator = com.dslplatform.client.Bootstrap.init(${testName}.class.getResourceAsStream("/dsl-project.properties"));
     }
 """)
 

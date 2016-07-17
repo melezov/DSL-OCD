@@ -23,10 +23,10 @@ class EntryPoint(
     }
 
     val turtles = Seq[ITestProject](
-      TestJavaAssertsBorderValuesTurtle
-    , TestJavaPropertyFieldTypeTurtle
-    , TestJavaPropertyGetterTypeTurtle
-    , TestJavaPropertySetterTypeTurtle
+//      TestJavaAssertsBorderValuesTurtle
+//    , TestJavaPropertyFieldTypeTurtle
+//    , TestJavaPropertyGetterTypeTurtle
+//    , TestJavaPropertySetterTypeTurtle
     )
 
     val projects = Seq[ProjectFactory](

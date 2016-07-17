@@ -23,10 +23,10 @@ class EntryPoint(
     }
 
     val turtles = Seq[ITestProject](
-//      TestJavaAssertsBorderValuesTurtle
-//    , TestJavaPropertyFieldTypeTurtle
-//    , TestJavaPropertyGetterTypeTurtle
-//    , TestJavaPropertySetterTypeTurtle
+      TestJavaAssertsBorderValuesTurtle
+    , TestJavaPropertyFieldTypeTurtle
+    , TestJavaPropertyGetterTypeTurtle
+    , TestJavaPropertySetterTypeTurtle
     )
 
     val projects = Seq[ProjectFactory](
@@ -42,14 +42,14 @@ class EntryPoint(
     )
 
     val tests = projects.flatMap(_.projects)
-    logger.trace(s"Initialized ${projects.size} projects, deploying ${tests.size} tests ...")
+    logger.info(s"Initialized ${projects.size} project factories, deploying ${tests.size} projects ...")
 
     testDeployer.deployTests(
       turtles ++
-      projects.flatMap(_.projects)
+      tests
     )
 
-    logger.debug("Finished!")
+    logger.info("Finished!")
     sys.exit(0)
   }
 }

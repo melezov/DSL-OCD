@@ -31,7 +31,7 @@ package object test {
 //    `type.Integer`
 //    `type.Double`
 //    `type.Point`
-    `type.Location`
+//    `type.Location`
   )
 
   object OcdTypeSingletonExtender {

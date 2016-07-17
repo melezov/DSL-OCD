@@ -20,8 +20,9 @@ private[config] class TestDeployer(
   private val buildTemplates = testSettings.templates / "build-templates"
   private val projectBuild = testSettings.templates / "project"
 
+  private val configTarget = toolsTarget / "config"
+  private val clientConfigTemplate = testSettings.templates / "config-templates" / "java_client" / "dsl-project.properties.template"
   private val serverConfigTemplate = testSettings.templates / "config-templates" / s"revenj.${testSettings.database.templateName}" / s"${testSettings.revenj.configName}"
-  private val serverConfigTarget = toolsTarget / "config"
 
   private val commonBuildTemplateName = s"build-common-template-${testSettings.revenj.templateName}-${testSettings.database.templateName}.xml"
 
@@ -47,7 +48,8 @@ private[config] class TestDeployer(
     cleanAndCopy(buildTemplates / commonBuildTemplateName, rootTarget / "build-common-template.xml")
     cleanAndCopy(toolsTemplate, toolsTarget)
     cleanAndCopy(reportTemplate, reportTarget)
-    cleanAndCopy(serverConfigTemplate, serverConfigTarget / serverConfigTemplate.name)
+    cleanAndCopy(clientConfigTemplate, configTarget / clientConfigTemplate.name)
+    cleanAndCopy(serverConfigTemplate, configTarget / serverConfigTemplate.name)
   }
 
   private def cleanAndCopy(source: Path, target: Path): Unit = {
@@ -62,6 +64,9 @@ private[config] class TestDeployer(
   class TestSetup(testProject: ITestProject, namesAndPorts: NamesAndPorts) {
     private val projectRoot = rootTarget / (testProject.projectPath, '/')
     private val projectShortName = testProject.projectPath.replaceAll(".*/", "")
+
+    private val serverHost = "127.0.0.1" // [::1]
+    namesAndPorts.generateProjectRevenjPort(projectShortName, serverHost)
 
     private val dslTarget = projectRoot / "dsl"
 
@@ -93,26 +98,26 @@ private[config] class TestDeployer(
       testRoot(language) / "resources"
 
     def deploy(): Unit = {
-      logger.trace("Deploying {} ...", testProject.projectName)
+      logger.debug("Deploying {} ...", testProject.projectName)
       deployDsl()
       prepareGeneratedCodePath()
       deployTestCases()
       deployProjectFiles()
-      logger.debug("Deployed {}", testProject.projectName)
+      logger.info("Deployed {}", testProject.projectName)
     }
 
     private def deployDsl(): Unit = {
-      logger.trace("Cleaning generated DSL: " + dslTarget.path)
+      logger.trace("Cleaning generated DSL: {}", dslTarget.path)
       val remaining = dslTarget.deleteRecursively(true, true)._2
       if (remaining > 0) {
-        logger.warn(s"Could not delete all generated DSL ($remaining)!")
+        logger.warn("Could not delete all generated DSL ({})!", remaining)
       }
       val dsls = testProject.dslFiles
       if (dsls.nonEmpty) {
-        logger.debug("Deploying {} DSL files to {}", dsls.size, dslTarget)
+        logger.debug("Deploying {} DSL files to {} ...", dsls.size, dslTarget.path)
         dsls.par foreach { case (filename, body) =>
           val path = dslTarget / (filename, '/')
-          logger.trace("Deploying DSL: " + path.path)
+          logger.trace("Deploying DSL: {}", path.path)
           path.write(body)
         }
       }
@@ -140,13 +145,13 @@ private[config] class TestDeployer(
       languages foreach { case language =>
         val mainRoot = mainCode(language)
         if (!mainRoot.exists) {
-          logger.trace("Creating the main path: " + mainRoot.path)
+          logger.trace("Creating the main path: {}", mainRoot.path)
           mainRoot.createDirectory(true, false)
         }
 
         val resourcePath = mainResources(language)
         if (!resourcePath.exists) {
-          logger.trace("Creating the main resource path: " + resourcePath.path)
+          logger.trace("Creating the main resource path: {}", resourcePath.path)
           resourcePath.createDirectory(true, false)
         }
       }
@@ -164,13 +169,13 @@ private[config] class TestDeployer(
 
         val remaining = path.deleteRecursively(true, true)._2
         if (remaining > 0) {
-          logger.warn(s"Could not delete all code for $language (remaining: $remaining)!")
+          logger.warn(s"Could not delete all code for {} (remaining: {})!", language, remaining)
         }
       }
 
-      logger.trace("Deploying tests...")
       testProject.testFiles foreach { case (language, files) =>
         val testRootForLanguage = testRoot(language)
+        logger.debug("Deploying {} tests to {} ...", testProject.testFiles.values.map(_.size).sum, testRootForLanguage.path)
 
         val classes = files.values.map(JavaInfo(_).classPath).toIndexedSeq.sorted
         val suite = JavaInfo(
@@ -182,15 +187,16 @@ private[config] class TestDeployer(
         )
 
         val suiteWithTests = files + suite.toEntry
-
         suiteWithTests.par foreach { case (filename, body) =>
           val path = testRootForLanguage / (filename, '/')
-          logger.trace("Deploying test: " + path.path)
+          logger.trace("Deploying test: {}", path.path)
           path.write(Patches.fixTests(body))
         }
 
+        logger.trace("Deploying test resources ...")
         val testResourcesPath = testResources(language)
         (testResourcesTemplate ***) foreach { testResource =>
+          logger.trace("Deploying test resource: {}", testResource.path)
           copyTemplate(testResource, testResourcesPath / testResource.name)
         }
       }
@@ -198,20 +204,20 @@ private[config] class TestDeployer(
 
     private def deployProjectFiles(): Unit =
       testProject.testFiles.keys foreach { case language =>
-        logger.trace("Deploying compiler scripts for language: " + language)
+        logger.trace("Deploying project files for language: {}", language)
         val langRoot = languageRoot(language)
         language match {
           case JAVA =>
-            copyTemplate(projectBuild / "build.xml", langRoot / "build.xml")
-//            copyTemplate(projectBuild / ".pgpass", langRoot / ".pgpass")
             copyTemplate(projectBuild / ".project", langRoot / ".project")
             copyTemplate(projectBuild / ".classpath", langRoot / ".classpath", jarExpansion)
+//            copyTemplate(projectBuild / ".pgpass", langRoot / ".pgpass")
+            copyTemplate(projectBuild / "build.xml", langRoot / "build.xml")
           case _ =>
         }
       }
 
     private def copyTemplate(source: Path, target: Path, process: String => String = templateApplication) = {
-      logger.trace("Creating the " + source.name + " script: " + target.path)
+      logger.trace(s"Creating the ${source.name} script: {}", target.path)
       val body = process(source.string)
       target write body
     }
@@ -220,15 +226,6 @@ private[config] class TestDeployer(
       "projectName" -> testProject.projectName
     , "ProjectNameCamel" -> testProject.ProjectNameCamel
     , "projectShortName" -> projectShortName
-
-    , "serverHost" -> "127.0.0.1" // "[::1]"
-    , "serverPort" -> namesAndPorts.generateProjectRevenjPort(projectShortName, "127.0.0.1").toString
-/*
-    , "xjavaRoot" -> languageRoot(JAVA).path
-    , "xtoolsPath" -> (testSettings.workspace.path.path.replace('\\', '/') + "/tools")
-    , "xdslSource" -> dslTarget.path
-    , "xrevenjPath" -> serverConfigTarget.path
-*/
     )
 
     private val templateApplication = (stringWithTemplateProperties: String) =>

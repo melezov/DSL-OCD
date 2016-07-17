@@ -1,7 +1,6 @@
 package com.dslplatform.ocd
 package config
 
-import org.apache.commons.io.IOUtils
 import test.javatest.{JavaInfo, TestSuiteCreator}
 
 private[config] class TestDeployer(
@@ -28,14 +27,13 @@ private[config] class TestDeployer(
 
   private val testResourcesTemplate = testSettings.templates / "test-resources"
 
-
   def deployTests(tests: Seq[ITestProject]): Unit = {
     logger.trace(s"Deploying ${tests.size} tests ...")
 
     val namesAndPorts = new NamesAndPorts(logger, testSettings)
     copyStatic()
 
-    tests/* .par*/ foreach { test =>
+    tests.par foreach { test =>
       new TestSetup(test, namesAndPorts).deploy()
     }
   }
@@ -44,7 +42,8 @@ private[config] class TestDeployer(
   private[this] def copyStatic(): Unit = {
     logger.debug("Copying the static tools and resources ...")
 
-    cleanAndCopy(masterBuild, rootTarget)
+    cleanAndCopy(masterBuild / "build.xml", rootTarget / "build.xml")
+    cleanAndCopy(masterBuild / "macrodef.xml", rootTarget / "macrodef.xml")
     cleanAndCopy(buildTemplates / commonBuildTemplateName, rootTarget / "build-common-template.xml")
     cleanAndCopy(toolsTemplate, toolsTarget)
     cleanAndCopy(reportTemplate, reportTarget)
@@ -57,7 +56,7 @@ private[config] class TestDeployer(
       target.deleteRecursively(true, true)
     }
     logger.trace(s"Copying ${source.path} to ${target.path}")
-    source copyTo target
+    source.copyTo(target = target, replaceExisting = true)
   }
 
   class TestSetup(testProject: ITestProject, namesAndPorts: NamesAndPorts) {
@@ -123,7 +122,7 @@ private[config] class TestDeployer(
     private def prepareGeneratedCodePath(): Unit = {
       logger.trace("Preparing the generated code paths ...")
 
-      testProject.testFiles foreach { case (language, files) =>
+      testProject.testFiles foreach { case (language, _) =>
         val generatedRoot = generatedCode(language)
         if (!generatedRoot.exists) {
           logger.trace("Creating the generated path: " + generatedRoot.path)
@@ -137,7 +136,7 @@ private[config] class TestDeployer(
         }
       }
 
-      testProject.testFiles foreach { case (language, files) =>
+      testProject.testFiles foreach { case (language, _) =>
         val mainRoot = mainCode(language)
         if (!mainRoot.exists) {
           logger.trace("Creating the main path: " + mainRoot.path)
@@ -189,7 +188,10 @@ private[config] class TestDeployer(
           path.write(Patches.fixTests(body))
         }
 
-        cleanAndCopy(testResourcesTemplate, testResources(language))
+        val testResourcesPath = testResources(language)
+        (testResourcesTemplate ***) foreach { testResource =>
+          copyTemplate(testResource, testResourcesPath / testResource.name)
+        }
       }
     }
 
@@ -200,8 +202,7 @@ private[config] class TestDeployer(
         language match {
           case JAVA =>
             copyTemplate(projectBuild / "build.xml", langRoot / "build.xml")
-            copyTemplate(projectBuild / ".pgpass", langRoot / ".pgpass")
-            copyTemplate(projectBuild / ".gitignore", langRoot / ".gitignore")
+//            copyTemplate(projectBuild / ".pgpass", langRoot / ".pgpass")
             copyTemplate(projectBuild / ".project", langRoot / ".project")
             copyTemplate(projectBuild / ".classpath", langRoot / ".classpath", jarExpansion)
           case _ =>
@@ -218,19 +219,15 @@ private[config] class TestDeployer(
       "projectName" -> testProject.projectName
     , "ProjectNameCamel" -> testProject.ProjectNameCamel
     , "projectShortName" -> projectShortName
-    , "javaRoot" -> languageRoot(JAVA).path
-    , "dbName" -> projectShortName
-    , "dbHost" -> "localhost"
-    , "dbPort" -> "5432"
-    , "dbUser" -> "ocduser"
-    , "dbPassword" -> "ocdpassword"
-    , "dbOwner" -> "postgres"
-    , "dbOwnerPassword" -> "ocdpassword"
+
     , "serverHost" -> "127.0.0.1" // "[::1]"
-    , "serverPort" -> namesAndPorts.generateProjectRevenjPort(projectShortName, "127.0.0.1").toString()
-    , "toolsPath" -> (testSettings.workspace.path.path.replace('\\', '/') + "/tools")
-    , "dslSource" -> dslTarget.path
-    , "revenjPath" -> serverConfigTarget.path
+    , "serverPort" -> namesAndPorts.generateProjectRevenjPort(projectShortName, "127.0.0.1").toString
+/*
+    , "xjavaRoot" -> languageRoot(JAVA).path
+    , "xtoolsPath" -> (testSettings.workspace.path.path.replace('\\', '/') + "/tools")
+    , "xdslSource" -> dslTarget.path
+    , "xrevenjPath" -> serverConfigTarget.path
+*/
     )
 
     private val templateApplication = (stringWithTemplateProperties: String) =>

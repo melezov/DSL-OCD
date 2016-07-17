@@ -23,22 +23,22 @@ class EntryPoint(
     }
 
     val turtles = Seq[ITestProject](
-//      TestJavaAssertsBorderValuesTurtle
-//    , TestJavaPropertyFieldTypeTurtle
-//    , TestJavaPropertyGetterTypeTurtle
-//    , TestJavaPropertySetterTypeTurtle
+      TestJavaAssertsBorderValuesTurtle
+    , TestJavaPropertyFieldTypeTurtle
+    , TestJavaPropertyGetterTypeTurtle
+    , TestJavaPropertySetterTypeTurtle
     )
 
     val projects = Seq[ProjectFactory](
       new AggregateWithOnePropertyTestProjectFactory(testSettings)
-//    , new AggregateWithSurrogateKeyAndOnePropertyTestProjectFactory(testSettings)
-//    , new AggregateWithSurrogateKeyAndOnePropertyWithinOneEntityTestProjectFactory(testSettings)
-//    , new AggregateWithSurrogateKeyAndOnePropertyWithinOneValueTestProjectFactory(testSettings)
-//    , new AggregateWithSurrogateKeyAndOnePropertyWithinOneEntityWithinOneEntityTestProjectFactory(testSettings)
-//    , new AggregateWithSurrogateKeyAndOnePropertyWithinOneValueWithinOneEntityTestProjectFactory(testSettings)
-//    , new AggregateWithSurrogateKeyAndOnePropertyWithinOneValueWithinOneValueTestProjectFactory(testSettings)
-//    , new CalculatedPropertyInSnowflakeTestProjectFactory(testSettings)
-//    , new ValueWithOnePropertyTestProjectFactory(testSettings)
+    , new AggregateWithSurrogateKeyAndOnePropertyTestProjectFactory(testSettings)
+    , new AggregateWithSurrogateKeyAndOnePropertyWithinOneEntityTestProjectFactory(testSettings)
+    , new AggregateWithSurrogateKeyAndOnePropertyWithinOneValueTestProjectFactory(testSettings)
+    , new AggregateWithSurrogateKeyAndOnePropertyWithinOneEntityWithinOneEntityTestProjectFactory(testSettings)
+    , new AggregateWithSurrogateKeyAndOnePropertyWithinOneValueWithinOneEntityTestProjectFactory(testSettings)
+    , new AggregateWithSurrogateKeyAndOnePropertyWithinOneValueWithinOneValueTestProjectFactory(testSettings)
+    , new CalculatedPropertyInSnowflakeTestProjectFactory(testSettings)
+    , new ValueWithOnePropertyTestProjectFactory(testSettings)
     )
 
     val tests = projects.flatMap(_.projects)

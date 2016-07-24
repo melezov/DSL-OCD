@@ -1,6 +1,14 @@
 package com.dslplatform.ocd
 package config
 
+object NamesAndPorts {
+  val MinPort = 10000
+  val MaxPort = 65535
+
+  val MaxNumberOfTestProjects = 1000
+  val MinNumberOfPortsToReserve = MaxNumberOfTestProjects * 2 // Java test projects need stop ports, so doubled
+}
+
 /** A utility class that contains and stores a mapping of generated
   * project names to server ports.
   * On the first run the mappings are persisted in an on-disk .properties file. */
@@ -12,7 +20,12 @@ class NamesAndPorts(
 
   // TODO: Move this class into the portCorrector and reference as external library
   val propertiesSourceFile = testSettings.workspace.path / "namesAndPorts.properties"
-  var portSequence = 10000 + 1000 * random.nextInt(50)
+  var portSequence = {
+    import NamesAndPorts._
+    val start = MinPort + random.nextInt(MaxPort - MinPort - MinNumberOfPortsToReserve)
+    assert(start + MinNumberOfPortsToReserve <= MaxPort, "portSequence will finish beyond port #" + MaxPort)
+    start
+  }
 
   private val props = new Properties()
   if (propertiesSourceFile.exists) {

@@ -4,7 +4,7 @@
         <attribute name="result"/>
         <sequential>
             <script language="javascript">
-                stopPort = 10000 + parseInt('@{port}');
+                stopPort = 1000 + parseInt('@{port}'); // MaxNumberOfTestProjects = 1000
                 project.setProperty('@{result}', stopPort);
             </script>
         </sequential>

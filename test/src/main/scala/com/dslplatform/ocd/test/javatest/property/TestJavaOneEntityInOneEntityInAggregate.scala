@@ -123,7 +123,7 @@ ${isDefault match {
         final ${conceptName} aggregate = new ${conceptName}();
         aggregate.get${EntityName}().get${NestedEntityName}().set${PropertyName}(testValue);"""}}
 
-        // persist via repository
+        // persist via repository interface for collections
         final String uri = ${repositoryName}.insert(new ${conceptName}[] { aggregate }).get().get(0);
 
         final ${conceptName} aggregateFound = ${repositoryName}.find(uri).get();

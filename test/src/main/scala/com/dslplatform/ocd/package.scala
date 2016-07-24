@@ -26,6 +26,7 @@ package object ocd
   val Workspace = hr.element.etb.Workspace
 
   type Random = scala.util.Random
+  type Regex = scala.util.matching.Regex
 
   implicit class RichBoolean(val value: Boolean) extends AnyVal {
     def ifTrue(trueText: String, falseText: String = "") = if (value) trueText else falseText

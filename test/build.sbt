@@ -66,7 +66,6 @@ scalacOptions := Seq(
 , "-unchecked"
 , "-Xcheckinit"
 , "-Xlint"
-, "-Xmax-classfile-name", "72"
 , "-Xverify"
 , "-Yclosure-elim"
 , "-Yconst-opt"

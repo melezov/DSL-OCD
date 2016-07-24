@@ -29,7 +29,9 @@ private[config] class TestDeployer(
   private val testResourcesTemplate = testSettings.templates / "test-resources"
 
   def deployTests(tests: Seq[ITestProject]): Unit = {
-    logger.trace(s"Deploying ${tests.size} tests ...")
+    val count = tests.size
+    logger.trace(s"Deploying ${count} tests ...")
+    require(NamesAndPorts.MaxNumberOfTestProjects > count, s"Increase max number of tests! Currently set to ${NamesAndPorts.MaxNumberOfTestProjects}, but tried to create ${count}")
 
     val namesAndPorts = new NamesAndPorts(logger, testSettings)
     copyStatic()

@@ -146,7 +146,7 @@ class EventWithOnePropertyTestProject(
         def testValue = ojbt.defaultValue
       }
     ) ++ ojbt.nonDefaultValues.zipWithIndex.map { case (ndv, index) =>
-      new TestJavaPropertyInAggregate {
+      new TestJavaPropertyInEvent {
         def conceptName = eventConcept
         def property = javaProperty
         def isDefault = false

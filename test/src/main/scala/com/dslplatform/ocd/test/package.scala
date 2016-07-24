@@ -24,7 +24,7 @@ package object test {
   }
 
   import types._
-
+  /** This overrides the typePattern in testSettings, for development only - should always be commented out */
   val overrideTypes = Seq(
 //    `type.Binary`
 //    `type.Boolean`
@@ -112,11 +112,15 @@ package object test {
     import OcdTypeSingletonExtender._
 
     def useCaseValues(testSettings: ITestSettings): Seq[types.OcdType] = overrideTypes match {
-      case overrides if overrides.nonEmpty => overrides
-      case _ => testSettings.database match {
+      case overrides if overrides.nonEmpty =>
+        overrides
+
+      case _ => (testSettings.database match {
         case Database.Oracle32
            | Database.Oracle64 => oracleSupportedTypes
         case Database.PostgreSQL => postgresSupportedTypes
+      }) filter { tpe =>
+        testSettings.typePattern.pattern.matcher(tpe.typeName).matches()
       }
     }
   }

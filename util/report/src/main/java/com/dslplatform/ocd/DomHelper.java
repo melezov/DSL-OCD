@@ -43,7 +43,7 @@ public class DomHelper {
             new File(file.getParent()).mkdirs();
             fileOutputStream = new FileOutputStream(file);
 
-            final byte[] bytesContent = isStackTrace 
+            final byte[] bytesContent = isStackTrace
                     ? this.getDocumentAsString()
                             .replaceAll("&lt;", "<")
                             .replaceAll("&gt;", ">").getBytes("UTF-8")

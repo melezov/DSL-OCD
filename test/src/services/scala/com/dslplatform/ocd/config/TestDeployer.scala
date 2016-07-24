@@ -9,7 +9,6 @@ private[config] class TestDeployer(
   ) extends ITestDeployer {
 
   private val rootTarget = testSettings.workspace.path
-
   private val toolsTemplate = testSettings.templates / "tools"
   private val toolsTarget = rootTarget / "tools"
 
@@ -26,6 +25,7 @@ private[config] class TestDeployer(
 
   private val commonBuildTemplateName = s"build-common-template-${testSettings.revenj.templateName}-${testSettings.database.templateName}.xml"
 
+  private val dslTemplates =  testSettings.templates / "dsl-templates"
   private val testResourcesTemplate = testSettings.templates / "test-resources"
 
   def deployTests(tests: Seq[ITestProject]): Unit = {
@@ -122,6 +122,11 @@ private[config] class TestDeployer(
           logger.trace("Deploying DSL: {}", path.path)
           path.write(body)
         }
+      } else {
+        val src = dslTemplates / "empty.dsl"
+        val path = dslTarget / src.name
+        logger.trace("Deploying empty DSL: {}", path.path)
+        src.copyTo(path)
       }
       logger.trace("Done deploying DSL files!")
     }

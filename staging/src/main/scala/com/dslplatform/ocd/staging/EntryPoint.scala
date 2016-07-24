@@ -13,11 +13,11 @@ object EntryPoint
 
   Repositories.clean()
 
-  Git("ngs-doo", "dsl-json", "master")
-  Git("ngs-doo", "dsl-client-java", "master")
-  Git("ngs-doo", "revenj", "master")
-  Git("ngs-doo", "dsl-compiler-client", "master")
-  Git("mentat-labs", "DSL-OCD", "master")
+  Git("dsl-platform", "dsl-json",            "master")
+  Git("dsl-platform", "dsl-client-java",     "master")
+  Git("dsl-platform", "revenj",              "master")
+  Git("dsl-platform", "dsl-compiler-client", "master")
+  Git("dsl-platform", "DSL-OCD",             "master")
 
   val dslJsonVersion = Sed("dsl-json", "library/pom.xml",
     None ->
@@ -40,7 +40,7 @@ object EntryPoint
   )
   Sed("dsl-client-java", "project/Build.scala",
     None ->
-      """(\n\s+, )(ideaExcludeFolders := Seq\([^)]+\))""" ->
+      """(\n\s+, )(EclipseKeys\.projectFlavor := EclipseProjectFlavor\.Java)""" ->
       "$1$2$1resolvers += Resolver.mavenLocal"
   , Some(dslJsonVersion) ->
       """(val dslJson = "com.dslplatform" % "dsl-json" % ")([^"]+)(")""" ->

@@ -69,8 +69,7 @@ ${isDefault match {
            case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate = new ${conceptName}();
-        aggregate.get${ValueName}().set${PropertyName}(testValue);"""
-}}
+        aggregate.get${ValueName}().set${PropertyName}(testValue);"""}}
 
         // check that the property was properly assigned
         ${assertEquals("aggregate")}
@@ -93,11 +92,11 @@ ${isDefault match {
     /* Testing the "${propertyName}" within one ${ValueName} ${testID} property value after active record persist */
     @org.junit.Test
     public void test${PropertyName}WithinOne${ValueName}${testID}PropertyValueInAggregateAfterActiveRecordPersist() throws IOException {${setupBlock}${isDefault match {
-           case true => s"""
+      case true => s"""
         final ${conceptName} aggregate = new ${conceptName}();
         final ${propertyType.javaClass} testValue = aggregate.get${ValueName}().get${PropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate = new ${conceptName}();
         aggregate.get${ValueName}().set${PropertyName}(testValue);"""}}
@@ -126,11 +125,11 @@ ${isDefault match {
     /* Testing the "${propertyName}" within one ${ValueName} ${testID} property value after repository persist */
     @org.junit.Test
     public void test${PropertyName}WithinOne${ValueName}${testID}PropertyValueInAggregateAfterRepositoryPersist() throws IOException, InterruptedException, ExecutionException {${setupBlock}${isDefault match {
-           case true => s"""
+      case true => s"""
         final ${conceptName} aggregate = new ${conceptName}();
         final ${propertyType.javaClass} testValue = aggregate.get${ValueName}().get${PropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate = new ${conceptName}();
         aggregate.get${ValueName}().set${PropertyName}(testValue);"""}}

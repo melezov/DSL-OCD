@@ -47,12 +47,12 @@ trait TestJavaCalculatedPropertyInAggregate
     /* Testing the "${propertyName}" ${testID} property value after active record persist */
     @org.junit.Test
     public void test${PropertyName}${testID}PropertyValueInAggregateAfterActiveRecordPersist() throws IOException {${setupBlock}${isDefault match {
-           case true => s"""
+      case true => s"""
         final ${conceptName} aggregate =
                 new ${conceptName}();
         final ${propertyType.javaClass} testValue = aggregate.get${PropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate =
                 new ${conceptName}()
@@ -88,12 +88,12 @@ trait TestJavaCalculatedPropertyInAggregate
     /* Testing the "${propertyName}" ${testID} property value after repository persist */
     @org.junit.Test
     public void test${PropertyName}${testID}PropertyValueInAggregateAfterRepositoryPersist() throws IOException, InterruptedException, ExecutionException {${setupBlock}${isDefault match {
-           case true => s"""
+      case true => s"""
         final ${conceptName} aggregate =
                 new ${conceptName}();
         final ${propertyType.javaClass} testValue = aggregate.get${PropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate =
                 new ${conceptName}()

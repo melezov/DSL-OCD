@@ -50,17 +50,15 @@ trait TestJavaOneEntityInOneEntityInAggregate
   def jsonSerializationTest = s"""
     /* Testing the "${propertyName}" within one ${NestedEntityName} within one ${EntityName} ${testID} aggregate property JSON serialization */
     @org.junit.Test
-    public void test${PropertyName}WithinOne${NestedEntityName}WithinOne${EntityName}${testID}PropertyInAggregateJsonSerialization() throws IOException {
-${isDefault match {
-           case true => s"""
+    public void test${PropertyName}WithinOne${NestedEntityName}WithinOne${EntityName}${testID}PropertyInAggregateJsonSerialization() throws IOException {${isDefault match {
+      case true => s"""
         final ${conceptName} aggregate = new ${conceptName}();
         final ${propertyType.javaClass} testValue = aggregate.get${EntityName}().get${NestedEntityName}().get${PropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate = new ${conceptName}();
-        aggregate.get${EntityName}().get${NestedEntityName}().set${PropertyName}(testValue);"""
-}}
+        aggregate.get${EntityName}().get${NestedEntityName}().set${PropertyName}(testValue);"""}}
 
         // check that the property was properly assigned
         ${assertEquals("aggregate")}
@@ -83,11 +81,11 @@ ${isDefault match {
     /* Testing the "${propertyName}" within one ${NestedEntityName} within one ${EntityName} ${testID} property value after active record persist */
     @org.junit.Test
     public void test${PropertyName}WithinOne${NestedEntityName}WithinOne${EntityName}${testID}PropertyEntityInAggregateAfterActiveRecordPersist() throws IOException {${setupBlock}${isDefault match {
-           case true => s"""
+      case true => s"""
         final ${conceptName} aggregate = new ${conceptName}();
         final ${propertyType.javaClass} testValue = aggregate.get${EntityName}().get${NestedEntityName}().get${PropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate = new ${conceptName}();
         aggregate.get${EntityName}().get${NestedEntityName}().set${PropertyName}(testValue);"""}}
@@ -114,11 +112,11 @@ ${isDefault match {
     /* Testing the "${propertyName}" within one ${NestedEntityName} within one ${EntityName} ${testID} property value after repository persist */
     @org.junit.Test
     public void test${PropertyName}WithinOne${NestedEntityName}WithinOne${EntityName}${testID}PropertyEntityInAggregateAfterRepositoryPersist() throws IOException, InterruptedException, ExecutionException {${setupBlock}${isDefault match {
-           case true => s"""
+      case true => s"""
         final ${conceptName} aggregate = new ${conceptName}();
         final ${propertyType.javaClass} testValue = aggregate.get${EntityName}().get${NestedEntityName}().get${PropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate = new ${conceptName}();
         aggregate.get${EntityName}().get${NestedEntityName}().set${PropertyName}(testValue);"""}}

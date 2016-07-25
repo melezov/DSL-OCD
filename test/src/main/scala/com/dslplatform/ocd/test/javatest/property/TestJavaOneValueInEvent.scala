@@ -6,13 +6,20 @@ package property
 import types._
 import javas._
 
-trait TestJavaPropertyInEvent
+trait TestJavaOneValueInEvent
     extends TestComponentWithProperty {
 
   def testID: String
   def isDefault: Boolean
   def testValue: JavaValue
   def setupBlock: String = ""
+
+  def conceptName: String
+
+  def valueName: String
+  def ValueName = valueName.fciu
+
+  def valueConceptName: String
 
   def testComponentBody = (
     jsonSerializationTest
@@ -23,34 +30,45 @@ trait TestJavaPropertyInEvent
   private def assertEquals(target: String) = property match {
     case _ if isDisallowed(isDefault) =>
       s"""// special null check for disallowed null value in a non-nullable property
-        org.junit.Assert.assertNull(${target}.get${PropertyName}());"""
+        org.junit.Assert.assertNull(${target}.get${ValueName}().get${PropertyName}());"""
 
     case p: OcdJavaBoxTypeProperty if p.boxType.isPrecise =>
       s"""com.dslplatform.ocd.javaasserts.${p.boxType.typeSingleName}Asserts.assert${p.box.boxName}Equals(
                 testValue,
-                ${target}.get${PropertyName}(),
+                ${target}.get${ValueName}().get${PropertyName}(),
                 2);"""
 
     case p: OcdJavaBoxTypeProperty =>
       s"""com.dslplatform.ocd.javaasserts.${p.boxType.typeSingleName}Asserts.assert${p.box.boxName}Equals(
                 testValue,
-                ${target}.get${PropertyName}());"""
+                ${target}.get${ValueName}().get${PropertyName}());"""
 
     case _ => ???
   }
 
+  private def assertValueEqualityAndHashCode =
+    s"""// nested values must be equal
+        com.dslplatform.ocd.test.FancyAsserts.assertEquals(
+                event.get${ValueName}(),
+                eventFound.get${ValueName}());
+
+        // nested values hashCode() must be equal
+        com.dslplatform.ocd.test.FancyAsserts.assertEquals(
+                event.get${ValueName}().hashCode(),
+                eventFound.get${ValueName}().hashCode());"""
+
   def jsonSerializationTest = s"""
-    /* Testing the "${propertyName}" ${testID} event property JSON serialization */
+    /* Testing the "${propertyName}" within one ${ValueName} ${testID} event property JSON serialization */
     @org.junit.Test
-    public void test${PropertyName}${testID}PropertyInEventJsonSerialization() throws IOException {${isDefault match {
+    public void test${PropertyName}WithinOne${ValueName}${testID}PropertyInEventJsonSerialization() throws IOException {${isDefault match {
            case true => s"""
         final ${conceptName} event = new ${conceptName}();
-        final ${propertyType.javaClass} testValue = event.get${PropertyName}();"""
+        final ${propertyType.javaClass} testValue = event.get${ValueName}().get${PropertyName}();"""
 
            case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
-        final ${conceptName} event = new ${conceptName}()
-                .set${PropertyName}(testValue);"""}}
+        final ${conceptName} event = new ${conceptName}();
+        event.get${ValueName}().set${PropertyName}(testValue);"""}}
 
         // check that the property was properly assigned
         ${assertEquals("event")}
@@ -71,17 +89,17 @@ trait TestJavaPropertyInEvent
 """
 
   def activeRecordPersistTest = s"""
-    /* Testing the "${propertyName}" ${testID} property value after active record persist */
+    /* Testing the "${propertyName}" within one ${ValueName} ${testID} property value after active record persist */
     @org.junit.Test
-    public void test${PropertyName}${testID}PropertyValueInEventAfterActiveRecordPersist() throws IOException, InterruptedException, ExecutionException {${setupBlock}${isDefault match {
-      case true => s"""
+    public void test${PropertyName}WithinOne${ValueName}${testID}PropertyValueInEventAfterActiveRecordPersist() throws IOException, InterruptedException, ExecutionException {${setupBlock}${isDefault match {
+    case true => s"""
         final ${conceptName} event = new ${conceptName}();
-        final ${propertyType.javaClass} testValue = event.get${PropertyName}();"""
+        final ${propertyType.javaClass} testValue = event.get${ValueName}().get${PropertyName}();"""
 
-      case _ => s"""
+    case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
-        final ${conceptName} event = new ${conceptName}()
-                .set${PropertyName}(testValue);"""}}
+        final ${conceptName} event = new ${conceptName}();
+        event.get${ValueName}().set${PropertyName}(testValue);"""}}
 
         // submit via active record pattern
         final String uri = event.submit();
@@ -98,7 +116,7 @@ trait TestJavaPropertyInEvent
 
         final ${conceptName} eventFound = domainProxy.find(${conceptName}.class, new String[] {uri}).get().get(0);
         // check the property retrieved from the database
-        ${assertEquals("eventFound")}
+        ${assertValueEqualityAndHashCode}
 
         // TODO: events are compared via URI equality - both URIs have be initialized at this point
 //        com.dslplatform.ocd.test.FancyAsserts.assertEquals(event, eventFound);
@@ -109,17 +127,17 @@ trait TestJavaPropertyInEvent
 """
 
   def repositoryPersistTest = s"""
-    /* Testing the "${propertyName}" ${testID} property value after repository persist */
+    /* Testing the "${propertyName}" within one ${ValueName} ${testID} property value after repository persist */
     @org.junit.Test
-    public void test${PropertyName}${testID}PropertyValueInEventAfterRepositoryPersist() throws IOException, InterruptedException, ExecutionException {${setupBlock}${isDefault match {
-      case true => s"""
+    public void test${PropertyName}WithinOne${ValueName}${testID}PropertyValueInEventAfterRepositoryPersist() throws IOException, InterruptedException, ExecutionException {${setupBlock}${isDefault match {
+    case true => s"""
         final ${conceptName} event = new ${conceptName}();
-        final ${propertyType.javaClass} testValue = event.get${PropertyName}();"""
+        final ${propertyType.javaClass} testValue = event.get${ValueName}().get${PropertyName}();"""
 
-      case _ => s"""
+    case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
-        final ${conceptName} event = new ${conceptName}()
-                .set${PropertyName}(testValue);"""}}
+        final ${conceptName} event = new ${conceptName}();
+        event.get${ValueName}().set${PropertyName}(testValue);"""}}
 
         // submit via store interface
         final String uri = domainProxy.submit(event).get();
@@ -135,7 +153,7 @@ trait TestJavaPropertyInEvent
         com.dslplatform.ocd.test.FancyAsserts.assertEquals(uri, eventFound.getURI());
 
         // check the property retrieved from the database
-        ${assertEquals("eventFound")}
+        ${assertValueEqualityAndHashCode}
     }
 """
 }

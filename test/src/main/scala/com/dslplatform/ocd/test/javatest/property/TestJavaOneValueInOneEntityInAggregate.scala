@@ -94,11 +94,11 @@ ${isDefault match {
     /* Testing the "${propertyName}" within one ${ValueName} within one ${EntityName} ${testID} property value after active record persist */
     @org.junit.Test
     public void test${PropertyName}WithinOne${ValueName}WithinOne${EntityName}${testID}PropertyEntityInAggregateAfterActiveRecordPersist() throws IOException {${setupBlock}${isDefault match {
-           case true => s"""
+      case true => s"""
         final ${conceptName} aggregate = new ${conceptName}();
         final ${propertyType.javaClass} testValue = aggregate.get${EntityName}().get${ValueName}().get${PropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate = new ${conceptName}();
         aggregate.get${EntityName}().get${ValueName}().set${PropertyName}(testValue);"""}}
@@ -127,11 +127,11 @@ ${isDefault match {
     /* Testing the "${propertyName}" within one ${ValueName} within one ${EntityName} ${testID} property value after repository persist */
     @org.junit.Test
     public void test${PropertyName}WithinOne${ValueName}WithinOne${EntityName}${testID}PropertyEntityInAggregateAfterRepositoryPersist() throws IOException, InterruptedException, ExecutionException {${setupBlock}${isDefault match {
-           case true => s"""
+      case true => s"""
         final ${conceptName} aggregate = new ${conceptName}();
         final ${propertyType.javaClass} testValue = aggregate.get${EntityName}().get${ValueName}().get${PropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate = new ${conceptName}();
         aggregate.get${EntityName}().get${ValueName}().set${PropertyName}(testValue);"""}}

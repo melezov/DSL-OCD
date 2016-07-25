@@ -45,6 +45,7 @@ class EntryPoint(
       , new AggregateWithSurrogateKeyAndOnePropertyWithinOneValueWithinOneEntityTestProjectFactory(testSettings)
       , new AggregateWithSurrogateKeyAndOnePropertyWithinOneValueWithinOneValueTestProjectFactory(testSettings)
       , new EventWithOnePropertyTestProjectFactory(testSettings)
+      , new EventWithOnePropertyWithinOneValueTestProjectFactory(testSettings)
       , new CalculatedPropertyInSnowflakeTestProjectFactory(testSettings)
       , new ValueWithOnePropertyTestProjectFactory(testSettings)
       )

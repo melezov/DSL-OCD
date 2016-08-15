@@ -43,11 +43,11 @@ trait TestJavaPropertyInEvent
     /* Testing the "${propertyName}" ${testID} event property JSON serialization */
     @org.junit.Test
     public void test${PropertyName}${testID}PropertyInEventJsonSerialization() throws IOException {${isDefault match {
-           case true => s"""
+      case true => s"""
         final ${conceptName} event = new ${conceptName}();
         final ${propertyType.javaClass} testValue = event.get${PropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} event = new ${conceptName}()
                 .set${PropertyName}(testValue);"""}}

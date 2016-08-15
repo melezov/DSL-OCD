@@ -1,5 +1,6 @@
 package com.dslplatform.ocd
 
+import com.dslplatform.ocd.dsls.OcdDslBoxType
 import config.{Database, ITestSettings}
 
 package object test {
@@ -122,6 +123,21 @@ package object test {
       }) filter { tpe =>
         testSettings.typePattern.pattern.matcher(tpe.typeName).matches()
       }
+    }
+  }
+
+  implicit class ClassyBoxTyper(val box: boxes.OcdBox) extends AnyVal {
+    def around(content: String) = {
+      val tmp = `type.Secret`
+      val dslTmp = OcdDslBoxType.resolve(tmp, box)
+      val contentInBox = dslTmp.dslName.replace(tmp.typeName, content)
+
+      contentInBox + (
+        if (contentInBox endsWith "?>?") "" else
+        if (contentInBox endsWith ">?") " " else
+        if (contentInBox endsWith "?>") " " else
+        if (contentInBox endsWith ">") "  " else
+        if (contentInBox endsWith "?") "" else " ")
     }
   }
 

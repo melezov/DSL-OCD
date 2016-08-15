@@ -61,17 +61,15 @@ trait TestJavaOneValueInOneEntityInAggregate
   def jsonSerializationTest = s"""
     /* Testing the "${propertyName}" within one ${ValueName} within one ${EntityName} ${testID} aggregate property JSON serialization */
     @org.junit.Test
-    public void test${PropertyName}WithinOne${ValueName}WithinOne${EntityName}${testID}PropertyInAggregateJsonSerialization() throws IOException {
-${isDefault match {
-           case true => s"""
+    public void test${PropertyName}WithinOne${ValueName}WithinOne${EntityName}${testID}PropertyInAggregateJsonSerialization() throws IOException {${isDefault match {
+      case true => s"""
         final ${conceptName} aggregate = new ${conceptName}();
         final ${propertyType.javaClass} testValue = aggregate.get${EntityName}().get${ValueName}().get${PropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate = new ${conceptName}();
-        aggregate.get${EntityName}().get${ValueName}().set${PropertyName}(testValue);"""
-}}
+        aggregate.get${EntityName}().get${ValueName}().set${PropertyName}(testValue);"""}}
 
         // check that the property was properly assigned
         ${assertEquals("aggregate")}

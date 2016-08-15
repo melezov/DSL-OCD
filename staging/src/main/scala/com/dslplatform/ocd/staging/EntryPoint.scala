@@ -77,12 +77,13 @@ object EntryPoint
 //      java.util.concurrent.Executors.newFixedThreadPool(
 //        Runtime.getRuntime.availableProcessors()))
 
+  Mvn("dsl-compiler-client", "CommandLineClient", "clean", "package")
   Mvn("dsl-json", "library", "clean", "install")
   Mvn("dsl-json", "java8", "clean", "install")
   Sbt("dsl-client-java", "", "clean", "publishM2")
   Mvn("revenj", "java/revenj-core", "clean", "install")
   Mvn("revenj", "java/revenj-servlet", "clean", "install", "war:war")
-  Mvn("dsl-compiler-client", "CommandLineClient", "clean", "package")
+  Sbt("revenj", "scala", "clean", "publishM2")
 }
 
 object Repositories {
@@ -173,11 +174,12 @@ object Sbt {
 
   def apply(project: String, path: String, commands: String*): Unit = {
     val target = Path(s"repositories/${project}/${path}", '/')
+    val launcher = Path("tools") / "sbt-launch-0.13.12.jar"
 
     Process((Seq(
       "java"
     , s"-Duser.home=${userHome.path}"
-    , "-jar", "project/strap/gruj_vs_sbt-launch-0.13.x.jar"
+    , "-jar", launcher.toAbsolute.path
     ) ++ commands), target.jfile)!
   }
 }

@@ -1,12 +1,14 @@
+/*
 package com.dslplatform.ocd
 package test
 package javatest
 package property
 
+import domain.ValueCollection
 import types._
 import javas._
 
-trait TestJavaOneEntityInAggregate
+trait TestJavaManyValuesInAggregate
     extends TestComponentWithProperty {
 
   def testID: String
@@ -14,50 +16,89 @@ trait TestJavaOneEntityInAggregate
   def testValue: JavaValue
   def setupBlock: String = ""
 
-  def entityName: String
-  def EntityName = entityName.fciu
+  def valueCollections: Seq[ValueCollection]
+  def ValueName: String
 
-  def entityConceptName: String
-
+  def valueConceptName: String
   def repositoryName: String
 
   def testComponentBody = (
-    jsonSerializationTest
-  + (!isDisallowed(isDefault)).ifTrue(activeRecordPersistTest)
-  + (!isDisallowed(isDefault)).ifTrue(repositoryPersistTest)
+    initializationBlock
+
+//    jsonSerializationTest
+//  + (!isDisallowed(isDefault)).ifTrue(activeRecordPersistTest)
+//  + (!isDisallowed(isDefault)).ifTrue(repositoryPersistTest)
   )
+
+  var xi = 0
+
+  private def initializationBlock() = {
+    val x = s"""
+    /* Initializing crap ${{xi += 1; xi}} */
+    @org.junit.Test
+    public void test${xi}() throws IOException {${
+        final
+
+
+      valueCollections map { collection =>
+
+        collection
+
+      } mkString("\n")
+
+    }
+
+
+"""
+
+    println(x)
+
+
+    x
+  }
 
   private def assertEquals(target: String) = property match {
     case _ if isDisallowed(isDefault) =>
       s"""// special null check for disallowed null value in a non-nullable property
-        org.junit.Assert.assertNull(${target}.get${EntityName}().get${PropertyName}());"""
+        org.junit.Assert.assertNull(${target}.get${ValueName}().get${PropertyName}());"""
 
     case p: OcdJavaBoxTypeProperty if p.boxType.isPrecise =>
       s"""com.dslplatform.ocd.javaasserts.${p.boxType.typeSingleName}Asserts.assert${p.box.boxName}Equals(
                 testValue,
-                ${target}.get${EntityName}().get${PropertyName}(),
+                ${target}.get${ValueName}().get${PropertyName}(),
                 2);"""
 
     case p: OcdJavaBoxTypeProperty =>
       s"""com.dslplatform.ocd.javaasserts.${p.boxType.typeSingleName}Asserts.assert${p.box.boxName}Equals(
                 testValue,
-                ${target}.get${EntityName}().get${PropertyName}());"""
+                ${target}.get${ValueName}().get${PropertyName}());"""
 
     case _ => ???
   }
 
+  private def assertValueEqualityAndHashCode =
+    s"""// nested values must be equal
+        com.dslplatform.ocd.test.FancyAsserts.assertEquals(
+                aggregate.get${ValueName}(),
+                aggregateFound.get${ValueName}());
+
+        // nested values hashCode() must be equal
+        com.dslplatform.ocd.test.FancyAsserts.assertEquals(
+                aggregate.get${ValueName}().hashCode(),
+                aggregateFound.get${ValueName}().hashCode());"""
+
   def jsonSerializationTest = s"""
-    /* Testing the "${propertyName}" within one ${EntityName} ${testID} aggregate property JSON serialization */
+    /* Testing the "${propertyName}" within one ${ValueName} ${testID} aggregate property JSON serialization */
     @org.junit.Test
-    public void test${PropertyName}WithinOne${EntityName}${testID}PropertyInAggregateJsonSerialization() throws IOException {${isDefault match {
+    public void test${PropertyName}WithinOne${ValueName}${testID}PropertyInAggregateJsonSerialization() throws IOException {${isDefault match {
       case true => s"""
         final ${conceptName} aggregate = new ${conceptName}();
-        final ${propertyType.javaClass} testValue = aggregate.get${EntityName}().get${PropertyName}();"""
+        final ${propertyType.javaClass} testValue = aggregate.get${ValueName}().get${PropertyName}();"""
 
       case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate = new ${conceptName}();
-        aggregate.get${EntityName}().set${PropertyName}(testValue);"""}}
+        aggregate.get${ValueName}().set${PropertyName}(testValue);"""}}
 
         // check that the property was properly assigned
         ${assertEquals("aggregate")}
@@ -77,17 +118,17 @@ trait TestJavaOneEntityInAggregate
     }
 """
   def activeRecordPersistTest = s"""
-    /* Testing the "${propertyName}" within one ${EntityName} ${testID} property value after active record persist */
+    /* Testing the "${propertyName}" within one ${ValueName} ${testID} property value after active record persist */
     @org.junit.Test
-    public void test${PropertyName}WithinOne${EntityName}${testID}PropertyEntityInAggregateAfterActiveRecordPersist() throws IOException {${setupBlock}${isDefault match {
+    public void test${PropertyName}WithinOne${ValueName}${testID}PropertyValueInAggregateAfterActiveRecordPersist() throws IOException {${setupBlock}${isDefault match {
       case true => s"""
         final ${conceptName} aggregate = new ${conceptName}();
-        final ${propertyType.javaClass} testValue = aggregate.get${EntityName}().get${PropertyName}();"""
+        final ${propertyType.javaClass} testValue = aggregate.get${ValueName}().get${PropertyName}();"""
 
       case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate = new ${conceptName}();
-        aggregate.get${EntityName}().set${PropertyName}(testValue);"""}}
+        aggregate.get${ValueName}().set${PropertyName}(testValue);"""}}
 
         // persist via active record pattern
         aggregate.create();
@@ -99,6 +140,8 @@ trait TestJavaOneEntityInAggregate
         // check the property retrieved from the database
         ${assertEquals("aggregateFound")}
 
+        ${assertValueEqualityAndHashCode}
+
         // aggregates are compared via URI equality - both URIs have be initialized at this point
         com.dslplatform.ocd.test.FancyAsserts.assertEquals(aggregate, aggregateFound);
 
@@ -108,17 +151,17 @@ trait TestJavaOneEntityInAggregate
 """
 
   def repositoryPersistTest = s"""
-    /* Testing the "${propertyName}" within one ${EntityName} ${testID} property value after repository persist */
+    /* Testing the "${propertyName}" within one ${ValueName} ${testID} property value after repository persist */
     @org.junit.Test
-    public void test${PropertyName}WithinOne${EntityName}${testID}PropertyEntityInAggregateAfterRepositoryPersist() throws IOException, InterruptedException, ExecutionException {${setupBlock}${isDefault match {
+    public void test${PropertyName}WithinOne${ValueName}${testID}PropertyValueInAggregateAfterRepositoryPersist() throws IOException, InterruptedException, ExecutionException {${setupBlock}${isDefault match {
       case true => s"""
         final ${conceptName} aggregate = new ${conceptName}();
-        final ${propertyType.javaClass} testValue = aggregate.get${EntityName}().get${PropertyName}();"""
+        final ${propertyType.javaClass} testValue = aggregate.get${ValueName}().get${PropertyName}();"""
 
       case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} aggregate = new ${conceptName}();
-        aggregate.get${EntityName}().set${PropertyName}(testValue);"""}}
+        aggregate.get${ValueName}().set${PropertyName}(testValue);"""}}
 
         // persist via repository interface for collections
         final String uri = ${repositoryName}.insert(new ${conceptName}[] { aggregate }).get().get(0);
@@ -130,6 +173,9 @@ trait TestJavaOneEntityInAggregate
 
         // check the property retrieved from the database
         ${assertEquals("aggregateFound")}
+
+        ${assertValueEqualityAndHashCode}
     }
 """
 }
+*/

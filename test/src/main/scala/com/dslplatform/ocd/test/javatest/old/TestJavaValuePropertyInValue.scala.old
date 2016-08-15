@@ -46,12 +46,12 @@ trait TestJavaValuePropertyInValue
     /* Testing the "${outterConceptName}" ${testID} property value serialization */
     @org.junit.Test
     public void test${outterPropertyName}${testID}PropertyValueSerialization() throws java.io.IOException {${setupBlock}${isDefault match {
-           case true => s"""
+      case true => s"""
         final ${outterConceptName} domainValue =
                 new ${outterConceptName}();
         final ${InnerPropertyName} testValue = domainValue.get${OutterPropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${javaClass} testValue = ${testValue};
         final ${outterConceptName} domainValue =
                 new ${outterConceptName}()

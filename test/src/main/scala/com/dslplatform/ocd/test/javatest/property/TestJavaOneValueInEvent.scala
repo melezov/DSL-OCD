@@ -61,11 +61,11 @@ trait TestJavaOneValueInEvent
     /* Testing the "${propertyName}" within one ${ValueName} ${testID} event property JSON serialization */
     @org.junit.Test
     public void test${PropertyName}WithinOne${ValueName}${testID}PropertyInEventJsonSerialization() throws IOException {${isDefault match {
-           case true => s"""
+      case true => s"""
         final ${conceptName} event = new ${conceptName}();
         final ${propertyType.javaClass} testValue = event.get${ValueName}().get${PropertyName}();"""
 
-           case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} event = new ${conceptName}();
         event.get${ValueName}().set${PropertyName}(testValue);"""}}
@@ -92,11 +92,11 @@ trait TestJavaOneValueInEvent
     /* Testing the "${propertyName}" within one ${ValueName} ${testID} property value after active record persist */
     @org.junit.Test
     public void test${PropertyName}WithinOne${ValueName}${testID}PropertyValueInEventAfterActiveRecordPersist() throws IOException, InterruptedException, ExecutionException {${setupBlock}${isDefault match {
-    case true => s"""
+      case true => s"""
         final ${conceptName} event = new ${conceptName}();
         final ${propertyType.javaClass} testValue = event.get${ValueName}().get${PropertyName}();"""
 
-    case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} event = new ${conceptName}();
         event.get${ValueName}().set${PropertyName}(testValue);"""}}
@@ -130,11 +130,11 @@ trait TestJavaOneValueInEvent
     /* Testing the "${propertyName}" within one ${ValueName} ${testID} property value after repository persist */
     @org.junit.Test
     public void test${PropertyName}WithinOne${ValueName}${testID}PropertyValueInEventAfterRepositoryPersist() throws IOException, InterruptedException, ExecutionException {${setupBlock}${isDefault match {
-    case true => s"""
+      case true => s"""
         final ${conceptName} event = new ${conceptName}();
         final ${propertyType.javaClass} testValue = event.get${ValueName}().get${PropertyName}();"""
 
-    case _ => s"""
+      case _ => s"""
         final ${propertyType.javaClass} testValue = ${testValue};
         final ${conceptName} event = new ${conceptName}();
         event.get${ValueName}().set${PropertyName}(testValue);"""}}

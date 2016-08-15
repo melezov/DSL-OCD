@@ -21,9 +21,9 @@
   <property name="target.main" location="${target}/classes"/>
   <property name="target.test" location="${target}/test-classes"/>
 
-  <property name="dsl-clc" value="dsl-clc-1.7.2-160723-221904.jar"/>
-  <property name="dsl-compiler" value="dsl-compiler-1.5.6044.31558-160723-221904.exe"/>
-  <property name="revenj.war" value="revenj-servlet-1.0.0-160723-221904.war"/>
+  <property name="dsl-clc" value="dsl-clc-1.7.2-160816-002633.jar"/>
+  <property name="dsl-compiler" value="dsl-compiler-1.5.6066.34048-160816-002633.exe"/>
+  <property name="revenj.war" value="revenj-servlet-1.0.0-160816-002633.war"/>
 
   <property name="client" value="java_client"/>
   <property name="server" value="revenj.java"/>

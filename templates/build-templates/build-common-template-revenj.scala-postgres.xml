@@ -41,7 +41,7 @@
   <property name="tools.revenj-runner" location="${tools.runtime}/revenj-runner/dsl-ocd-util-revenj-runner-0.1.0.jar"/>
 
   <property name="workspace.client" location="${temp.client}/workspace"/>
-  <property name="workspace.server" location="${temp.client}/workspace"/>
+  <property name="workspace.server" location="${temp.server}/workspace"/>
   <property name="workspace.migration" location="${temp.migration}/workspace"/>
 
   <property name="client.dependencies.template" location="${tools.compile}/${client}"/>

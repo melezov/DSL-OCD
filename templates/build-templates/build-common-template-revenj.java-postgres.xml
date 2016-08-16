@@ -42,7 +42,7 @@
   <property name="tools.jetty-stopper" location="${tools.runtime}/jetty-runner/jetty-stopper-9.3.3.v20150827.jar"/>
 
   <property name="workspace.client" location="${temp.client}/workspace"/>
-  <property name="workspace.server" location="${temp.client}/workspace"/>
+  <property name="workspace.server" location="${temp.server}/workspace"/>
   <property name="workspace.migration" location="${temp.migration}/workspace"/>
 
   <property name="client.dependencies.template" location="${tools.compile}/${client}"/>
@@ -273,8 +273,8 @@
     <java jar="${tools.jetty-runner}" dir="${server.runtime}" fork="true" spawn="true">
       <arg value="--host"/> <arg value="${serverHost}"/>
       <arg value="--port"/> <arg value="${serverPort}"/>
-      <arg value="--stop-port"/> <arg value="${jetty-stop-port}"/>
-      <arg value="--stop-key"/> <arg value="${jetty-stop-key}"/>
+      <arg value="--stop-port"/> <arg value="${revenj-stop-port}"/>
+      <arg value="--stop-key"/> <arg value="${revenj-stop-key}"/>
       <arg value="--out"/> <arg value="${server.log}"/>
       <arg value="--log"/> <arg value="${server.log}"/>
       <arg value="${revenj.war}"/>

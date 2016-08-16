@@ -1,6 +1,5 @@
 package com.dslplatform.ocd
 
-import com.dslplatform.ocd.dsls.OcdDslBoxType
 import config.{Database, ITestSettings}
 
 package object test {
@@ -152,7 +151,7 @@ package object test {
   implicit class ClassyBoxTyper(val box: boxes.OcdBox) extends AnyVal {
     def around(content: String) = {
       val tmp = `type.Secret`
-      val dslTmp = OcdDslBoxType.resolve(tmp, box)
+      val dslTmp = dsls.OcdDslBoxType.resolve(tmp, box)
       val contentInBox = dslTmp.dslName.replace(tmp.typeName, content)
 
       contentInBox + (

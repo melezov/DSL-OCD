@@ -21,7 +21,12 @@ private[config] class TestDeployer(
 
   private val configTarget = toolsTarget / "config"
   private val clientConfigTemplate = testSettings.templates / "config-templates" / "java_client" / "dsl-project.properties.template"
-  private val serverConfigTemplate = testSettings.templates / "config-templates" / s"revenj.${testSettings.database.templateName}" / s"${testSettings.revenj.configName}"
+  private val serverConfigTemplates = {
+    val base = testSettings.templates / "config-templates" / s"${testSettings.revenj.templateName}-${testSettings.database.templateName}"
+    testSettings.revenj.configs map { config =>
+      base / config
+    }
+  }
 
   private val commonBuildTemplateName = s"build-common-template-${testSettings.revenj.templateName}-${testSettings.database.templateName}.xml"
 
@@ -51,7 +56,9 @@ private[config] class TestDeployer(
     cleanAndCopy(toolsTemplate, toolsTarget)
     cleanAndCopy(reportTemplate, reportTarget)
     cleanAndCopy(clientConfigTemplate, configTarget / clientConfigTemplate.name)
-    cleanAndCopy(serverConfigTemplate, configTarget / serverConfigTemplate.name)
+    serverConfigTemplates foreach { serverConfigTemplate =>
+      cleanAndCopy(serverConfigTemplate, configTarget / serverConfigTemplate.name)
+    }
   }
 
   private def cleanAndCopy(source: Path, target: Path): Unit = {

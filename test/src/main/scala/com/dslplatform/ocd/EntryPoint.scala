@@ -27,9 +27,9 @@ class EntryPoint(
 
       Seq[ITestProject](
         TestJavaAssertsBorderValuesTurtle
-        , TestJavaPropertyFieldTypeTurtle
-        , TestJavaPropertyGetterTypeTurtle
-        , TestJavaPropertySetterTypeTurtle
+      , TestJavaPropertyFieldTypeTurtle
+      , TestJavaPropertyGetterTypeTurtle
+      , TestJavaPropertySetterTypeTurtle
       )
     }
 

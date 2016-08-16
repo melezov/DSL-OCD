@@ -26,7 +26,7 @@
   <property name="revenj.war" value="revenj-servlet-1.0.0-160816-002633.war"/>
 
   <property name="client" value="java_client"/>
-  <property name="server" value="revenj.java"/>
+  <property name="server" value="revenj.scala"/>
 
   <property name="tools.test" location="${tools}/test"/>
   <property name="tools.build" location="${tools}/build"/>
@@ -38,8 +38,7 @@
   <property name="tools.dsl-compiler" location="${tools.build}/${dsl-compiler}"/>
 
   <property name="tools.ping" location="${tools.build}/dsl-ocd-util-ping-0.1.1.jar"/>
-  <property name="tools.jetty-runner" location="${tools.runtime}/jetty-runner/jetty-runner-9.3.3.v20150827.jar"/>
-  <property name="tools.jetty-stopper" location="${tools.runtime}/jetty-runner/jetty-stopper-9.3.3.v20150827.jar"/>
+  <property name="tools.revenj-runner" location="${tools.runtime}/revenj-runner/dsl-ocd-util-revenj-runner-0.1.0.jar"/>
 
   <property name="workspace.client" location="${temp.client}/workspace"/>
   <property name="workspace.server" location="${temp.client}/workspace"/>
@@ -56,7 +55,8 @@
   <property name="server.runtime" location="server"/>
 
   <property name="client.config.template" location="${tools.config}/dsl-project.properties.template"/>
-  <property name="server.config.template" location="${tools.config}/revenj.properties.template"/>
+  <property name="server.config.template" location="${tools.config}/application.conf.template"/>
+  <property name="server.config.template.legacy" location="${tools.config}/revenj.properties.template"/>
 
   <property name="server.log" location="${server.runtime}/log"/>
 
@@ -258,7 +258,8 @@
       <fileset dir="${server.runtime.template}"/>
     </copy>
 
-    <copy file="${server.config.template}" toFile="${server.runtime}/revenj.properties" overwrite="true" filtering="true"/>
+    <copy file="${server.config.template}" toFile="${server.runtime}/application.conf" overwrite="true" filtering="true"/>
+    <copy file="${server.config.template.legacy}" toFile="${server.runtime}/revenj.properties" overwrite="true" filtering="true"/>
   </target>
 
   <!-- ################ -->
@@ -270,30 +271,35 @@
 
   <target name="server-start" description="Starts the server">
     <delete file="${server.log}"/>
-    <java jar="${tools.jetty-runner}" dir="${server.runtime}" fork="true" spawn="true">
-      <arg value="--host"/> <arg value="${serverHost}"/>
-      <arg value="--port"/> <arg value="${serverPort}"/>
-      <arg value="--stop-port"/> <arg value="${jetty-stop-port}"/>
-      <arg value="--stop-key"/> <arg value="${jetty-stop-key}"/>
-      <arg value="--out"/> <arg value="${server.log}"/>
-      <arg value="--log"/> <arg value="${server.log}"/>
-      <arg value="${revenj.war}"/>
+    <java classname="com.dslplatform.ocd.test.RevenjRunner" dir="${server.runtime}" fork="true" spawn="true">
+      <classpath>
+        <pathelement path="${tools.revenj-runner}"/>
+        <pathelement path="${server.runtime}/*"/>
+        <pathelement path="${server.runtime}/plugins/*"/>
+      </classpath>
+      <jvmarg value="-Dconfig.file=application.conf"/>
+      <arg value="${serverHost}"/>
+      <arg value="${serverPort}"/>
+      <arg value="${serverHost}"/>
+      <arg value="${revenj-stop-port}"/>
+      <arg value="${revenj-stop-key}"/>
     </java>
     <java jar="${tools.ping}" fork="true">
       <arg value="-t"/>
       <arg value="30000ms"/>
       <arg value="-i"/>
       <arg value="100ms"/>
-      <arg value="http://${serverHost}:${serverPort}/ping"/>
+      <arg value="http://${serverHost}:${serverPort}/"/>
     </java>
   </target>
 
   <target name="server-stop" description="Stops the running server">
-    <java jar="${tools.jetty-stopper}" fork="true">
-      <arg value="STOP.HOST=${serverHost}"/>
-      <arg value="STOP.PORT=${jetty-stop-port}"/>
-      <arg value="STOP.KEY=${jetty-stop-key}"/>
-      <arg value="--stop"/>
+    <java jar="${tools.ping}" fork="true">
+      <arg value="-t"/>
+      <arg value="10000ms"/>
+      <arg value="-i"/>
+      <arg value="250ms"/>
+      <arg value="http://${serverHost}:${revenj-stop-port}/${revenj-stop-key}"/>
     </java>
   </target>
 

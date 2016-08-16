@@ -38,8 +38,8 @@
   <property name="tools.dsl-compiler" location="${tools.build}/${dsl-compiler}"/>
 
   <property name="tools.ping" location="${tools.build}/dsl-ocd-util-ping-0.1.0.jar"/>
-  <property name="tools.jetty-runner" location="${tools.runtime}/jetty/jetty-runner-9.3.3.v20150827.jar"/>
-  <property name="tools.jetty-stopper" location="${tools.runtime}/jetty/jetty-stopper-9.3.3.v20150827.jar"/>
+  <property name="tools.jetty-runner" location="${tools.runtime}/jetty-runner/jetty-runner-9.3.3.v20150827.jar"/>
+  <property name="tools.jetty-stopper" location="${tools.runtime}/jetty-runner/jetty-stopper-9.3.3.v20150827.jar"/>
 
   <property name="workspace.client" location="${temp.client}/workspace"/>
   <property name="workspace.server" location="${temp.client}/workspace"/>

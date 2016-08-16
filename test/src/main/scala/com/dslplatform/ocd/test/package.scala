@@ -24,9 +24,17 @@ package object test {
     }
   }
 
+  import boxes._
   import types._
+
+  /** This overrides the boxPattern in testSettings, for development only - should always be commented out */
+  val overrideBoxes = Seq[OcdBox](
+//    `box.One`
+//    `box.NullableLinkedListOfNullable`
+  )
+
   /** This overrides the typePattern in testSettings, for development only - should always be commented out */
-  val overrideTypes = Seq(
+  val overrideTypes = Seq[OcdType](
 //    `type.Binary`
 //    `type.Boolean`
 //    `type.Integer`
@@ -36,7 +44,7 @@ package object test {
   )
 
   object OcdTypeSingletonExtender {
-    private val postgresSupportedTypes = Seq(
+    private val postgresSupportedTypes = Seq[OcdType](
       `type.Binary`
 //    , `type.Bits`
     , `type.Boolean`
@@ -72,7 +80,7 @@ package object test {
     , `type.Xml`
     )
 
-    private val oracleSupportedTypes = Seq(
+    private val oracleSupportedTypes = Seq[OcdType](
       `type.Binary`
 //    , `type.Bits`
     , `type.Boolean`
@@ -107,6 +115,21 @@ package object test {
 //    , `type.Url`
 //    , `type.Xml`
     )
+  }
+
+  implicit class OcdBoxSingletonExtender(val ocdBox: boxes.OcdBox.type) extends AnyVal {
+    def useCaseValues(testSettings: ITestSettings): Seq[boxes.OcdBox] = overrideBoxes match {
+      case overrides if overrides.nonEmpty =>
+        overrides
+
+      case _ => OcdBox.values filter {
+        case box if box.collectionFamily == Some(CollectionFamily.Queue) && box.areElementsNullable == Some(true) =>
+          false // Queue cannot contain null elements (in Java client)
+
+        case box =>
+          testSettings.boxPattern.pattern.matcher(box.boxName).matches()
+      }
+    }
   }
 
   implicit class OcdTypeSingletonExtender(val ocdType: types.OcdType.type) extends AnyVal {

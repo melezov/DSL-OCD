@@ -17,9 +17,8 @@ private[domain] class CalculatedPropertyInSnowflakeSetupFactory(
 
   val setups = for {
     t <- OcdType.useCaseValues(testSettings)
-    b <- OcdBox.values
+    b <- OcdBox.useCaseValues(testSettings)
     d = OcdDslBoxType.resolve(t, b)
-    if !(b.collectionFamily == Some(CollectionFamily.Queue) && b.areElementsNullable == Some(true)) // Queue cannot contain null elements
     if !isOracle || (t.typeName != "String" && t.typeName != "Text" && t.typeName != "Binary" || !b.isCollection)
   } yield {
     new CalculatedPropertyInSnowflakeSetup(d)

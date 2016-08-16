@@ -16,8 +16,7 @@ private[domain] class EventWithOnePropertyWithinOneValueSetupFactory(
 
   val setups = for {
     t <- OcdType.useCaseValues(testSettings)
-    b <- OcdBox.values
-    if !(b.collectionFamily == Some(CollectionFamily.Queue) && b.areElementsNullable == Some(true)) // Queue cannot contain null elements
+    b <- OcdBox.useCaseValues(testSettings)
     if !isOracle || (t.typeName != "String" && t.typeName != "Text" && t.typeName != "Binary" || !b.isCollection)
     d = OcdDslBoxType.resolve(t, b)
   } yield {

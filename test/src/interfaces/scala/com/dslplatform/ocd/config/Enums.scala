@@ -19,18 +19,22 @@ trait EnumObj[T <: Enum] {
 
 sealed trait Revenj extends Enum {
   val templateName: String
-  val configName: String
+  val configs: Seq[String]
 }
 object Revenj extends EnumObj[Revenj] {
   case object DotNet extends Revenj {
     val templateName = "revenj.net"
-    val configName = "Revenj.Http.exe.config.template"
+    val configs = Seq("Revenj.Http.exe.config.template")
   }
   case object Java extends Revenj {
     val templateName = "revenj.java"
-    val configName = "revenj.properties.template"
+    val configs = Seq("revenj.properties.template")
   }
-  val values = IndexedSeq(DotNet, Java)
+  case object Scala extends Revenj {
+    val templateName = "revenj.scala"
+    val configs = Seq("revenj.properties.template", "application.conf.template")
+  }
+  val values = IndexedSeq[Revenj](DotNet, Java, Scala)
 }
 
 sealed trait Database extends Enum { val templateName: String }

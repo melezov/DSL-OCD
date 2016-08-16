@@ -64,7 +64,7 @@ public class Ping {
                         final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                         try {
                             final int response = connection.getResponseCode();
-                            if (response == 404 || response == 200) {
+                            if (response == 404 || response == 400 || response == 200) {
                                 if (success.compareAndSet(false, true)) {
                                     System.out.println("PONG!");
                                 }

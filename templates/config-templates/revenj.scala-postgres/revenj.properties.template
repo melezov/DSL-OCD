@@ -1,2 +1,2 @@
 revenj.jdbcUrl=jdbc:postgresql://@dbHost@:@dbPort@/@dbName@?user=@dbUser@&password=@dbPassword@
-revenj.pluginsPath=.
+revenj.pluginsPath=plugins

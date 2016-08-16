@@ -19,6 +19,4 @@ object EntryPoint
 
   logger.info("#" * 50)
   Gather()
-
-  sys.exit(0)
 }

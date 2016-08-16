@@ -1,5 +1,5 @@
 <project>
-    <macrodef name="get-jetty-stop-port">
+    <macrodef name="get-revenj-stop-port">
         <attribute name="port"/>
         <attribute name="result"/>
         <sequential>
@@ -10,7 +10,7 @@
         </sequential>
     </macrodef>
 
-    <macrodef name="get-jetty-stop-key">
+    <macrodef name="get-revenj-stop-key">
         <attribute name="host"/>
         <attribute name="port"/>
         <attribute name="result"/>

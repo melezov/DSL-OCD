@@ -1,6 +1,5 @@
 package com.dslplatform.ocd
 
-import dsls.OcdDslBoxType
 import scala.concurrent.Future
 import config._
 import test.javatest.property.turtle._
@@ -18,8 +17,20 @@ class EntryPoint(
   def run(): Unit = {
     Future {
       logger.trace(s"Initializing DSL values ...")
-      val values = OcdDslBoxType.values
+      val values = dsls.OcdDslBoxType.values
       logger.debug(s"Initialized ${values.size} DSL values!")
+    }
+
+    locally {
+      import test._
+      if (logger.isDebugEnabled) {
+        types.OcdType.useCaseValues(testSettings) foreach { tpe =>
+          logger.debug("Using use-case type: {}", tpe.typeName)
+        }
+        boxes.OcdBox.useCaseValues(testSettings) foreach { box =>
+          logger.debug("Using use-case box: {}", box.boxName)
+        }
+      }
     }
 
     lazy val turtles = {

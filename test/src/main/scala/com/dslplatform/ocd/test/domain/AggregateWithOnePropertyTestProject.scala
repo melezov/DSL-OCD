@@ -22,10 +22,9 @@ private[domain] class AggregateWithOnePropertySetupFactory(
     if t != `type.Xml`                                  // ERROR: data type xml has no default operator class for access method "btree"
     if t != `type.Rectangle`                            // ERROR: data type box has no default operator class for access method "btree"
     if !isOracle || t != `type.Binary` && t != `type.String` && t != `type.Text` // Oracle doesn't support BLOB or CLOB as primary key
-    b <- OcdBox.values
+    b <- OcdBox.useCaseValues(testSettings)
     if !b.isNullable                                    // Primary keys cannot be nullable
-    if !(b.collectionFamily == Some(CollectionFamily.Queue) && b.areElementsNullable == Some(true)) // Queue cannot contain null elements
-    if !isOracle || b.isCollection == false               // Collections cannot be PK in Oracle
+    if !isOracle || b.isCollection == false             // Collections cannot be PK in Oracle
     if b.collectionFamily != Some(CollectionFamily.Set) // URIs from Set PKs are currently behaving erratically
     d = OcdDslBoxType.resolve(t, b)
   } yield {

@@ -60,6 +60,9 @@ private[config] class TestSettings(logger: Logger) {
 
       val typePattern = properties.getProperty("typePattern", ".*").r
       logger.info("Type pattern: {}", typePattern)
+
+      val boxPattern = properties.getProperty("boxPattern", ".*").r
+      logger.info("Box pattern: {}", boxPattern)
     }
 
     logger.trace("Test settings successfully extracted!")

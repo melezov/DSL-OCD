@@ -15,4 +15,5 @@ trait ITestSettings {
   def turtles: Boolean
   def projectPattern: Regex
   def typePattern: Regex
+  def boxPattern: Regex
 }

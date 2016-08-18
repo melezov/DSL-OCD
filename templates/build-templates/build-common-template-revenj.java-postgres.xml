@@ -23,7 +23,7 @@
 
   <property name="dsl-clc" value="dsl-clc-1.7.2-160816-204909.jar"/>
   <property name="dsl-compiler" value="dsl-compiler-1.5.6072.30766-160816-204909.exe"/>
-  <property name="revenj.war" value="revenj-servlet-1.0.0-160816-204909.jar"/>
+  <property name="revenj.war" value="revenj-servlet-1.0.0-160816-204909.war"/>
 
   <property name="client" value="java_client"/>
   <property name="server" value="revenj.java"/>
@@ -291,8 +291,8 @@
   <target name="server-stop" description="Stops the running server">
     <java jar="${tools.jetty-stopper}" fork="true">
       <arg value="STOP.HOST=${serverHost}"/>
-      <arg value="STOP.PORT=${jetty-stop-port}"/>
-      <arg value="STOP.KEY=${jetty-stop-key}"/>
+      <arg value="STOP.PORT=${revenj-stop-port}"/>
+      <arg value="STOP.KEY=${revenj-stop-key}"/>
       <arg value="--stop"/>
     </java>
   </target>

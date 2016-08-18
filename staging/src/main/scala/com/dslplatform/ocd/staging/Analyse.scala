@@ -23,8 +23,10 @@ object Analyse {
 
     val origVersion = firstMatcher.group(2)
     for (check <- firstCheck) yield {
-      assert(origVersion == check, s"Version of $project/$path dependency ${origVersion} differs from expected: ${check}")
-      println(s"Original version of $project/$path was: $origVersion")
+      logger.info(s"Original version of $project/$path was: $origVersion")
+      if (origVersion != check) {
+        logger.warn(s"Version of $project/$path dependency ${origVersion} differs from expected: ${check}")
+      }
       origVersion
     }
 
@@ -38,7 +40,9 @@ object Analyse {
 
       val nextVersion = nextMatcher.group(2)
       for (check <- nextCheck) {
-        assert(nextVersion == check, s"Version of $project/$path dependency ${nextVersion} differs from expected: ${check}")
+        if (nextVersion != check) {
+          logger.warn(s"Version of $project/$path dependency ${nextVersion} differs from expected: ${check}")
+        }
       }
       acc.replaceFirst(nextPattern, nextReplacement)
     }

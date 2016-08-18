@@ -33,4 +33,7 @@ package object staging
       Await.result(future, scala.concurrent.duration.Duration.Inf)
     }
   }
+
+  def unixVsWindows(unixArgs: String*)(windowsArgs: String*): Seq[String] =
+    if (java.io.File.separator == "/") unixArgs else windowsArgs
 }

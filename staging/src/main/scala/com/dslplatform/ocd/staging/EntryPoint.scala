@@ -8,7 +8,6 @@ object EntryPoint
   Source()
 
   logger.info("#" * 50)
-  scala.io.StdIn.readLine("Inspect versions of newly cloned repositories, then press ENTER to compile")
   Analyse()
 
   logger.info("#" * 50)

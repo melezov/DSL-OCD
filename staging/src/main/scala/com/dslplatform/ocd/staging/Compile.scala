@@ -17,10 +17,10 @@ object Compile {
   private[this] def mvn(project: String, path: String, commands: String*): Unit = {
     val target = Path(s"repositories/${project}/${path}", '/')
 
-    Process((Seq(
-      "cmd", "/c", "mvn"
-      , "-Dmaven.test.skip=true"
-      , s"-Duser.home=${userHome.path}"
+    Process((unixVsWindows()("cmd", "/c") ++ Seq(
+      "mvn"
+    , "-Dmaven.test.skip=true"
+    , s"-Duser.home=${userHome.path}"
     ) ++ commands), target.jfile)!
   }
 
@@ -30,8 +30,8 @@ object Compile {
 
     Process((Seq(
       "java"
-      , s"-Duser.home=${userHome.path}"
-      , "-jar", launcher.toAbsolute.path
+    , s"-Duser.home=${userHome.path}"
+    , "-jar", launcher.toAbsolute.path
     ) ++ commands), target.jfile)!
   }
 

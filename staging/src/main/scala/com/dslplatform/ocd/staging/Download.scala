@@ -64,11 +64,7 @@ object Download {
     val stdoutWriter = new java.io.PrintWriter(stdout)
     val stderrWriter = new java.io.PrintWriter(stderr)
 
-    (if (java.io.File.separator == "/") {
-      Seq("mono", tempFile.path)
-    } else {
-      Seq(tempFile.path)
-    }) ! ProcessLogger(stdoutWriter.println, stderrWriter.println)
+    (unixVsWindows("mono")() :+ tempFile.path) ! ProcessLogger(stdoutWriter.println, stderrWriter.println)
 
     stdoutWriter.close()
     stderrWriter.close()

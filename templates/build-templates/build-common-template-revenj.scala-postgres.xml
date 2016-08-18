@@ -23,7 +23,6 @@
 
   <property name="dsl-clc" value="dsl-clc-1.7.2-160816-204909.jar"/>
   <property name="dsl-compiler" value="dsl-compiler-1.5.6072.30766-160816-204909.exe"/>
-  <property name="revenj.war" value="revenj-servlet-1.0.0-160816-204909.jar"/>
 
   <property name="client" value="java_client"/>
   <property name="server" value="revenj.scala"/>

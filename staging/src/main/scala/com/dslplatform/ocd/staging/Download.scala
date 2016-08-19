@@ -11,7 +11,7 @@ object Download {
     (home ** "*.exe") foreach { old =>
       val oldVersion = testVersion(old)
       old.delete(force = true)
-      logger.debug(s"Deleted ${old.path} ($oldVersion) ...")
+      logger.trace(s"Deleted ${old.path} ($oldVersion) ...")
     }
   }
 
@@ -40,7 +40,7 @@ object Download {
         if (read != -1) {
           fos.write(buffer, 0, read)
           val total = soFar + read
-          logger.info(s"Wrote $total bytes ...")
+          logger.trace(s"Wrote $total bytes ...")
           slurp(total)
         } else {
           soFar
@@ -77,7 +77,7 @@ object Download {
   private[this] def rename(tempFile: Path, version: String): Unit = {
     val targetFile = home / s"dsl-compiler-$version-$xkcd.exe"
     tempFile moveTo targetFile
-    logger.info(s"Renamed to ${targetFile.path}")
+    logger.debug(s"Renamed to ${targetFile.name}")
   }
 
   def apply(): Unit = {
@@ -86,7 +86,7 @@ object Download {
 
     // Download compiler
     val (tempFile, size) = download()
-    logger.info(s"Wrote ${tempFile.path} ($size bytes)")
+    logger.debug(s"Wrote ${tempFile.name} ($size bytes)")
 
     // Check version
     val version = testVersion(tempFile)

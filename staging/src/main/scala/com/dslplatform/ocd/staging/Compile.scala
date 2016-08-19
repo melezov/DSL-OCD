@@ -6,33 +6,37 @@ import sys.process._
 object Compile {
   private[this] def clean(path: String*): Unit = {
     val tempRepoM2 = userHome / ".m2" / "repository" / (path.mkString("/"), '/')
-    logger.debug("Cleaning previous publish local .m2: {}", tempRepoM2.path)
+    logger.trace("Cleaning previous publish local .m2: {}", tempRepoM2.path)
     tempRepoM2.deleteRecursively(force = true, continueOnFailure = false)
 
     val tempRepoIvy = userHome / ".ivy" / "repository" / path.mkString(".")
-    logger.debug("Cleaning previous publish local .ivy: {}", tempRepoIvy.path)
+    logger.trace("Cleaning previous publish local .ivy: {}", tempRepoIvy.path)
     tempRepoIvy.deleteRecursively(force = true, continueOnFailure = false)
   }
 
   private[this] def mvn(project: String, path: String, commands: String*): Unit = {
     val target = Path(s"repositories/${project}/${path}", '/')
 
+    logger.debug(">> Starting MVN @ {}/{}: {}", project, path, commands mkString " ")
     Process((unixVsWindows()("cmd", "/c") ++ Seq(
       "mvn"
     , "-Dmaven.test.skip=true"
     , s"-Duser.home=${userHome.path}"
-    ) ++ commands), target.jfile)!
+    ) ++ commands), target.jfile)! ProcessLogger(logger.trace(_), logger.warn(_))
+    logger.debug("<< Finished with MVN @ {}/{}: {}", project, path, commands mkString " ")
   }
 
   private[this] def sbt(project: String, path: String, commands: String*): Unit = {
     val target = Path(s"repositories/${project}/${path}", '/')
     val launcher = tools / "sbt-launch-0.13.12.jar"
 
+    logger.debug(">> Starting SBT @ {}/{}: {}", project, path, commands mkString " ")
     Process((Seq(
       "java"
     , s"-Duser.home=${userHome.path}"
     , "-jar", launcher.toAbsolute.path
-    ) ++ commands), target.jfile)!
+    ) ++ commands), target.jfile)! ProcessLogger(logger.trace(_), logger.warn(_))
+    logger.debug("<< Finished with SBT @ {}/{}: {}", project, path, commands mkString " ")
   }
 
   def apply(): Unit = block(

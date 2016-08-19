@@ -4,18 +4,23 @@ package staging
 object EntryPoint
     extends App {
 
-  logger.info("#" * 50)
-  Source()
+  def time[R](section: String, runSection: => Unit): Unit = {
+    logger.info(s"### ${section} START ###")
+    val startAt = System.currentTimeMillis
+    runSection
+    val endAt = System.currentTimeMillis
+    logger.info(s"### ${section} END (took: ${endAt - startAt} ms) ###")
+  }
 
-  logger.info("#" * 50)
-  Analyse()
-
-  logger.info("#" * 50)
-  Compile()
-
-  logger.info("#" * 50)
-  Download()
-
-  logger.info("#" * 50)
-  Gather()
+  time("Staging",
+    try {
+      time("Source", Source())
+      time("Analyse", Analyse())
+      time("Compile", Compile())
+      time("Download", Download())
+      time("Gather", Gather())
+    } finally {
+      pool.shutdown()
+    }
+  )
 }

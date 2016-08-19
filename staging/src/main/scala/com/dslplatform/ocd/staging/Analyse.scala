@@ -23,7 +23,7 @@ object Analyse {
 
     val origVersion = firstMatcher.group(2)
     for (check <- firstCheck) yield {
-      logger.info(s"Original version of $project/$path was: $origVersion")
+      logger.debug(s"Original version of $project/$path was: $origVersion")
       if (origVersion != check) {
         logger.warn(s"Version of $project/$path dependency ${origVersion} differs from expected: ${check}")
       }

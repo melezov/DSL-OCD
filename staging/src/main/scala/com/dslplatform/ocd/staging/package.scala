@@ -23,10 +23,10 @@ package object staging
   val repositories = Path("repositories") toAbsolute
   val userHome = repositories / ".home"
 
-  implicit val executionContext =
-    ExecutionContext.fromExecutor(
-      java.util.concurrent.Executors.newFixedThreadPool(
-        Runtime.getRuntime.availableProcessors()))
+  val pool = java.util.concurrent.Executors.newFixedThreadPool(
+    Runtime.getRuntime.availableProcessors())
+
+  implicit val executionContext = ExecutionContext.fromExecutor(pool)
 
   def block(futures: Future[_]*): Unit = {
     for (future <- futures) {

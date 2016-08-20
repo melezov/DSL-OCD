@@ -1,60 +1,38 @@
-val NGSNexus            = "NGS Nexus"             at "http://ngs.hr/nexus/content/groups/public/"
-val NGSPrivateReleases  = "NGS Private Releases"  at "http://ngs.hr/nexus/content/repositories/releases-private/"
-val NGSPrivateSnapshots = "NGS Private Snapshots" at "http://ngs.hr/nexus/content/repositories/snapshots-private/"
-
 // ### BASIC SETTINGS ### //
 
 organization := "com.dslplatform.ocd"
 name := "DSL-OCD-Model-Types"
-version := "0.2.0"
+version := "0.2.1"
 
 unmanagedSourceDirectories in Compile := Seq(
   (scalaSource in Compile).value
 , sourceDirectory.value / "generated" / "scala"
 )
-
 unmanagedSourceDirectories in Test := Nil
 
-libraryDependencies := Seq(
-  "com.dslplatform.ocd" %% "dsl-ocd-model-kinds" % "0.2.0"
+libraryDependencies ++= Seq(
+  "com.dslplatform.ocd" %% "dsl-ocd-model-kinds" % "0.2.1"
 )
-
-// ### RESOLVERS ### //
-
-resolvers := Seq(NGSNexus, NGSPrivateReleases, NGSPrivateSnapshots)
-externalResolvers := Resolver.withDefaultResolvers(resolvers.value, mavenCentral = false)
-
-publishTo := Some(if (version.value endsWith "-SNAPSHOT") NGSPrivateSnapshots else NGSPrivateReleases)
-publishArtifact in (Compile, packageDoc) := false
-
-credentials in ThisBuild ++= {
-  val creds = Path.userHome / ".config" / "DSL-OCD" / "nexus.config"
-  if (creds.exists) Some(Credentials(creds)) else None
-}.toSeq
 
 // ### COMPILE SETTINGS ### //
 
 scalaVersion := "2.11.8"
-
 scalacOptions := Seq(
   "-deprecation"
 , "-encoding", "UTF-8"
 , "-feature"
-, "-language:postfixOps"
-, "-language:reflectiveCalls"
-, "-language:implicitConversions"
-, "-language:existentials"
-, "-language:dynamics"
-, "-optimise"
+, "-language:_"
 , "-unchecked"
 , "-Xcheckinit"
+, "-Xfatal-warnings"
+, "-Xfuture"
 , "-Xlint"
-, "-Xmax-classfile-name", "72"
 , "-Xverify"
 , "-Yclosure-elim"
 , "-Yconst-opt"
 , "-Ydead-code"
 , "-Yinline"
+, "-Yinline-warnings"
 , "-Yrepl-sync"
 , "-Ywarn-adapted-args"
 , "-Ywarn-dead-code"
@@ -73,12 +51,70 @@ javacOptions in doc := Seq(
   case Some(jdk16Home) => Seq("-bootclasspath", jdk16Home + "/jre/lib/rt.jar")
   case _ => Nil
 })
-
 javacOptions := Seq(
   "-deprecation"
 , "-Xlint"
 , "-target", "1.6"
 ) ++ (javacOptions in doc).value
+
+// ### PUBLISH SETTINGS ###
+
+credentials in ThisBuild ++= {
+  val creds = Path.userHome / ".config" / "DSL-OCD" / "nexus.config"
+  if (creds.exists) Some(Credentials(creds)) else None
+}.toSeq
+
+scalacOptions in(Compile, doc) ++= Seq(
+  "-no-link-warnings",
+  "-sourcepath", baseDirectory.value.toString,
+  "-doc-source-url", if (isSnapshot.value) {
+    s"""https://github.com/dsl-platform/DSL-OCD/tree/master/model/types\u20AC{FILE_PATH}.scala"""
+  } else {
+    s"""https://github.com/dsl-platform/DSL-OCD/blob/v${version.value}/model/types\u20AC{FILE_PATH}.scala"""
+  }
+)
+
+packageOptions := Seq(Package.ManifestAttributes(
+  ("Implementation-Vendor", "DSL Platform"),
+  ("Sealed", "true")
+))
+
+publishTo := Some(if (isSnapshot.value) Opts.resolver.sonatypeSnapshots else Opts.resolver.sonatypeStaging)
+publishArtifact in Test := false
+publishMavenStyle := true
+pomIncludeRepository := { _ => false }
+
+pomExtra :=
+  <inceptionYear>2013</inceptionYear>
+    <url>https://github.com/dsl-platform/DSL-OCD</url>
+    <licenses>
+      <license>
+        <name>BSD 3-clause "New" or "Revised" License</name>
+        <url>https://spdx.org/licenses/BSD-3-Clause.html</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+    <scm>
+      <url>git@github.com:dsl-platform/DSL-OCD.git</url>
+      <connection>scm:git:git@github.com:dsl-platform/DSL-OCD.git</connection>
+    </scm>
+    <developers>
+      <developer>
+        <id>melezov</id>
+        <name>Marko Elezovi&#263;</name>
+        <url>https://github.com/melezov</url>
+      </developer>
+      <developer>
+        <id>hperadin</id>
+        <name>Hrvoje Peradin</name>
+        <url>https://github.com/hperadin</url>
+      </developer>
+      <developer>
+        <id>tferega</id>
+        <name>Tomo Ferega</name>
+        <url>https://github.com/tferega</url>
+      </developer>
+    </developers>
 
 // ### ECLIPSE ### //
 

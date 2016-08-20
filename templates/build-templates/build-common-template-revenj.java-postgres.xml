@@ -55,8 +55,12 @@
   <property name="client.runtime" location="lib"/>
   <property name="server.runtime" location="server"/>
 
-  <property name="client.config.template" location="${tools.config}/dsl-project.properties.template"/>
-  <property name="server.config.template" location="${tools.config}/revenj.properties.template"/>
+  <property name="client.config.name" value="dsl-project.properties"/>
+  <property name="server.config.name" value="revenj.properties"/>
+  <property name="client.config.template" location="${tools.config}/${client.config.name}.template"/>
+  <property name="server.config.template" location="${tools.config}/${server.config.name}.template"/>
+  <property name="client.config.runtime" location="${src.test.resources}/${client.config.name}"/>
+  <property name="server.config.runtime" location="${server.runtime}/${server.config.name}"/>
 
   <property name="server.log" location="${server.runtime}/log"/>
 
@@ -197,7 +201,7 @@
       <fileset dir="${workspace.client}/JAVA_CLIENT/${namespace}"/>
     </copy>
 
-    <copy file="${client.config.template}" toFile="${src.test.resources}/dsl-project.properties" overwrite="true" filtering="true"/>
+    <copy file="${client.config.template}" toFile="${client.config.runtime}" overwrite="true" filtering="true"/>
   </target>
 
   <path id="client.compile.classpath">
@@ -253,12 +257,13 @@
       <arg value="namespace=${namespace}"/>
     </java>
 
-    <move file="${workspace.server}/server-model.jar" todir="${server.runtime}/plugins"/>
     <copy todir="${server.runtime}">
       <fileset dir="${server.runtime.template}"/>
     </copy>
+    <move file="${workspace.server}/server-model.jar" todir="${server.runtime}/plugins"/>
 
-    <copy file="${server.config.template}" toFile="${server.runtime}/revenj.properties" overwrite="true" filtering="true"/>
+    <copy file="${server.config.template}" toFile="${server.config.runtime}" overwrite="true" filtering="true"/>
+
   </target>
 
   <!-- ################ -->

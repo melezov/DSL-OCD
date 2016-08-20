@@ -258,7 +258,6 @@
       <fileset dir="${server.runtime.template}"/>
     </copy>
     <move file="${workspace.server}/server-model.dll" todir="${server.runtime}/model"/>
-    <mkdir dir="${server.runtime}/plugins"/>
 
     <copy file="${server.config.template}" toFile="${server.config.runtime}" overwrite="true" filtering="true"/>
   </target>

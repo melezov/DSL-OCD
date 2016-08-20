@@ -4,7 +4,7 @@
     <section name="autofacConfiguration" type="Revenj.Extensibility.Autofac.Configuration.SectionHandler, Revenj.Extensibility" />
   </configSections>
   <appSettings>
-    <add key="PluginsPath" value="plugins" />
+    <add key="PluginsPath" value="." />
     <add key="ServerAssembly" value="model/server-model.dll"/>
     <add key="ConnectionString" value="server=@dbHost@;port=@dbPort@;database=@dbName@;user=@dbUser@;password=@dbPassword@;encoding=unicode" />
     <add key="HttpAddress_@serverPort@" value="http://@serverHost@:@serverPort@/" />

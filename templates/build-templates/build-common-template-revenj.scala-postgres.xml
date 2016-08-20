@@ -252,10 +252,10 @@
       <arg value="namespace=${namespace}"/>
     </java>
 
-    <move file="${workspace.server}/server-model.jar" todir="${server.runtime}/plugins"/>
     <copy todir="${server.runtime}">
       <fileset dir="${server.runtime.template}"/>
     </copy>
+    <move file="${workspace.server}/server-model.jar" todir="${server.runtime}/plugins"/>
 
     <copy file="${server.config.template}" toFile="${server.runtime}/application.conf" overwrite="true" filtering="true"/>
     <copy file="${server.config.template.legacy}" toFile="${server.runtime}/revenj.properties" overwrite="true" filtering="true"/>

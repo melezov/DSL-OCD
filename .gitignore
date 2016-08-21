@@ -1,7 +1,10 @@
 .cache
 .classpath
 .idea
+.history
 .project
 .settings
 .target
 target
+
+*.iml

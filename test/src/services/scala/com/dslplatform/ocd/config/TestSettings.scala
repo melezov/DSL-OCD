@@ -1,7 +1,7 @@
 package com.dslplatform.ocd
 package config
 
-private[config] class TestSettings(logger: Logger) {
+class TestSettings(logger: Logger) {
   def load(relativePath: String) = {
     val testIni = Path(
       sys.props("user.home")

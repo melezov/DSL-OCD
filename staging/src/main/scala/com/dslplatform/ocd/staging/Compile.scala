@@ -58,7 +58,7 @@ object Compile {
     }
   , Future {
       clean("net", "revenj")
-      sbt("revenj", "scala", "clean"
+      sbt("revenj", "scala"
       , "core/clean", "core/publishM2"
       , "akka/clean", "akka/publishM2"
       )

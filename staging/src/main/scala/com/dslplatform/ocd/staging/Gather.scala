@@ -114,11 +114,13 @@ import Keys._
   private[this] def revenjCoreScala(): Unit =
     downloadDependencies("revenj-core_scala"
     , s""""net.revenj" %% "revenj-core" % "${Analyse.revenjCoreScalaVersion}-$xkcd""""
+    , """"org.scala-lang.modules" %% "scala-xml" % "1.0.5""""
     )
 
   private[this] def revenjAkkaScala(): Unit =
     downloadDependencies("revenj-akka_scala"
     , s""""net.revenj" %% "revenj-akka" % "${Analyse.revenjAkkaScalaVersion}-$xkcd""""
+    , """"org.scala-lang.modules" %% "scala-xml" % "1.0.5""""
     )
 
   def apply(): Unit = {

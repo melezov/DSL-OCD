@@ -40,8 +40,4 @@ package object ocd
   implicit class RichLanguage(val language: Language) extends AnyVal {
     def lowerName = language.name.toLowerCase(Locale.ENGLISH)
   }
-
-  implicit val ec = scala.concurrent.ExecutionContext.fromExecutor(
-    java.util.concurrent.Executors.newCachedThreadPool
-  )
 }

@@ -18,7 +18,7 @@ object EntryPoint extends App {
     logger = logger
   , testSettings = testSettings
   , testDeployer = testDeployer
-  )
+  ).run()
 }
 
 class EntryPoint(
@@ -31,7 +31,7 @@ class EntryPoint(
       logger.trace(s"Initializing DSL values ...")
       val values = dsls.OcdDslBoxType.values
       logger.debug(s"Initialized ${values.size} DSL values!")
-    }
+    }(scala.concurrent.ExecutionContext.Implicits.global)
 
     locally {
       import test._
@@ -94,6 +94,5 @@ class EntryPoint(
     testDeployer.deployTests(tests)
 
     logger.info("Finished!")
-    sys.exit(0)
   }
 }

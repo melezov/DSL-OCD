@@ -1,5 +1,15 @@
+// ### BASIC SETTINGS ### //
+
 organization := "com.dslplatform.ocd"
 name := "DSL-OCD-Staging"
+version := "0.2.1"
+
+unmanagedSourceDirectories in Compile := Seq(
+  (scalaSource in Compile).value
+)
+unmanagedSourceDirectories in Test := Nil
+
+// ### DEPENDENCIES ### //
 
 libraryDependencies ++= Seq(
   "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3-1"
@@ -9,27 +19,12 @@ libraryDependencies ++= Seq(
 , "ch.qos.logback"             % "logback-classic" % "1.1.7"
 )
 
-scalaVersion := "2.11.8"
-scalacOptions := Seq(
-  "-deprecation"
-, "-encoding", "UTF-8"
-, "-feature"
-, "-language:_"
-, "-unchecked"
-, "-Xcheckinit"
-, "-Xlint"
-, "-Xverify"
-, "-Yclosure-elim"
-, "-Yconst-opt"
-, "-Ydead-code"
-, "-Yinline"
-, "-Yrepl-sync"
-, "-Ywarn-adapted-args"
-, "-Ywarn-dead-code"
-, "-Ywarn-inaccessible"
-, "-Ywarn-infer-any"
-, "-Ywarn-nullary-override"
-, "-Ywarn-nullary-unit"
-, "-Ywarn-numeric-widen"
-, "-Ywarn-unused"
-)
+// ### ECLIPSE ### //
+
+EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
+EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
+EclipseKeys.eclipseOutput := Some(".target")
+
+// ### MISC ### //
+
+fork in run := true

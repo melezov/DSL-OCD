@@ -22,7 +22,7 @@ libraryDependencies ++= Seq(
 , "com.dslplatform" % "dsl-clc" % "1.7.2"
 , "hr.element.etb" %% "etb-util" % "0.2.23"
 , "io.jvm.uuid" %% "scala-uuid" % "0.2.1"
-, "ch.qos.logback" % "logback-classic" % "1.1.7" % "compile->default"
+, "ch.qos.logback" % "logback-classic" % "1.1.7"
 )
 
 // ### ECLIPSE ### //

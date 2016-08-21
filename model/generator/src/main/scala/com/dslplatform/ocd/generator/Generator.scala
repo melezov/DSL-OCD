@@ -5,9 +5,12 @@ import scalax.file._
 import java.util.Properties
 
 trait Generator {
+  private def readPath(path: String): Path =
+    Path(path.replace('\\', '/'), '/')
+
   private val props = {
     val tmp = new Properties()
-    val config = Path(sys.props("user.home").replace('\\', '/'), '/') /
+    val config = readPath(sys.props("user.home")) /
       ".config" / "DSL-OCD" / "ocd.config"
     config.inputStream acquireAndGet { tmp.load }
     tmp
@@ -15,7 +18,7 @@ trait Generator {
 
   private val generated = props.getProperty("model")
 
-  private def gene(name: String, language: String) = Path(generated, '/') /
+  private def gene(name: String, language: String) = readPath(generated) /
     name / "src" / "generated" / language / "com" / "dslplatform" / "ocd"
 
   def spawnDirectory(name: String, language: String) = {

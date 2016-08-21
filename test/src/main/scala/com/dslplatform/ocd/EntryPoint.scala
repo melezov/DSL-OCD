@@ -2,11 +2,23 @@ package com.dslplatform.ocd
 
 import scala.concurrent.Future
 import config._
+import org.slf4j.LoggerFactory
 import test.javatest.property.turtle._
 import test.domain._
 
 object EntryPoint extends App {
-  Locator[EntryPoint].run()
+  val logger = LoggerFactory getLogger "DSL-OCD"
+
+  val testSettings = new TestSettings(logger)
+    .load("DSL-OCD/ocd.config")
+
+  val testDeployer = new TestDeployer(logger, testSettings)
+
+  new EntryPoint(
+    logger = logger
+  , testSettings = testSettings
+  , testDeployer = testDeployer
+  )
 }
 
 class EntryPoint(

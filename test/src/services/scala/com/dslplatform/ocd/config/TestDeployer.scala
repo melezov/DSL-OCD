@@ -1,9 +1,11 @@
 package com.dslplatform.ocd
 package config
 
+import java.util.Locale
+
 import test.javatest.{JavaInfo, TestSuiteCreator}
 
-private[config] class TestDeployer(
+class TestDeployer(
     logger: Logger
   , testSettings: ITestSettings
   ) extends ITestDeployer {
@@ -80,13 +82,13 @@ private[config] class TestDeployer(
     private val dslTarget = projectRoot / "dsl"
 
     private def languageRoot(language: Language) =
-      projectRoot / language.language.toLowerCase.concat("_project")
+      projectRoot / language.lowerName
 
     private def mainRoot(language: Language) =
       languageRoot(language) / "src" / "main"
 
     private def mainCode(language: Language) =
-      mainRoot(language) / language.language.toLowerCase()
+      mainRoot(language) / language.lowerName
 
     private def mainResources(language: Language) =
       mainRoot(language) / "resources"
@@ -95,7 +97,7 @@ private[config] class TestDeployer(
       languageRoot(language) / "src" / "generated"
 
     private def generatedCode(language: Language) =
-      generatedRoot(language) / language.language.toLowerCase()
+      generatedRoot(language) / language.lowerName
 
     private def generatedResources(language: Language) =
       generatedRoot(language) / "resources"

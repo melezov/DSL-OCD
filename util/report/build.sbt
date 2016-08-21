@@ -1,16 +1,19 @@
+// ### BASIC SETTINGS ### //
+
 organization := "com.dslplatform.ocd"
-name := "ocd-report"
-version := "0.2.1"
+name := "DSL-OCD-Util-Report"
+version := "0.2.2"
 
-mainClass in assembly := Some("com.dslplatform.ocd.EntryPoint")
-
-javacOptions in doc := Seq(
-  "-encoding", "UTF-8"
-  , "-source", "1.7"
+unmanagedSourceDirectories in Compile := Seq(
+  (javaSource in Compile).value
 )
+unmanagedSourceDirectories in Test := Nil
 
-javacOptions := Seq(
-  "-deprecation"
-  , "-Xlint"
-  , "-target", "1.7"
-) ++ (javacOptions in doc).value
+crossPaths := false
+autoScalaLibrary := false
+
+// ### ECLIPSE ### //
+
+EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE17)
+EclipseKeys.eclipseOutput := Some(".target")
+EclipseKeys.projectFlavor := EclipseProjectFlavor.Java

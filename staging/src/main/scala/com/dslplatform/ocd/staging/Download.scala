@@ -4,7 +4,7 @@ package staging
 import sys.process._
 
 object Download {
-  private[this] val home = repositories / "NGS"
+  private[this] val home = repositories / "dsl-compiler"
 
   private[this] def clean(): Unit = {
     if (!home.exists) home.createDirectory(createParents = true)

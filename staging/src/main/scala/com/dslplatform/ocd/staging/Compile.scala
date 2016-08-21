@@ -15,27 +15,30 @@ object Compile {
   }
 
   private[this] def mvn(project: String, path: String, commands: String*): Unit = {
-    val target = Path(s"repositories/${project}/${path}", '/')
+    val target = repositories / project / (path.replace('\\', '/'), '/')
 
     logger.debug(">> Starting MVN @ {}/{}: {}", project, path, commands mkString " ")
     Process((unixVsWindows()("cmd", "/c") ++ Seq(
       "mvn"
     , "-Dmaven.test.skip=true"
     , s"-Duser.home=${userHome.path}"
-    ) ++ commands), target.jfile)! ProcessLogger(logger.trace(_), logger.warn(_))
+    ) ++ commands), target.fileOption.get)! ProcessLogger(logger.trace(_), logger.warn(_))
     logger.debug("<< Finished with MVN @ {}/{}: {}", project, path, commands mkString " ")
   }
 
   private[this] def sbt(project: String, path: String, commands: String*): Unit = {
-    val target = Path(s"repositories/${project}/${path}", '/')
-    val launcher = tools / "sbt-launch-0.13.12.jar"
+    val target = path match {
+      case "" => repositories / project
+      case subproject => repositories / project / (path.replace('\\', '/'), '/')
+    }
+    val launcher = templates / "tools" / "build" / "sbt-launch-0.13.12.jar"
 
     logger.debug(">> Starting SBT @ {}/{}: {}", project, path, commands mkString " ")
     Process((Seq(
       "java"
     , s"-Duser.home=${userHome.path}"
     , "-jar", launcher.toAbsolute.path
-    ) ++ commands), target.jfile)! ProcessLogger(logger.trace(_), logger.warn(_))
+    ) ++ commands), target.fileOption.get)! ProcessLogger(logger.trace(_), logger.warn(_))
     logger.debug("<< Finished with SBT @ {}/{}: {}", project, path, commands mkString " ")
   }
 
@@ -55,7 +58,10 @@ object Compile {
     }
   , Future {
       clean("net", "revenj")
-      sbt("revenj", "scala", "clean", "publishM2")
+      sbt("revenj", "scala", "clean"
+      , "core/clean", "core/publishM2"
+      , "akka/clean", "akka/publishM2"
+      )
     }
   )
 }

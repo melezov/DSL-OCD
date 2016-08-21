@@ -1,12 +1,14 @@
 package com.dslplatform.ocd
 
+import java.io.FileInputStream
 import com.typesafe.scalalogging.Logger
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.{Await, ExecutionContext}
 
 package object staging
-    extends com.github.nscala_time.time.Imports {
+    extends com.github.nscala_time.time.Imports
+    with scala.collection.convert.DecorateAsScala {
 
   val Path = scalax.file.Path
   type Path = scalax.file.Path
@@ -19,8 +21,18 @@ package object staging
 
   val logger = Logger(LoggerFactory.getLogger("dsl-ocd-staging"))
 
-  val tools = Path("tools")
-  val repositories = Path("repositories") toAbsolute
+  lazy val templates: Path = {
+    val properties = new java.util.Properties
+    val configPath = sys.props("user.home")
+      .replace('\\', '/')
+      .replaceFirst("/+$", "") + "/.config/DSL-OCD/ocd.config"
+    val fis = new FileInputStream(configPath)
+    properties.load(fis)
+    fis.close()
+    Path(properties.getProperty("templates").replace('\\', '/'), '/').toAbsolute
+  }
+
+  val repositories = templates / "staging"
   val userHome = repositories / ".home"
 
   val pool = java.util.concurrent.Executors.newFixedThreadPool(

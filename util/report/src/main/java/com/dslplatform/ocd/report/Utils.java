@@ -1,4 +1,4 @@
-package com.dslplatform.ocd;
+package com.dslplatform.ocd.report;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

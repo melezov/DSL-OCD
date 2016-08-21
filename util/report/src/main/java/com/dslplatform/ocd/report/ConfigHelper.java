@@ -1,4 +1,4 @@
-package com.dslplatform.ocd;
+package com.dslplatform.ocd.report;
 
 import java.io.InputStream;
 import java.io.FileInputStream;

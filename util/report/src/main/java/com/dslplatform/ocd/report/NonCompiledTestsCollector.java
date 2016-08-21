@@ -1,8 +1,8 @@
-package com.dslplatform.ocd;
+package com.dslplatform.ocd.report;
 
-import com.dslplatform.ocd.generated.Properties;
-import com.dslplatform.ocd.generated.Property;
-import com.dslplatform.ocd.generated.Testsuite;
+import com.dslplatform.ocd.report.generated.Properties;
+import com.dslplatform.ocd.report.generated.Property;
+import com.dslplatform.ocd.report.generated.Testsuite;
 
 import java.io.File;
 import java.io.FileFilter;

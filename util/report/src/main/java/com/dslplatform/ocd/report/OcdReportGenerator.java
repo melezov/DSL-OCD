@@ -1,4 +1,4 @@
-package com.dslplatform.ocd;
+package com.dslplatform.ocd.report;
 
 import java.io.FileInputStream;
 
@@ -10,12 +10,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Element;
 
-import com.dslplatform.ocd.dao.TestsuitesDao;
-import com.dslplatform.ocd.generated.Error;
-import com.dslplatform.ocd.generated.Failure;
-import com.dslplatform.ocd.generated.Testcase;
-import com.dslplatform.ocd.generated.Testsuite;
-import com.dslplatform.ocd.generated.Testsuites;
+import com.dslplatform.ocd.report.dao.TestsuitesDao;
+import com.dslplatform.ocd.report.generated.Error;
+import com.dslplatform.ocd.report.generated.Failure;
+import com.dslplatform.ocd.report.generated.Testcase;
+import com.dslplatform.ocd.report.generated.Testsuite;
+import com.dslplatform.ocd.report.generated.Testsuites;
 
 public class OcdReportGenerator {
 

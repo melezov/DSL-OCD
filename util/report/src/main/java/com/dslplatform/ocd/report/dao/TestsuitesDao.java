@@ -1,14 +1,14 @@
-package com.dslplatform.ocd.dao;
+package com.dslplatform.ocd.report.dao;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dslplatform.ocd.NonCompiledTestsCollector;
-import com.dslplatform.ocd.Utils;
-import com.dslplatform.ocd.generated.Property;
-import com.dslplatform.ocd.generated.Testcase;
-import com.dslplatform.ocd.generated.Testsuite;
-import com.dslplatform.ocd.generated.Testsuites;
+import com.dslplatform.ocd.report.NonCompiledTestsCollector;
+import com.dslplatform.ocd.report.Utils;
+import com.dslplatform.ocd.report.generated.Property;
+import com.dslplatform.ocd.report.generated.Testcase;
+import com.dslplatform.ocd.report.generated.Testsuite;
+import com.dslplatform.ocd.report.generated.Testsuites;
 
 public class TestsuitesDao {
 

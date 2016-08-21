@@ -6,7 +6,7 @@
 //
 
 
-package com.dslplatform.ocd.generated;
+package com.dslplatform.ocd.report.generated;
 
 import java.util.ArrayList;
 import java.util.List;

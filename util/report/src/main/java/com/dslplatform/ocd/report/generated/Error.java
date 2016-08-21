@@ -6,7 +6,7 @@
 //
 
 
-package com.dslplatform.ocd.generated;
+package com.dslplatform.ocd.report.generated;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

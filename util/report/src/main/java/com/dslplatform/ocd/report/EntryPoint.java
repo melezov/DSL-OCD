@@ -1,4 +1,4 @@
-package com.dslplatform.ocd;
+package com.dslplatform.ocd.report;
 
 public class EntryPoint {
     public static void main(final String[] args) throws Exception {

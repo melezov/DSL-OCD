@@ -8,8 +8,8 @@ object Analyse {
       project: String, path: String
     , replacements: ((Option[String], String), String)*): String = {
 
-    val target = Path(s"repositories/${project}/${path}", '/')
-    val backup = Path(s"repositories/${project}/${path}.backup", '/')
+    val target = repositories / project / (path.replace('\\', '/'), '/')
+    val backup = target.parent.get / (target.name + ".backup")
 
     if (backup.exists) {
       backup.copyTo(target = target, replaceExisting = true)
@@ -57,8 +57,12 @@ object Analyse {
         "(<version>)([^<]+)(</version>)" ->
         s"$$1$$2-$xkcd$$3"
     )
-    Path("repositories/dsl-compiler-client/CommandLineClient/src/main/resources/com/dslplatform/compiler/client/dsl-clc.properties", '/')
+
+    (repositories / "dsl-compiler-client" / "CommandLineClient" /
+        "src" / "main" / "resources" /
+        "com" / "dslplatform" / "compiler" / "client" / "dsl-clc.properties")
       .write(s"version=${version}-$xkcd\ndate=${now.toLocalDate}")
+
     version
   }
 

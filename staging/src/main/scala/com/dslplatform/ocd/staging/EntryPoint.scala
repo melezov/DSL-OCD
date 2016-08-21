@@ -17,6 +17,7 @@ object EntryPoint
       time("Source", Source())
       time("Analyse", Analyse())
       time("Compile", Compile())
+      time("Fetch", Fetch())
       time("Download", Download())
       time("Gather", Gather())
     } finally {

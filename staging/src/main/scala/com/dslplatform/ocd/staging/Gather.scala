@@ -19,7 +19,7 @@ object Gather {
 
   private[this] def downloadDependencies(target: String, dependencies: String*): Unit = {
     val downloadFolder = home / target / "downloader"
-    (tools / "downloader") copyTo downloadFolder
+    (templates / "tools" / "downloader") copyTo downloadFolder
 
     val libs = (dependencies map { dependency =>
       "libraryDependencies += " + dependency
@@ -30,7 +30,7 @@ import Keys._
 
     (downloadFolder / "dependencies.sbt") write libs
 
-    val launcher = tools / "sbt-launch-0.13.12.jar"
+    val launcher = templates / "tools" / "build" / "sbt-launch-0.13.12.jar"
     logger.debug(">> Starting SBT @ {}: packCopyDependencies", target + "/downloader")
     Process(Seq(
       "java"
@@ -49,7 +49,7 @@ import Keys._
   }
 
   private[this] def dslCompiler(): Unit = {
-    val src = (repositories / "NGS" ** s"*.exe").head
+    val src = (repositories / "dsl-compiler" ** s"*.exe").head
     val target = home / "dsl-compiler" / src.name
     src copyTo target
     logger.info("Gathered {}", "dsl-compiler")

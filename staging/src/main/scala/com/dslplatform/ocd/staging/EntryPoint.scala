@@ -14,12 +14,13 @@ object EntryPoint
 
   time("Staging",
     try {
-      time("Source", Source())
-      time("Analyse", Analyse())
-      time("Compile", Compile())
-      time("Fetch", Fetch())
-      time("Download", Download())
-      time("Gather", Gather())
+//      time("Source", Source())
+//      time("Analyse", Analyse())
+//      time("Compile", Compile())
+//      time("Fetch", Fetch())
+//      time("Download", Download())
+//      time("Gather", Gather())
+      time("Deploy", Deploy())
     } finally {
       pool.shutdown()
     }

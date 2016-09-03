@@ -13,7 +13,7 @@ object Deploy {
 
     for (config <- (templates / "build-templates" ** "build-common-template-*.xml")) {
       val body = config.string
-      val patchedVersion = body.replaceFirst("""(<property name="dsl-compiler" value=")dsl-compiler-[^"]+(\.exe"/>)""", s"$$1${src.name}$$2")
+      val patchedVersion = body.replaceFirst("""(<property name="dsl-compiler" value=")dsl-compiler-[^"]+\.exe("/>)""", s"$$1${src.name}$$2")
       if (body != patchedVersion) {
         config write patchedVersion
         logger.debug("Patched dsl-compiler version in {}", config.name)
@@ -36,7 +36,7 @@ object Deploy {
 
     for (config <- (templates / "build-templates" ** "build-common-template-*.xml")) {
       val body = config.string
-      val patchedVersion = body.replaceFirst("""(<property name="dsl-clc" value=")dsl-clc-[^"]+(\.jar"/>)""", s"$$1${src.name}$$2")
+      val patchedVersion = body.replaceFirst("""(<property name="dsl-clc" value=")dsl-clc-[^"]+\.jar("/>)""", s"$$1${src.name}$$2")
       if (body != patchedVersion) {
         config write patchedVersion
         logger.debug("Patched dsl-clc version in {}", config.name)
@@ -87,7 +87,7 @@ object Deploy {
 
     for (config <- (templates / "build-templates" ** "build-common-template-*.xml")) {
       val body = config.string
-      val patchedVersion = body.replaceFirst("""(<property name="revenj.war" value=")revenj-servlet-[^"]+(\.war"/>)""", s"$$1${src.name}$$2")
+      val patchedVersion = body.replaceFirst("""(<property name="revenj.war" value=")revenj-servlet-[^"]+\.war("/>)""", s"$$1${src.name}$$2")
       if (body != patchedVersion) {
         config write patchedVersion
         logger.debug("Patched revenj.war version in {}", config.name)
@@ -152,11 +152,14 @@ object Deploy {
 
   def apply(): Unit = {
     block(
-      Future { dslCompiler() }
-    , Future { dslClc() }
+      Future {
+        // quick fix to prevent concurrent overwriting of config templates
+        dslCompiler()
+        dslClc()
+        revenjJavaRuntime()
+      }
     , Future { javaClientCompile() }
     , Future { revenjJavaCompile() }
-    , Future { revenjJavaRuntime() }
     , Future { revenjNetCompile() }
     , Future { revenjNetRuntime() }
     , Future { revenjScalaCompile() }

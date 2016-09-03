@@ -8,7 +8,6 @@ scalacOptions := Seq(
 , "-language:_"
 , "-unchecked"
 , "-Xcheckinit"
-, "-Xfatal-warnings"
 , "-Xfuture"
 , "-Xlint"
 , "-Xverify"

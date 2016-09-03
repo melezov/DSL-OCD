@@ -20,6 +20,7 @@ object EntryPoint
       time("Fetch", Fetch())
       time("Download", Download())
       time("Gather", Gather())
+      time("Deploy", Deploy())
     } finally {
       pool.shutdown()
     }

@@ -7,7 +7,7 @@ import java.util.jar.JarInputStream
 import sys.process._
 
 object Gather {
-  private[this] val home = repositories / ".gather"
+  private[staging] val home = repositories / ".gather"
 
   private[this] def clean(): Unit = {
     if (home.exists) {
@@ -48,18 +48,22 @@ import Keys._
     logger.info("Gathered: {}", target)
   }
 
+  private[this] def copy(name: String, source: Path, target: Path): Unit = {
+    logger.trace("Copying {} name ...", name)
+    source copyTo target
+    logger.info("Gathered {}", name)
+  }
+
   private[this] def dslCompiler(): Unit = {
     val src = (repositories / "dsl-compiler" ** s"*.exe").head
     val target = home / "dsl-compiler" / src.name
-    src copyTo target
-    logger.info("Gathered {}", "dsl-compiler")
+    copy("dsl-compiler", src, target)
   }
 
   private[this] def dslClc(): Unit = {
     val src = repositories / "dsl-compiler-client" / "CommandLineClient" / "target" / s"dsl-clc-${Analyse.dslClcVersion}-$xkcd-jar-with-dependencies.jar"
     val target = home / "dsl-compiler-client" / s"dsl-clc-${Analyse.dslClcVersion}-$xkcd.jar"
-    src copyTo target
-    logger.info("Gathered {}", "dsl-compiler-client")
+    copy("dsl-compiler-client", src, target)
   }
 
   private[this] def dslClientJava(): Unit =
@@ -123,6 +127,20 @@ import Keys._
     , """"org.scala-lang.modules" %% "scala-xml" % "1.0.5""""
     )
 
+  private[this] def revenjCoreNet(): Unit = {
+    val src = (Fetch.releases ** (Fetch.`revenj.net library dependencies`.replaceFirst("\\.zip$", "") + "-*"))
+      .headOption.getOrElse(sys.error("Could not gather revenj-core (.NET)"))
+    val target = home / "revenj-core_net"
+    copy("revenj-core_net", src, target)
+  }
+
+  private[this] def revenjServerNet(): Unit = {
+    val src = (Fetch.releases ** (Fetch.`revenj.net runtime server`.replaceFirst("\\.zip$", "") + "-*"))
+      .headOption.getOrElse(sys.error("Could not gather revenj-server (.NET)"))
+    val target = home / "revenj-server_net"
+    copy("revenj-server_net", src, target)
+  }
+
   def apply(): Unit = {
     clean()
     block(
@@ -133,6 +151,8 @@ import Keys._
     , Future { revenjServletJava() }
     , Future { revenjCoreScala() }
     , Future { revenjAkkaScala() }
+    , Future { revenjCoreNet() }
+    , Future { revenjServerNet() }
     )
   }
 }

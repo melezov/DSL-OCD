@@ -22,7 +22,7 @@
   <property name="target.test" location="${target}/test-classes"/>
 
   <property name="dsl-clc" value="dsl-clc-1.7.3-160903-181500.jar"/>
-  <property name="dsl-compiler" value="dsl-compiler-1.6.6088.26307-160903-181500.exe"/>
+  <property name="dsl-compiler" value="dsl-compiler-1.6.6091.12797-160904-082610.exe"/>
 
   <property name="client" value="java_client"/>
   <property name="server" value="revenj.net"/>

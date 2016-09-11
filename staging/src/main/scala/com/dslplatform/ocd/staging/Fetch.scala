@@ -3,7 +3,8 @@ package staging
 
 import java.net.URL
 
-import org.kohsuke.github.GitHub
+import org.kohsuke.github.{GHRelease, GitHub}
+
 import scala.reflect.io.ZipArchive
 
 object Fetch {
@@ -17,26 +18,37 @@ object Fetch {
       releases.deleteRecursively(force = true, continueOnFailure = false)
     }
 
+    def extractAssets(release: GHRelease) =
+      release.getAssets.asScala filter { _.getName match {
+        case `revenj.net library dependencies`
+           | `revenj.net runtime server` => true
+        case _ => false
+      }}
+
     val lastRelease = GitHub.connectAnonymously()
       .getRepository("ngs-doo/revenj")
       .listReleases.asScala
-      .filter {
-        case release if release.isDraft =>
-          logger.debug("Skipping draft release: {}", release.getTagName)
-          false
-        case release if release.isPrerelease =>
-          logger.debug("Skipping prerelease: {}", release.getTagName)
-          false
-        case _ =>
+      .find { release =>
+        val version = release.getTagName
+        val found = extractAssets(release).size == 2
+
+        if (found) {
           true
-      }.headOption.getOrElse(sys.error("Could not find latest Revenj release!"))
+        } else {
+          if (release.isDraft) {
+            logger.debug("Skipping draft release: {}", version)
+            false
+          } else if (release.isPrerelease) {
+            logger.debug("Skipping prerelease: {}", version)
+            false
+          } else {
+            sys.error("Could not find both required bundles in release: " + version)
+          }
+        }
+      }.getOrElse(sys.error("Could not find latest Revenj release!"))
 
     val version = lastRelease.getTagName
-    val assets = lastRelease.getAssets.asScala filter { _.getName match {
-      case `revenj.net library dependencies`
-         | `revenj.net runtime server` => true
-      case _ => false
-    }} ensuring(_.size == 2, "Could not find both required bundles in release: " + version)
+    val assets = extractAssets(lastRelease)
 
     logger.info("Downloading binary Revenj.NET release from GitHub: {}", lastRelease.getTagName)
 

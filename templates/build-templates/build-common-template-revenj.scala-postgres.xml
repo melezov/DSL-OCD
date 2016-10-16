@@ -21,8 +21,8 @@
   <property name="target.main" location="${target}/classes"/>
   <property name="target.test" location="${target}/test-classes"/>
 
-  <property name="dsl-clc" value="dsl-clc-1.8.0-160918-123606.jar"/>
-  <property name="dsl-compiler" value="dsl-compiler-1.6.6096.16632-160918-123606.exe"/>
+  <property name="dsl-clc" value="dsl-clc-1.8.1-161016-234747.jar"/>
+  <property name="dsl-compiler" value="dsl-compiler-1.7.6133.34171-161016-234747.exe"/>
 
   <property name="client" value="java_client"/>
   <property name="server" value="revenj.scala"/>

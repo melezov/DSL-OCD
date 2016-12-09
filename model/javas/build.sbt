@@ -2,7 +2,7 @@
 
 organization := "com.dslplatform.ocd"
 name := "DSL-OCD-Model-Javas"
-version := "0.2.1"
+version := "0.2.2"
 
 unmanagedSourceDirectories in Compile := Seq(
   (scalaSource in Compile).value
@@ -13,8 +13,8 @@ unmanagedSourceDirectories in Test := Nil
 // ### DEPENDENCIES ### //
 
 libraryDependencies ++= Seq(
-  "com.dslplatform.ocd" %% "dsl-ocd-model-types" % "0.2.1"
-, "com.dslplatform.ocd" %% "dsl-ocd-model-boxes" % "0.2.1"
+  "com.dslplatform.ocd" %% "dsl-ocd-model-types" % "0.2.2"
+, "com.dslplatform.ocd" %% "dsl-ocd-model-boxes" % "0.2.2"
 )
 
 // ### ECLIPSE ### //

@@ -2,7 +2,7 @@
 
 organization := "com.dslplatform.ocd"
 name := "DSL-OCD-Model-Boxes"
-version := "0.2.1"
+version := "0.2.2"
 
 unmanagedSourceDirectories in Compile := Seq(
   (scalaSource in Compile).value

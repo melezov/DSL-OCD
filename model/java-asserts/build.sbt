@@ -2,7 +2,7 @@
 
 organization := "com.dslplatform.ocd"
 name := "DSL-OCD-Model-Java-Asserts"
-version := "0.2.1"
+version := "0.2.2"
 
 unmanagedSourceDirectories in Compile := Seq(
   sourceDirectory.value / "generated" / "java"
@@ -15,8 +15,9 @@ autoScalaLibrary := false
 // ### DEPENDENCIES ### //
 
 libraryDependencies ++= Seq(
-  "com.dslplatform.ocd" % "dsl-ocd-util-testing" % "0.2.1"
-, "joda-time" % "joda-time" % "2.9.4"
+  "com.dslplatform.ocd" % "dsl-ocd-util-testing" % "0.2.2"
+, "com.dslplatform" % "dsl-client-java" % "1.5.0"
+, "joda-time" % "joda-time" % "2.9.6"
 , "junit" % "junit" % "4.12"
 )
 

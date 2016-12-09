@@ -2,7 +2,7 @@
 
 organization := "com.dslplatform.ocd"
 name := "DSL-OCD-Util-Revenj-Runner"
-version := "0.1.1"
+version := "0.2.2"
 
 unmanagedSourceDirectories in Compile := Seq(
   (javaSource in Compile).value

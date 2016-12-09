@@ -17,7 +17,7 @@ object Gather {
     home.createDirectory(createParents = true)
   }
 
-  private[this] def downloadDependencies(target: String, dependencies: String*): Unit = {
+  private[this] def downloadDependencies(target: String, scalaVersion: String, dependencies: String*): Unit = {
     val downloadFolder = home / target / "downloader"
     (templates / "tools" / "downloader") copyTo downloadFolder
 
@@ -30,7 +30,16 @@ import Keys._
 
     (downloadFolder / "dependencies.sbt") write libs
 
-    val launcher = templates / "tools" / "build" / "sbt-launch-0.13.12.jar"
+    val fullScalaVersion = scalaVersion match {
+      case "2.12" => "2.12.1"
+      case "2.11" => "2.11.8"
+      case _ => ???
+    }
+
+    (downloadFolder / "scalaVersion.sbt") write s"""scalaVersion := "$fullScalaVersion"
+"""
+
+    val launcher = templates / "tools" / "build" / "sbt-launch-0.13.13.jar"
     logger.debug(">> Starting SBT @ {}: packCopyDependencies", target + "/downloader")
     Process(Seq(
       "java"
@@ -41,7 +50,7 @@ import Keys._
     logger.debug("<< Finished with SBT @ {}: packCopyDependencies", target + "/downloader")
 
     val packDeps = downloadFolder / "dependencies"
-    (packDeps / "downloader_2.11-0.1-SNAPSHOT.jar").delete(force = true)
+    (packDeps / s"downloader_${scalaVersion}-0.1-SNAPSHOT.jar").delete(force = true)
     (packDeps ** "*.jar") foreach { jar => jar moveTo downloadFolder.parent.get / jar.name }
 
     downloadFolder.deleteRecursively(force = true, continueOnFailure = false)
@@ -67,15 +76,15 @@ import Keys._
   }
 
   private[this] def dslClientJava(): Unit =
-    downloadDependencies("dsl-client-java"
+    downloadDependencies("dsl-client-java", "2.11"
     , s""""com.dslplatform" % "dsl-client-java" % "${Analyse.dslClientJavaVersion}-$xkcd""""
-    , """"com.fasterxml.jackson.core" % "jackson-databind" % "2.7.4""""
+    , """"com.fasterxml.jackson.core" % "jackson-databind" % "2.7.8""""
     )
 
   private[this] def revenjCoreJava(): Unit =
-    downloadDependencies("revenj-core_java"
+    downloadDependencies("revenj-core_java", "2.11"
     , s""""org.revenj" % "revenj-core" % "${Analyse.revenjCoreJavaVersion}-$xkcd""""
-    , """"com.fasterxml.jackson.core" % "jackson-databind" % "2.7.4""""
+    , """"com.fasterxml.jackson.core" % "jackson-databind" % "2.7.8""""
     )
 
   private[this] val VersionPattern = """[ \t]+<version>([^<]+)</version>"""r
@@ -115,16 +124,16 @@ import Keys._
     logger.info("Gathered {}", "revenj-servlet_java")
   }
 
-  private[this] def revenjCoreScala(): Unit =
-    downloadDependencies("revenj-core_scala"
+  private[this] def revenjCoreScala(scalaVersion: String): Unit =
+    downloadDependencies(s"revenj-core_scala_$scalaVersion", scalaVersion
     , s""""net.revenj" %% "revenj-core" % "${Analyse.revenjCoreScalaVersion}-$xkcd""""
-    , """"org.scala-lang.modules" %% "scala-xml" % "1.0.5""""
+    , """"org.scala-lang.modules" %% "scala-xml" % "1.0.6""""
     )
 
-  private[this] def revenjAkkaScala(): Unit =
-    downloadDependencies("revenj-akka_scala"
+  private[this] def revenjAkkaScala(scalaVersion: String): Unit =
+    downloadDependencies(s"revenj-akka_scala_$scalaVersion", scalaVersion
     , s""""net.revenj" %% "revenj-akka" % "${Analyse.revenjAkkaScalaVersion}-$xkcd""""
-    , """"org.scala-lang.modules" %% "scala-xml" % "1.0.5""""
+    , """"org.scala-lang.modules" %% "scala-xml" % "1.0.6""""
     )
 
   private[this] def revenjCoreNet(): Unit = {
@@ -144,15 +153,17 @@ import Keys._
   def apply(): Unit = {
     clean()
     block(
-      Future { dslCompiler() }
-    , Future { dslClc() }
-    , Future { dslClientJava() }
-    , Future { revenjCoreJava() }
-    , Future { revenjServletJava() }
-    , Future { revenjCoreScala() }
-    , Future { revenjAkkaScala() }
-    , Future { revenjCoreNet() }
-    , Future { revenjServerNet() }
+      () => dslCompiler()
+    , () => dslClc()
+    , () => dslClientJava()
+    , () => revenjCoreJava()
+    , () => revenjServletJava()
+    , () => revenjCoreScala("2.11")
+    , () => revenjCoreScala("2.12")
+    , () => revenjAkkaScala("2.11")
+    , () => revenjAkkaScala("2.12")
+    , () => revenjCoreNet()
+    , () => revenjServerNet()
     )
   }
 }

@@ -124,10 +124,10 @@ object Deploy {
     logger.info("Copied {} to tools/runtime", src.name)
   }
 
-  private[this] def revenjScalaCompile(): Unit = {
-    val src = Gather.home / "revenj-core_scala"
+  private[this] def revenjScalaCompile(scalaVersion: String): Unit = {
+    val src = Gather.home / s"revenj-core_scala_$scalaVersion"
 
-    val target = templates / "tools" / "compile" / "revenj.scala"
+    val target = templates / "tools" / "compile" / s"revenj.scala_$scalaVersion"
     if (target.exists) {
       logger.debug("Cleaning previous revenj-core (Scala) {}", target.path)
       target.deleteRecursively(true, false)
@@ -137,10 +137,10 @@ object Deploy {
     logger.info("Copied {} to tools/compile", src.name)
   }
 
-  private[this] def revenjAkkaRuntime(): Unit = {
-    val src = Gather.home / "revenj-akka_scala"
+  private[this] def revenjAkkaRuntime(scalaVersion: String): Unit = {
+    val src = Gather.home / s"revenj-akka_scala_$scalaVersion"
 
-    val target = templates / "tools" / "runtime" / "revenj.scala"
+    val target = templates / "tools" / "runtime" / s"revenj.scala_$scalaVersion"
     if (target.exists) {
       logger.debug("Cleaning previous revenj-akka (Scala) {}", target.path)
       target.deleteRecursively(true, false)
@@ -150,20 +150,20 @@ object Deploy {
     logger.info("Copied {} to tools/runtime", src.name)
   }
 
-  def apply(): Unit = {
-    block(
-      Future {
-        // quick fix to prevent concurrent overwriting of config templates
-        dslCompiler()
-        dslClc()
-        revenjJavaRuntime()
-      }
-    , Future { javaClientCompile() }
-    , Future { revenjJavaCompile() }
-    , Future { revenjNetCompile() }
-    , Future { revenjNetRuntime() }
-    , Future { revenjScalaCompile() }
-    , Future { revenjAkkaRuntime() }
-    )
-  }
+  def apply(): Unit = block(
+    () => {
+      // quick fix to prevent concurrent overwriting of config templates
+      dslCompiler()
+      dslClc()
+      revenjJavaRuntime()
+    }
+  , () => javaClientCompile()
+  , () => revenjJavaCompile()
+  , () => revenjNetCompile()
+  , () => revenjNetRuntime()
+  , () => revenjScalaCompile("2.11")
+  , () => revenjScalaCompile("2.12")
+  , () => revenjAkkaRuntime("2.11")
+  , () => revenjAkkaRuntime("2.12")
+  )
 }

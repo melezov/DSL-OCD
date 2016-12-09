@@ -81,6 +81,15 @@ object Analyse {
       s"$$1${dslJsonVersion}-$xkcd$$3"
   )
 
+  lazy val dslJsonJodaVersion = sed("dsl-json", "joda/pom.xml",
+    None ->
+      "(<version>)([^<]+)(</version>)" ->
+      s"$$1$$2-$xkcd$$3"
+    , Some(dslJsonVersion) ->
+      """(<dependency>\s+<groupId>com.dslplatform</groupId>\s+<artifactId>dsl-json</artifactId>\s+<version>)([^<]+)(</version>)""" ->
+      s"$$1${dslJsonVersion}-$xkcd$$3"
+  )
+
   lazy val dslClientJavaVersion = {
     val version = sed("dsl-client-java", "build.sbt",
       None ->
@@ -92,7 +101,7 @@ object Analyse {
         """(\n\s+, )(EclipseKeys\.projectFlavor := EclipseProjectFlavor\.Java)""" ->
         "$1$2$1resolvers += Resolver.mavenLocal"
       , Some(dslJsonVersion) ->
-        """(val dslJson = "com.dslplatform" % "dsl-json" % ")([^"]+)(")""" ->
+        """(val dslJson = "com.dslplatform" % "dsl-json-joda" % ")([^"]+)(")""" ->
         s"$$1${dslJsonVersion}-$xkcd$$3"
     )
     version
@@ -132,6 +141,7 @@ object Analyse {
     logger.info("Analysed dsl-clc: {}", dslClcVersion)
     logger.info("Analysed dsl-json version: {}", dslJsonVersion)
     logger.info("Analysed dsl-json-java8 version: {}", dslJsonJava8Version)
+    logger.info("Analysed dsl-json-joda version: {}", dslJsonJodaVersion)
     logger.info("Analysed dsl-client-java version: {}", dslClientJavaVersion)
     logger.info("Analysed revenj-core (Java) version: {}", revenjCoreJavaVersion)
     logger.info("Analysed revenj-servlet (Java) version: {}", revenjServletJavaVersion)

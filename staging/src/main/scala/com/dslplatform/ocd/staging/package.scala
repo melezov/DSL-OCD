@@ -40,10 +40,9 @@ package object staging
 
   implicit val executionContext = ExecutionContext.fromExecutor(pool)
 
-  def block(futures: Future[_]*): Unit = {
-    for (future <- futures) {
-      Await.result(future, scala.concurrent.duration.Duration.Inf)
-    }
+  def block(fs: (() => Unit)*): Unit = {
+    val futureSeq = Future.sequence(fs map (f => Future(f())))
+    Await.result(futureSeq, scala.concurrent.duration.Duration.Inf)
   }
 
   def unixVsWindows(unixArgs: String*)(windowsArgs: String*): Seq[String] =

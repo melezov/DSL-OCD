@@ -21,10 +21,10 @@ object Source {
     logger.debug("<< Finished with GIT @ {}/{}", project, branch)
   }
 
-  def apply(): Unit = block(
-    Future { git("dsl-platform", "dsl-json", "master") }
-  , Future { git("dsl-platform", "dsl-client-java", "master") }
-  , Future { git("dsl-platform", "revenj", "master") }
-  , Future { git("dsl-platform", "dsl-compiler-client", "master") }
+  def apply(skipGit: Boolean): Unit = block(
+    () => if (!skipGit) git("dsl-platform", "dsl-json", "master")
+  , () => if (!skipGit) git("dsl-platform", "dsl-client-java", "master")
+  , () => if (!skipGit) git("dsl-platform", "revenj", "master")
+  , () => if (!skipGit) git("dsl-platform", "dsl-compiler-client", "master")
   )
 }

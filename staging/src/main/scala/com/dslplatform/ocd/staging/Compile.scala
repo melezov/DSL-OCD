@@ -31,7 +31,7 @@ object Compile {
       case "" => repositories / project
       case subproject => repositories / project / (path.replace('\\', '/'), '/')
     }
-    val launcher = templates / "tools" / "build" / "sbt-launch-0.13.12.jar"
+    val launcher = templates / "tools" / "build" / "sbt-launch-0.13.13.jar"
 
     logger.debug(">> Starting SBT @ {}/{}: {}", project, path, commands mkString " ")
     Process((Seq(
@@ -43,24 +43,27 @@ object Compile {
   }
 
   def apply(): Unit = block(
-    Future {
+    () => {
       mvn("dsl-compiler-client", "CommandLineClient", "clean", "package")
     }
-  , Future {
+  , () => {
       clean("com", "dslplatform")
       mvn("dsl-json", "library", "clean", "install")
-      mvn("dsl-json", "java8", "clean", "install")
+      block(
+        () => mvn("dsl-json", "java8", "clean", "install")
+      , () => mvn("dsl-json", "joda", "clean", "install")
+      )
       sbt("dsl-client-java", "", "clean", "publishM2")
 
       clean("org", "revenj")
       mvn("revenj", "java/revenj-core", "clean", "install")
       mvn("revenj", "java/revenj-servlet", "clean", "install", "war:war")
     }
-  , Future {
+  , () => {
       clean("net", "revenj")
       sbt("revenj", "scala"
-      , "core/clean", "core/publishM2"
-      , "akka/clean", "akka/publishM2"
+      , "core/clean", "+core/publishM2"
+      , "akka/clean", "+akka/publishM2"
       )
     }
   )

@@ -12,7 +12,7 @@ object Fetch {
   private[staging] val `revenj.net library dependencies` = "revenj-core.zip"
   private[staging] val `revenj.net runtime server` = "http-server.zip"
 
-  def apply(): Unit = {
+  def apply(includePrereleases: Boolean): Unit = {
     if (releases.exists) {
       logger.trace("Cleaning old github-releases ...")
       releases.deleteRecursively(force = true, continueOnFailure = false)
@@ -30,17 +30,16 @@ object Fetch {
       .listReleases.asScala
       .find { release =>
         val version = release.getTagName
-        val found = extractAssets(release).size == 2
-
-        if (found) {
-          true
+        if (release.isDraft) {
+          logger.debug("Skipping draft release: {}", version)
+          false
+        } else if (release.isPrerelease && !includePrereleases) {
+          logger.debug("Skipping prerelease: {}", version)
+          false
         } else {
-          if (release.isDraft) {
-            logger.debug("Skipping draft release: {}", version)
-            false
-          } else if (release.isPrerelease) {
-            logger.debug("Skipping prerelease: {}", version)
-            false
+          val found = extractAssets(release).size == 2
+          if (found) {
+            true
           } else {
             sys.error("Could not find both required bundles in release: " + version)
           }

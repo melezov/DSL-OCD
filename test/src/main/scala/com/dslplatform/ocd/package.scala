@@ -5,7 +5,6 @@ import java.util.Locale
 package object ocd
     extends com.github.nscala_time.time.Imports
     with io.jvm.uuid.Imports
-    with hr.element.etb.Pimps
     with scala.collection.convert.DecorateAsScala {
 
   type Logger = org.slf4j.Logger
@@ -22,8 +21,8 @@ package object ocd
   type Path = scalax.file.Path
   val Path = scalax.file.Path
 
-  val XKCD = hr.element.etb.XKCD
-  val Workspace = hr.element.etb.Workspace
+  val XKCD = config.XKCD
+  val Workspace = config.Workspace
 
   type Random = scala.util.Random
   type Regex = scala.util.matching.Regex

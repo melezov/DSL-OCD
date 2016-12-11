@@ -18,6 +18,5 @@ object JavaStringWithMaxLength
   , E"${"""'/\[](){}"""}"
   , E"${(1 to 9).map(_.toChar).mkString}"
   , E"${"x" * TypeDefaults.DefaultStringLength}"
-//  , E"${(0 until 9).map(_.toChar).mkString}" // PostgreSQL does not support unicode character of value 0
   )
 }

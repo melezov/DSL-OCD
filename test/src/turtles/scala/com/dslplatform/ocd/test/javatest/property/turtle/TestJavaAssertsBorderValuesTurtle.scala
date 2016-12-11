@@ -6,9 +6,9 @@ package turtle
 
 import config._
 import javas._
-import com.dslplatform.ocd.boxes.CollectionFamily
+import test._
 
-object TestJavaAssertsBorderValuesTurtle
+class TestJavaAssertsBorderValuesTurtle(testSettings: ITestSettings)
     extends ITestProject {
 
   def projectPath = "turtles/asserts"
@@ -17,10 +17,7 @@ object TestJavaAssertsBorderValuesTurtle
 
   def dslFiles = Map.empty
   def testFiles = Map(
-    JAVA -> (for {
-      ojbt <- OcdJavaBoxType.values
-      if !(ojbt.collectionFamily == Some(CollectionFamily.Queue) && ojbt.areElementsNullable == Some(true))
-    } yield {
+    JAVA -> (for (ojbt <- OcdJavaBoxType.useCaseValues(testSettings)) yield {
       JavaInfo(makeTemplate(ojbt).testBody).toEntry
     }).toMap
   )
@@ -145,8 +142,8 @@ s"""    private static JsonSerialization jsonSerialization;
           s"""final java.util.List<${elementType}> deserializedTmpList = jsonSerialization.deserializeList(${elementType.baseClass}.class, ${input}.content, ${input}.length);
         final ${ojbt.javaClass} ${output} = deserializedTmpList == null ? null : new java.util.Vector<${elementType}>(deserializedTmpList);"""
 
-        case JavaGenericType(baseClass @ "java.util.Map", _*) =>
-          s"final ${ojbt.javaClass} ${output} = (java.util.Map<String, String>) jsonSerialization.deserialize(${baseClass}.class, ${input}.content, ${input}.length);"
+        case JavaGenericType(baseClass @ "java.util.Map", javaTypes @ _*) if javaTypes.size == 2 =>
+          s"final ${ojbt.javaClass} ${output} = (java.util.Map<${javaTypes(0)}, ${javaTypes(1)}>) jsonSerialization.deserialize(${baseClass}.class, ${input}.content, ${input}.length);"
 
         case _ => ???
       }

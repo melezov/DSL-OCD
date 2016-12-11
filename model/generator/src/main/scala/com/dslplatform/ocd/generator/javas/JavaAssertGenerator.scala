@@ -26,6 +26,8 @@ public class ${name}Asserts {${asserts.mkString}}
 """
       (root / s"${name}Asserts.java").write(body)
     }
+
+    println("Finished generating java-asserts!")
   }
 }
 

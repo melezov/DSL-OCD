@@ -61,5 +61,7 @@ package object types {
 }
 """
     )
+
+    println("Finished generating types!")
   }
 }

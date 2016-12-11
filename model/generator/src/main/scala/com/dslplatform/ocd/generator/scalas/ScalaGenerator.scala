@@ -95,5 +95,7 @@ trait OcdScalaBoxTypeValues {
   )
 }
 """)
+
+    println("Finished generating scalas!")
   }
 }

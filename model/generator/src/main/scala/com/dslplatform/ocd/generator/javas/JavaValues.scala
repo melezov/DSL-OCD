@@ -21,7 +21,9 @@ trait JavaValues {
   , "Long" -> JavaLong
   , "Map" -> JavaMap
   , "Money" -> JavaMoney
+  , "Path" -> JavaPath
   , "Point" -> JavaPoint
+  , "Properties" -> JavaProperties
   , "Rectangle" -> JavaRectangle
   , "String" -> JavaString
   , "String(9)" -> JavaStringWithMaxLength

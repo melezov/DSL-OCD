@@ -67,5 +67,7 @@ package dsls {
   }
 }
 """)
+
+    println("Finished generating dsls!")
   }
 }

@@ -150,6 +150,11 @@ case class VectorOfJavaValues(
 
 object MapOfJavaValues {
   def apply(entries: (String, String)*): MapOfJavaValues =
+    MapOfJavaValues("String", "Object", (entries.map { case (k, v) => (k: TestValue, v: TestValue)}).toMap)
+}
+
+object PropertiesOfJavaValues {
+  def apply(entries: (String, String)*): MapOfJavaValues =
     MapOfJavaValues("String", "String", (entries.map { case (k, v) => (k: TestValue, v: TestValue)}).toMap)
 }
 

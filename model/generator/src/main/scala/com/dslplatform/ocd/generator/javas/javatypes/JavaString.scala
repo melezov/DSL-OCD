@@ -17,6 +17,5 @@ object JavaString
     E"${'"'}"
   , E"${"""Quote: ", Solidus /, Backslash: \, Aphos: ', Brackets: [] () {}"""}"
   , E"${(1 to 256).map(_.toChar).mkString}"
-//  , E"${(0 to 256).map(_.toChar).mkString}" // PostgreSQL does not support unicode character of value 0
   )
 }

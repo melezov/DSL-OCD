@@ -118,5 +118,7 @@ trait OcdJavaBoxTypeValues {
   )
 }
 """)
+
+    println("Finished generating javas!")
   }
 }

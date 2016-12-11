@@ -64,5 +64,7 @@ package object boxes {
 }
 """
     )
+
+    println("Finished generating boxes!")
   }
 }

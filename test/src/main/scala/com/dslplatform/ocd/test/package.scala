@@ -59,13 +59,16 @@ package object test {
     , `type.Integer`
     , `type.Ip`
 //    , `type.Json`
+//    , `type.JsonOf<Map>`
     , `type.Location`
     , `type.Long`
     , `type.Map`
     , `type.Money`
 //    , `type.Native`
+    , `type.Path`
 //    , `type.Phone`
     , `type.Point`
+    , `type.Properties`
     , `type.Rectangle`
 //    , `type.S3`
 //    , `type.Secret`
@@ -95,13 +98,16 @@ package object test {
     , `type.Integer`
     , `type.Ip`
 //    , `type.Json`
+//    , `type.JsonOf<Map>`
 //    , `type.Location`
     , `type.Long`
 //    , `type.Map`
     , `type.Money`
 //    , `type.Native`
+//    , `type.Path`
 //    , `type.Phone`
 //    , `type.Point`
+//    , `type.Properties`
 //    , `type.Rectangle`
 //    , `type.S3`
 //    , `type.Secret`
@@ -161,6 +167,20 @@ package object test {
         if (contentInBox endsWith ">") "  " else
         if (contentInBox endsWith "?") "" else " ")
     }
+  }
+
+  implicit class OcdJavaBoxTypeSingletonExtender(val ocdJavaBoxType: javas.OcdJavaBoxType.type) extends AnyVal {
+    def useCaseValues(testSettings: ITestSettings): Seq[javas.OcdJavaBoxType] = for {
+      t <- types.OcdType.useCaseValues(testSettings)
+      b <- boxes.OcdBox.useCaseValues(testSettings)
+    } yield javas.OcdJavaBoxType.resolve(t, b)
+  }
+
+  implicit class OcdDslBoxTypeSingletonExtender(val ocdDslBoxType: dsls.OcdDslBoxType.type) extends AnyVal {
+    def useCaseValues(testSettings: ITestSettings): Seq[dsls.OcdDslBoxType] = for {
+      t <- types.OcdType.useCaseValues(testSettings)
+      b <- boxes.OcdBox.useCaseValues(testSettings)
+    } yield dsls.OcdDslBoxType.resolve(t, b)
   }
 
   implicit class ClassyDSLTyper(val ocdDsl: dsls.OcdDslBoxType.type) extends AnyVal {

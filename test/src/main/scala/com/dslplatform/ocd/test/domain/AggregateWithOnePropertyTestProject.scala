@@ -3,7 +3,6 @@ package test
 package domain
 
 import config._
-import types._
 import boxes._
 import dsls._
 import javas._
@@ -16,17 +15,15 @@ private[domain] class AggregateWithOnePropertySetupFactory(
   ) extends SetupFactory(testSettings) {
 
   val setups = for {
-    t <- OcdType.useCaseValues(testSettings)
-    if t != `type.Image`                                // Image types shouldn't be a primary key
-    if t != `type.Location` && t != `type.Point`        // ERROR: data type point has no default operator class for access method "btree"
-    if t != `type.Xml`                                  // ERROR: data type xml has no default operator class for access method "btree"
-    if t != `type.Rectangle`                            // ERROR: data type box has no default operator class for access method "btree"
-    if !isOracle || t != `type.Binary` && t != `type.String` && t != `type.Text` // Oracle doesn't support BLOB or CLOB as primary key
-    b <- OcdBox.useCaseValues(testSettings)
-    if !b.isNullable                                    // Primary keys cannot be nullable
-    if !isOracle || b.isCollection == false             // Collections cannot be PK in Oracle
-    if b.collectionFamily != Some(CollectionFamily.Set) // URIs from Set PKs are currently behaving erratically
-    d = OcdDslBoxType.resolve(t, b)
+    d <- OcdDslBoxType.useCaseValues(testSettings)
+    if !isOracle || (d.typeName != "String" && d.typeName != "Text" && d.typeName != "Binary" || !d.isCollection) // Oracle doesn't support BLOB or CLOB as primary key
+    if d.typeName != "Image"                             // Image types shouldn't be a primary key
+    if d.typeName != "Location" && d.typeName != "Point" // ERROR: data type point has no default operator class for access method "btree"
+    if d.typeName != "Xml"                               // ERROR: data type xml has no default operator class for access method "btree"
+    if d.typeName != "Rectangle"                         // ERROR: data type box has no default operator class for access method "btree"
+    if !d.isNullable                                     // Primary keys cannot be nullable
+    if !isOracle || !d.isCollection                      // Collections cannot be PK in Oracle
+    if d.collectionFamily != Some(CollectionFamily.Set)  // URIs from Set PKs are currently behaving erratically
   } yield {
     new AggregateWithOnePropertySetup(d)
   }

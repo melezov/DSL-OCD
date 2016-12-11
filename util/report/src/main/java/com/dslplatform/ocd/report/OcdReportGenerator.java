@@ -44,7 +44,7 @@ public class OcdReportGenerator {
             this.documentBuilder = this.documentBuilderFactory.newDocumentBuilder();
             this.outputDir = siteOutputDirectory.endsWith("/") ? siteOutputDirectory : siteOutputDirectory + "/";
             final Testsuites testsuites = (Testsuites) JAXBContext
-                    .newInstance("com.dslplatform.ocd.generated")
+                    .newInstance("com.dslplatform.ocd.report.generated")
                     .createUnmarshaller()
                     .unmarshal(new FileInputStream(aggregatedTestsFilename));
             this.generateWins = generateWins;

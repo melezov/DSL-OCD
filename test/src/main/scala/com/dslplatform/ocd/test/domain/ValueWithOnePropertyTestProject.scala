@@ -3,8 +3,6 @@ package test
 package domain
 
 import config._
-import types._
-import boxes._
 import dsls._
 import javas._
 
@@ -16,10 +14,9 @@ private[domain] class ValueWithOnePropertySetupFactory(
   ) extends SetupFactory(testSettings) {
 
   val setups = for {
-    t <- OcdType.useCaseValues(testSettings)
-    b <- OcdBox.useCaseValues(testSettings)
-    if !isOracle || (t.typeName != "String" && t.typeName != "Text" && t.typeName != "Binary" || !b.isCollection)
-    d = OcdDslBoxType.resolve(t, b)
+    st <- AggregateRootSugar.values
+    d <- OcdDslBoxType.useCaseValues(testSettings)
+    if !isOracle || (d.typeName != "String" && d.typeName != "Text" && d.typeName != "Binary" || !d.isCollection)
   } yield {
     new ValueWithOnePropertySetup(d)
   }

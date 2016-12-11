@@ -6,14 +6,13 @@
   <property name="report.target" location="report/site/" />
   <property name="report.generated" location="report/site/summaries" />
   <property name="report.stylesheet" location="report/xsl/report.xsl" />
-  <property name="saxon.jar" location="report/lib/saxon9he.jar" />
-  <property name="ocd-report-generator" location="tools/build/ocd-report-0.2.1.jar" />
+  <property name="ocd-report-generator" location="tools/build/dsl-ocd-util-report-0.2.2.jar" />
 
   <property name="tools" location="tools" />
   <property name="tools.revenj" location="tools/revenj" />
   <property name="tools.java_client" location="tools/java_client" />
   <property name="tools.revenj" location="tools/revenj" />
-  <property name="tools.port-corrector" location="tools/build/dsl-ocd-util-port-corrector-0.1.0.jar" />
+  <property name="tools.port-corrector" location="tools/build/dsl-ocd-util-port-corrector-0.2.2.jar" />
 
   <import file="macrodef.xml" />
 

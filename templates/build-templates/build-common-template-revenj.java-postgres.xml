@@ -21,9 +21,9 @@
   <property name="target.main" location="${target}/classes"/>
   <property name="target.test" location="${target}/test-classes"/>
 
-  <property name="dsl-clc" value="dsl-clc-1.8.1-161016-234747.jar"/>
-  <property name="dsl-compiler" value="dsl-compiler-1.7.6133.34171-161016-234747.exe"/>
-  <property name="revenj.war" value="revenj-servlet-1.0.0-161016-234747.war"/>
+  <property name="dsl-clc" value="dsl-clc-1.8.3-161211-162809.jar"/>
+  <property name="dsl-compiler" value="dsl-compiler-1.7.6185.21662-161211-162809.exe"/>
+  <property name="revenj.war" value="revenj-servlet-1.0.3-161211-162809.war"/>
 
   <property name="client" value="java_client"/>
   <property name="server" value="revenj.java"/>
@@ -37,7 +37,7 @@
   <property name="tools.dsl-clc" location="${tools.build}/${dsl-clc}"/>
   <property name="tools.dsl-compiler" location="${tools.build}/${dsl-compiler}"/>
 
-  <property name="tools.ping" location="${tools.build}/dsl-ocd-util-ping-0.1.1.jar"/>
+  <property name="tools.ping" location="${tools.build}/dsl-ocd-util-ping-0.2.2.jar"/>
   <property name="tools.jetty-runner" location="${tools.runtime}/jetty-runner/jetty-runner-9.3.3.v20150827.jar"/>
   <property name="tools.jetty-stopper" location="${tools.runtime}/jetty-runner/jetty-stopper-9.3.3.v20150827.jar"/>
 
@@ -68,7 +68,7 @@
   <property name="dbUser" value="${projectShortName}-user"/>
   <property name="dbPassword" value="${projectShortName}-password"/>
 
-  <path id="postgres.classpath" location="${tools.build}/postgresql-9.4.1208.jre6.jar"/>
+  <path id="postgres.classpath" location="${tools.build}/postgresql-9.4.1212.jre6.jar"/>
 
   <!-- ########### -->
   <!-- # FILTERS # -->

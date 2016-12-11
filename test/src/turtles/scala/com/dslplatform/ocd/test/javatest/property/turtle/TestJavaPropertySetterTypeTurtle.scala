@@ -7,7 +7,7 @@ package turtle
 import config._
 import javas._
 
-object TestJavaPropertySetterTypeTurtle
+class TestJavaPropertySetterTypeTurtle(testSettings: ITestSettings)
     extends ITestProject {
 
   def projectPath = "turtles/setters"
@@ -16,7 +16,7 @@ object TestJavaPropertySetterTypeTurtle
 
   def dslFiles = Map.empty
   def testFiles = Map(
-    JAVA -> (for (ojbt <- OcdJavaBoxType.values) yield {
+    JAVA -> (for (ojbt <- OcdJavaBoxType.useCaseValues(testSettings)) yield {
       JavaInfo(makeTemplate(ojbt).testBody).toEntry
     }).toMap
   )

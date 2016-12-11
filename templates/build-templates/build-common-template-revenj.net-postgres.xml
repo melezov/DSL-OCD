@@ -21,8 +21,8 @@
   <property name="target.main" location="${target}/classes"/>
   <property name="target.test" location="${target}/test-classes"/>
 
-  <property name="dsl-clc" value="dsl-clc-1.8.1-161016-234747.jar"/>
-  <property name="dsl-compiler" value="dsl-compiler-1.7.6133.34171-161016-234747.exe"/>
+  <property name="dsl-clc" value="dsl-clc-1.8.3-161211-162809.jar"/>
+  <property name="dsl-compiler" value="dsl-compiler-1.7.6185.21662-161211-162809.exe"/>
 
   <property name="client" value="java_client"/>
   <property name="server" value="revenj.net"/>
@@ -36,7 +36,7 @@
   <property name="tools.dsl-clc" location="${tools.build}/${dsl-clc}"/>
   <property name="tools.dsl-compiler" location="${tools.build}/${dsl-compiler}"/>
 
-  <property name="tools.ping" location="${tools.build}/dsl-ocd-util-ping-0.1.1.jar"/>
+  <property name="tools.ping" location="${tools.build}/dsl-ocd-util-ping-0.2.2.jar"/>
 
   <property name="workspace.client" location="${temp.client}/workspace"/>
   <property name="workspace.server" location="${temp.server}/workspace"/>
@@ -65,7 +65,7 @@
   <property name="dbUser" value="${projectShortName}-user"/>
   <property name="dbPassword" value="${projectShortName}-password"/>
 
-  <path id="postgres.classpath" location="${tools.build}/postgresql-9.4.1208.jre6.jar"/>
+  <path id="postgres.classpath" location="${tools.build}/postgresql-9.4.1212.jre6.jar"/>
 
   <!-- ########### -->
   <!-- # FILTERS # -->

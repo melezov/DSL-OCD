@@ -49,10 +49,10 @@ class EntryPoint(
       logger.debug("Initializing turtles ...")
 
       Seq[ITestProject](
-        TestJavaAssertsBorderValuesTurtle
-      , TestJavaPropertyFieldTypeTurtle
-      , TestJavaPropertyGetterTypeTurtle
-      , TestJavaPropertySetterTypeTurtle
+        new TestJavaAssertsBorderValuesTurtle(testSettings)
+      , new TestJavaPropertyFieldTypeTurtle(testSettings)
+      , new TestJavaPropertyGetterTypeTurtle(testSettings)
+      , new TestJavaPropertySetterTypeTurtle(testSettings)
       )
     }
 

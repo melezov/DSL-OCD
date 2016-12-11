@@ -3,7 +3,6 @@ package test
 package javatest
 package property
 
-import types._
 import javas._
 
 trait TestComponentWithProperty

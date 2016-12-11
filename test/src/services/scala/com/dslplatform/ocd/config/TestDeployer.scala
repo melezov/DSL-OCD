@@ -81,14 +81,17 @@ class TestDeployer(
 
     private val dslTarget = projectRoot / "dsl"
 
+    private def toName(language: Language) =
+      language.lowerName.replaceFirst("_.*", "")
+
     private def languageRoot(language: Language) =
-      projectRoot / language.lowerName
+      projectRoot / toName(language)
 
     private def mainRoot(language: Language) =
       languageRoot(language) / "src" / "main"
 
     private def mainCode(language: Language) =
-      mainRoot(language) / language.lowerName
+      mainRoot(language) / toName(language)
 
     private def mainResources(language: Language) =
       mainRoot(language) / "resources"
@@ -97,7 +100,7 @@ class TestDeployer(
       languageRoot(language) / "src" / "generated"
 
     private def generatedCode(language: Language) =
-      generatedRoot(language) / language.lowerName
+      generatedRoot(language) / toName(language)
 
     private def generatedResources(language: Language) =
       generatedRoot(language) / "resources"

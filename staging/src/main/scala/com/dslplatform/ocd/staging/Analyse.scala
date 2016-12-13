@@ -9,13 +9,7 @@ object Analyse {
     , replacements: ((Option[String], String), String)*): String = {
 
     val target = repositories / project / (path.replace('\\', '/'), '/')
-    val backup = target.parent.get / (target.name + ".backup")
-
-    if (backup.exists) {
-      backup.copyTo(target = target, replaceExisting = true)
-    } else {
-      target.copyTo(target = backup)
-    }
+    backup(target)
 
     val ((firstCheck, firstPattern), firstReplacement) = replacements.head
     val firstMatcher = Pattern.compile(firstPattern).matcher(target.string)

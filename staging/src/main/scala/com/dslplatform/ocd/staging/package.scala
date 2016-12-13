@@ -1,6 +1,9 @@
 package com.dslplatform.ocd
 
 import java.io.FileInputStream
+import java.text.NumberFormat
+import java.util.Locale
+
 import com.typesafe.scalalogging.Logger
 import org.slf4j.LoggerFactory
 
@@ -47,4 +50,18 @@ package object staging
 
   def unixVsWindows(unixArgs: String*)(windowsArgs: String*): Seq[String] =
     if (java.io.File.separator == "/") unixArgs else windowsArgs
+
+  def format(number: Long) = {
+    val nf = NumberFormat.getInstance(Locale.ROOT)
+    nf.format(number)
+  }
+
+  def backup(path: Path): Unit = {
+    val backup = path.parent.get / (path.name + ".backup")
+    if (backup.exists) {
+      backup.copyTo(target = path, replaceExisting = true)
+    } else {
+      path.copyTo(target = backup)
+    }
+  }
 }

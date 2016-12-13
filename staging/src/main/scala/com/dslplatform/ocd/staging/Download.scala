@@ -1,9 +1,14 @@
 package com.dslplatform.ocd
 package staging
 
-import sys.process._
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+
+import scalax.io.JavaConverters._
+import scala.sys.process._
+import scalax.io.Resource
 
 object Download {
+  private[this] val CompilerUrl = "https://compiler.dsl-platform.com:8443/platform/download/dsl-compiler.zip"
   private[this] val home = repositories / "dsl-compiler"
 
   private[this] def clean(): Unit = {
@@ -15,47 +20,34 @@ object Download {
     }
   }
 
-  private[this] def download(): (Path, Int) = {
-    val url = "https://compiler.dsl-platform.com:8443/platform/download/dsl-compiler.zip"
+  private[this] def download(): Array[Byte] = {
+    val downloader = Resource.fromURL(CompilerUrl).bytes.grouped(500000)
+    val baos = new ByteArrayOutputStream()
+    downloader.foldLeft(0L) { (last, buffer) =>
+      val soFar = last + buffer.length
+      logger.debug(s"--# Downloading compiler ({} bytes) ...", format(soFar))
+      baos.write(buffer.toArray)
+      soFar
+    }
+    baos.toByteArray
+  }
 
+  private[this] def downloadAndUnzip(): (Path, Int) = {
     val zis = new java.util.zip.ZipInputStream(
-      new java.io.BufferedInputStream(
-      new java.net.URL(url).openStream()))
+      new ByteArrayInputStream(download())
+    )
 
     val firstEntry = zis.getNextEntry
     assert(firstEntry.getName == "dsl-compiler.exe")
 
     val expectedLength = firstEntry.getSize.toInt
-
-    val buffer = new Array[Byte](1 << 20)
     val tempFile = home / (java.util.UUID.randomUUID + ".exe")
 
-    val bis = new java.io.BufferedInputStream(zis)
-    val fos = new java.io.FileOutputStream(tempFile.path)
+    val body = zis.asInput.byteArray
+    assert(body.length == expectedLength, "Size mismatch!")
 
-    def slurp(soFar: Int = 0): Int = {
-      val toRead = math.min(expectedLength - soFar, buffer.length)
-      if (toRead > 0) {
-        val read = bis.read(buffer, 0, toRead)
-        if (read != -1) {
-          fos.write(buffer, 0, read)
-          val total = soFar + read
-          logger.trace(s"Wrote $total bytes ...")
-          slurp(total)
-        } else {
-          soFar
-        }
-      } else {
-        soFar
-      }
-    }
-
-    val size = slurp()
-    assert(size == expectedLength, "Size mismatch!")
-    bis.close()
-    fos.close()
-
-    (tempFile, size)
+    tempFile write body
+    (tempFile, body.length)
   }
 
   private[this] def testVersion(tempFile: Path): String = {
@@ -85,7 +77,7 @@ object Download {
     clean()
 
     // Download compiler
-    val (tempFile, size) = download()
+    val (tempFile, size) = downloadAndUnzip()
     logger.debug(s"Wrote ${tempFile.name} ($size bytes)")
 
     // Check version

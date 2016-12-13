@@ -12,16 +12,18 @@ object EntryPoint
     logger.info(s"### ${section} END (took: ${endAt - startAt} ms) ###")
   }
 
-  val skipGit = args contains "skip-git"
+  val skipSource = args contains "skip-source"
+  val skipModel = args contains "skip-model"
   val includePrereleases = args contains "include-prereleases"
 
   time("Staging",
     try {
-      time("Source", Source(skipGit))
+      time("Source", Source(skipSource))
       time("Analyse", Analyse())
       time("Compile", Compile())
       time("Fetch", Fetch(includePrereleases))
       time("Download", Download())
+      time("Model", Model(skipModel))
       time("Gather", Gather())
       time("Deploy", Deploy())
     } finally {

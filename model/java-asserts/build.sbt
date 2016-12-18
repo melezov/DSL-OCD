@@ -21,6 +21,8 @@ libraryDependencies ++= Seq(
 , "junit" % "junit" % "4.12"
 )
 
+resolvers += Resolver.mavenLocal
+
 // ### ECLIPSE ### //
 
 EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)

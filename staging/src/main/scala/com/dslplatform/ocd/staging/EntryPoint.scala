@@ -12,9 +12,10 @@ object EntryPoint
     logger.info(s"### ${section} END (took: ${endAt - startAt} ms) ###")
   }
 
-  val skipSource = args contains "skip-source"
-  val skipModel = args contains "skip-model"
-  val includePrereleases = args contains "include-prereleases"
+  val skipSource = args contains "source:skip"
+  val skipUtil = args contains "util:skip"
+  val skipModel = args contains "model:skip"
+  val includePrereleases = args contains "fetch:include-prereleases"
 
   time("Staging",
     try {
@@ -23,9 +24,10 @@ object EntryPoint
       time("Compile", Compile())
       time("Fetch", Fetch(includePrereleases))
       time("Download", Download())
+      time("Util", Util(skipUtil))
       time("Model", Model(skipModel))
-      time("Gather", Gather())
-      time("Deploy", Deploy())
+//      time("Gather", Gather())
+//      time("Deploy", Deploy())
     } finally {
       pool.shutdown()
     }

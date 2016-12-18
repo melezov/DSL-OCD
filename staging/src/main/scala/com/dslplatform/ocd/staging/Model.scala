@@ -37,16 +37,17 @@ object Model {
       (generatorVersion, generatorVersion + "-" + xkcd)
     }
 
-    logger.info("--# Set model version is: {}", version)
-    val versionPatterns = Seq(
-      s"""(version := ")([^"]+)(")"""
-      , s"""("com.dslplatform.ocd" %% "dsl-ocd-model-[a-z]+" % ")([^"]+)(")"""
+    logger.info("--# Model version is: {}", version)
+    val versionPatterns = Map(
+      s"""(version := ")([^"]+)(")""" -> s"$$1${version}$$3"
+    , s"""("com.dslplatform.ocd" %%? "dsl-ocd-(?:util|model)-[a-z]+" % ")([^"]+)(")""" -> s"$$1${version}$$3"
+    , s"""("com.dslplatform" % "dsl-client-java" % ")([^"]+)(")""" -> s"$$1${Analyse.dslClientJavaVersion}-$xkcd$$3"
     )
 
     home ** ("build.sbt") foreach { path =>
       backup(path)
-      val versionFix = versionPatterns.foldLeft(path.string){ case (curBody, pattern) =>
-        curBody.replaceAll(pattern, s"$$1${version}$$3")
+      val versionFix = versionPatterns.foldLeft(path.string){ case (curBody, (pattern, replacement)) =>
+        curBody.replaceAll(pattern, replacement)
       }
       path write versionFix
       logger.debug("--# Updated versions in {}", path.path)

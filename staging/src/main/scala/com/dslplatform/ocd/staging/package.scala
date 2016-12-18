@@ -20,7 +20,7 @@ package object staging
   val Future = scala.concurrent.Future
 
   val now = DateTime.now
-  val xkcd = now.toString("YYMMdd-HHmmss")
+  val xkcd = "EXPLOSM-OATMEAL" // now.toString("YYMMdd-HHmmss")
 
   val logger = Logger(LoggerFactory.getLogger("dsl-ocd-staging"))
 

@@ -179,6 +179,7 @@ object Compile {
   }
 
   object Dsl {
+    val `assembly` = "assembly"
     val `clean` = "clean"
     val `package` = "package"
     val `install` = "install"

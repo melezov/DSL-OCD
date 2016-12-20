@@ -4,7 +4,7 @@ package staging
 import java.io.{BufferedReader, InputStreamReader}
 import java.util.jar.JarInputStream
 
-import sys.process._
+import Compile._
 
 object Gather {
   private[staging] val home = repositories / ".gather"
@@ -18,37 +18,33 @@ object Gather {
   }
 
   private[this] def downloadDependencies(target: String, scalaVersion: String, dependencies: String*): Unit = {
-    val downloadFolder = home / target / "downloader"
-    (templates / "tools" / "downloader") copyTo downloadFolder
-
-    val libs = (dependencies map { dependency =>
-      "libraryDependencies += " + dependency
-    }).mkString("""import sbt._
-import Keys._
-
-""", "\n", "\n")
-
-    (downloadFolder / "dependencies.sbt") write libs
-
     val fullScalaVersion = scalaVersion match {
       case "2.12" => "2.12.1"
       case "2.11" => "2.11.8"
       case _ => ???
     }
 
-    (downloadFolder / "scalaVersion.sbt") write s"""scalaVersion := "$fullScalaVersion"
+    val downloadFolder = home / target / "downloader"
+
+    (downloadFolder / "project" / "plugins.sbt") write """addSbtPlugin("org.xerial.sbt" % "sbt-pack" % "0.8.0")
+"""
+    (downloadFolder / "project" / "build.properties") write """sbt.version=0.13.13
+"""
+    (downloadFolder / "build.sbt") write s"""
+scalaVersion := "$fullScalaVersion"
+autoScalaLibrary := false
+
+libraryDependencies ++= Seq(
+  ${dependencies.mkString("\n, ")}
+)
+resolvers += Resolver.mavenLocal
+
+packAutoSettings
+packCopyDependenciesUseSymbolicLinks := false
+packCopyDependenciesTarget := file("dependencies")
 """
 
-    val launcher = templates / "tools" / "build" / "sbt-launch-0.13.13.jar"
-    logger.debug(">> Starting SBT @ {}: packCopyDependencies", target + "/downloader")
-    Process(Seq(
-      "java"
-    , s"-Duser.home=${userHome.path}"
-    , "-jar", launcher.toAbsolute.path
-    , "packCopyDependencies"
-    ), downloadFolder.fileOption.get)! ProcessLogger(logger.trace(_), logger.warn(_))
-    logger.debug("<< Finished with SBT @ {}: packCopyDependencies", target + "/downloader")
-
+    SBT(s".gather/$target/downloader", "", Nil, "packCopyDependencies")
     val packDeps = downloadFolder / "dependencies"
     (packDeps / s"downloader_${scalaVersion}-0.1-SNAPSHOT.jar").delete(force = true)
     (packDeps ** "*.jar") foreach { jar => jar moveTo downloadFolder.parent.get / jar.name }
@@ -58,13 +54,57 @@ import Keys._
   }
 
   private[this] def copy(name: String, source: Path, target: Path): Unit = {
-    logger.trace("Copying {} name ...", name)
+    logger.trace("Copying {} ...", name)
     source copyTo target
     logger.info("Gathered {}", name)
   }
 
+  private[this] def utilPing(): Unit = {
+    val src = repositories / "util" / "ping" / "target" ** "*.jar" head
+    val target = home / "dsl-ocd-util-ping" / src.name
+    copy("util-ping", src, target)
+  }
+
+  private[this] def utilPortCorrector(): Unit = {
+    val src = repositories / "util" / "port-corrector" / "target" ** "*.jar" head
+    val target = home / "dsl-ocd-util-port-corrector" / src.name
+    copy("util-port-corrector", src, target)
+  }
+
+  private[this] def utilReport(): Unit = {
+    val src = repositories / "util" / "report" / "target" ** "*.jar" head
+    val target = home / "dsl-ocd-util-report" / src.name
+    copy("util-report", src, target)
+  }
+
+  private[this] def utilJettyRunner(): Unit = {
+    downloadDependencies("jetty-runner", "2.11"
+    , s""""org.eclipse.jetty" % "jetty-runner" % "9.4.0.v20161208" intransitive()"""
+    , s""""org.eclipse.jetty" % "jetty-start" % "9.4.0.v20161208""""
+    )
+  }
+
+  private[this] def utilRevenjRunner(): Unit = {
+    val src = repositories / "util" / "revenj-runner" / "target" ** "*.jar" head
+    val target = home / "dsl-ocd-util-revenj-runner" / src.name
+    copy("util-revenj-runner", src, target)
+  }
+
+  private[this] def utilTesting(): Unit = {
+    downloadDependencies("util-testing", "2.11"
+    , s""""com.dslplatform.ocd" % "dsl-ocd-model-java-asserts" % "${Util.Version}-$xkcd""""
+    , """"ch.qos.logback" % "logback-classic" % "1.1.8""""
+    )
+
+    (home / "util-testing" / "dsl-ocd-model-java-asserts.jar") moveTo
+    (home / "util-testing" / s"dsl-ocd-model-java-asserts-${Util.Version}-$xkcd.jar")
+
+    (home / "util-testing" / "dsl-ocd-util-testing.jar") moveTo
+    (home / "util-testing" / s"dsl-ocd-util-testing-${Util.Version}-$xkcd.jar")
+  }
+
   private[this] def dslCompiler(): Unit = {
-    val src = (repositories / "dsl-compiler" ** s"*.exe").head
+    val src = (repositories / "dsl-compiler" ** "*.exe").head
     val target = home / "dsl-compiler" / src.name
     copy("dsl-compiler", src, target)
   }
@@ -150,20 +190,33 @@ import Keys._
     copy("revenj-server_net", src, target)
   }
 
-  def apply(): Unit = {
+  private[this] def postgreSqlJdbc(): Unit = {
+    val src = repositories / "drivers" / "postgresql-jdbc"
+    val target = home / "postgresql-jdbc"
+    copy("postgresql-jdbc", src, target)
+  }
+
+  def apply(skipGather: Boolean): Unit = if (!skipGather) {
     clean()
     block(
-      () => dslCompiler()
-//    , () => dslClc()
-//    , () => dslClientJava()
-//    , () => revenjCoreJava()
-//    , () => revenjServletJava()
-//    , () => revenjCoreScala("2.11")
-//    , () => revenjCoreScala("2.12")
-//    , () => revenjAkkaScala("2.11")
-//    , () => revenjAkkaScala("2.12")
-//    , () => revenjCoreNet()
-//    , () => revenjServerNet()
+      () => utilPing()
+    , () => utilPortCorrector()
+    , () => utilReport()
+    , () => utilRevenjRunner()
+    , () => utilJettyRunner()
+    , () => utilTesting()
+    , () => dslCompiler()
+    , () => dslClc()
+    , () => dslClientJava()
+    , () => revenjCoreJava()
+    , () => revenjServletJava()
+    , () => revenjCoreScala("2.11")
+    , () => revenjCoreScala("2.12")
+    , () => revenjAkkaScala("2.11")
+    , () => revenjAkkaScala("2.12")
+    , () => revenjCoreNet()
+    , () => revenjServerNet()
+    , () => postgreSqlJdbc()
     )
   }
 }

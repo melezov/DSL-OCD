@@ -25,5 +25,5 @@ EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
 EclipseKeys.eclipseOutput := Some(".target")
 EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
 
-packageOptions in (Compile, packageBin) += 
+packageOptions in (Compile, packageBin) +=
   Package.ManifestAttributes( java.util.jar.Attributes.Name.SEALED -> "false" )

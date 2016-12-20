@@ -12,7 +12,7 @@ object Fetch {
   private[staging] val `revenj.net library dependencies` = "revenj-core.zip"
   private[staging] val `revenj.net runtime server` = "http-server.zip"
 
-  def apply(includePrereleases: Boolean): Unit = {
+  def apply(skipFetch: Boolean, includePrereleases: Boolean): Unit = if (!skipFetch) {
     if (releases.exists) {
       logger.trace("Cleaning old github-releases ...")
       releases.deleteRecursively(force = true, continueOnFailure = false)

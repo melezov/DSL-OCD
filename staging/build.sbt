@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
 , "org.kohsuke"                   %  "github-api"       % "1.80"
 , "org.eclipse.jgit"              %  "org.eclipse.jgit" % "4.5.0.201609210915-r"
 , "com.typesafe.scala-logging"    %% "scala-logging"    % "3.5.0"
-, "ch.qos.logback"                %  "logback-classic"  % "1.1.7"
+, "ch.qos.logback"                %  "logback-classic"  % "1.1.8"
 )
 
 // ### ECLIPSE ### //

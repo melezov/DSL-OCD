@@ -3,8 +3,8 @@ package staging
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 
-import scalax.io.JavaConverters._
 import scala.sys.process._
+import scalax.io.JavaConverters._
 import scalax.io.Resource
 
 object Download {
@@ -72,7 +72,7 @@ object Download {
     logger.debug(s"Renamed to ${targetFile.name}")
   }
 
-  def apply(): Unit = {
+  def apply(skipDownload: Boolean): Unit = if (!skipDownload) {
     // Clean all the things!
     clean()
 

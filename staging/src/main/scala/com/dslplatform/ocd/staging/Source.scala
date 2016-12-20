@@ -38,10 +38,10 @@ object Source {
     logger.info("<-- Finished GIT @ {}/{}", project, branch)
   }
 
-  def apply(skipSource: Boolean): Unit = block(
-    () => if (!skipSource) git("dsl-platform", "dsl-json", "master")
-  , () => if (!skipSource) git("dsl-platform", "dsl-client-java", "master")
-  , () => if (!skipSource) git("dsl-platform", "revenj", "master")
-  , () => if (!skipSource) git("dsl-platform", "dsl-compiler-client", "master")
+  def apply(skipSource: Boolean): Unit = if (!skipSource) block(
+    () => git("dsl-platform", "dsl-json", "master")
+  , () => git("dsl-platform", "dsl-client-java", "master")
+  , () => git("dsl-platform", "revenj", "master")
+  , () => git("dsl-platform", "dsl-compiler-client", "master")
   )
 }

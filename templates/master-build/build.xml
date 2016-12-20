@@ -1,68 +1,66 @@
 <?xml version="1.0"?>
 <project name="Master test report builder" xmlns:ocd="com.dslplatform.ocd">
+  <property name="report.root" location="report"/>
+  <property name="report.src" location="report/OCD-Tests-Summary.xml"/>
+  <property name="report.target" location="report/site/"/>
+  <property name="report.generated" location="report/site/summaries"/>
+  <property name="report.stylesheet" location="report/xsl/report.xsl"/>
 
-  <property name="report.root" location="report" />
-  <property name="report.src" location="report/OCD-Tests-Summary.xml" />
-  <property name="report.target" location="report/site/" />
-  <property name="report.generated" location="report/site/summaries" />
-  <property name="report.stylesheet" location="report/xsl/report.xsl" />
-  <property name="ocd-report-generator" location="tools/build/dsl-ocd-util-report-0.2.2.jar" />
+  <property name="tools" location="tools"/>
+  <property name="tools.revenj" location="tools/revenj"/>
+  <property name="tools.java_client" location="tools/java_client"/>
+  <property name="tools.util-report" location="tools/build/dsl-ocd-util/dsl-ocd-util-report-0.2.2-161224-000735.jar"/>
+  <property name="tools.util-port-corrector" location="tools/build/dsl-ocd-util/dsl-ocd-util-port-corrector-0.2.2-161224-000735.jar"/>
 
-  <property name="tools" location="tools" />
-  <property name="tools.revenj" location="tools/revenj" />
-  <property name="tools.java_client" location="tools/java_client" />
-  <property name="tools.revenj" location="tools/revenj" />
-  <property name="tools.port-corrector" location="tools/build/dsl-ocd-util-port-corrector-0.2.2.jar" />
-
-  <import file="macrodef.xml" />
+  <import file="macrodef.xml"/>
 
   <tstamp>
-    <format property="test.timestamp" pattern="yyyy-MM-dd_hh:mm:ss" />
+    <format property="test.timestamp" pattern="yyyy-MM-dd_hh:mm:ss"/>
   </tstamp>
 
   <target name="collect-reports" description="Collects the test results of all subprojects">
     <junitreport todir="${report.root}" tofile="OCD-Tests-Summary.xml">
       <fileset dir=".">
-        <include name="**/TEST-*.xml" />
+        <include name="**/TEST-*.xml"/>
       </fileset>
     </junitreport>
   </target>
 
   <target name="generate-html-report" description="Generates the HTML report, using the OCD-Tests-Summary.xml collected from the subprojects">
-    <java jar="${ocd-report-generator}" fork="true">
-      <arg value="${user.dir}" />
-      <arg value="${report.target}" />
-      <arg value="${report.root}/OCD-Tests-Summary.xml" />
-      <arg value="generate-wins-by-all-means" />
+    <java jar="${tools.util-report}" fork="true">
+      <arg value="${user.dir}"/>
+      <arg value="${report.target}"/>
+      <arg value="${report.root}/OCD-Tests-Summary.xml"/>
+      <arg value="generate-wins-by-all-means"/>
     </java>
   </target>
 
   <target name="report" description="Compiles the test results of all subprojects, and generates the HTML report.">
-    <delete dir="${report.generated}" />
-    <antcall target="collect-reports" />
-    <antcall target="generate-html-report" />
+    <delete dir="${report.generated}"/>
+    <antcall target="collect-reports"/>
+    <antcall target="generate-html-report"/>
   </target>
 
   <!-- Subproject goals -->
   <target name="db-create" description="Creates a database and role for all projects">
     <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="db-create" />
+      <fileset dir="." includes="**/build.xml" excludes="build.xml"/>
+      <target name="db-create"/>
     </subant>
   </target>
 
   <target name="db-drop" description="Terminates connections and then drops the database and role for all projects">
     <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="db-drop" />
+      <fileset dir="." includes="**/build.xml" excludes="build.xml"/>
+      <target name="db-drop"/>
     </subant>
   </target>
 
   <target name="all" description="Runs the full build and test suite for all projects">
-    <sanitize-ports />
+    <sanitize-ports/>
     <subant failonerror="false">
-      <fileset dir="." includes="**/build.xml" excludes="build.xml" />
-      <target name="all" />
+      <fileset dir="." includes="**/build.xml" excludes="build.xml"/>
+      <target name="all"/>
     </subant>
   </target>
 </project>

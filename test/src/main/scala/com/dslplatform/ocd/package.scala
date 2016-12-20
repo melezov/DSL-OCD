@@ -12,9 +12,6 @@ package object ocd
 
   type MMap[K, V] = scala.collection.mutable.LinkedHashMap[K, V]
 
-  type Language = com.dslplatform.compiler.client.parameters.Targets.Option
-  val JAVA = com.dslplatform.compiler.client.parameters.Targets.Option.JAVA_CLIENT
-
   type Files = Map[String, String]
   type MFiles = MMap[String, String]
 
@@ -38,5 +35,15 @@ package object ocd
 
   implicit class RichLanguage(val language: Language) extends AnyVal {
     def lowerName = language.name.toLowerCase(Locale.ENGLISH)
+  }
+}
+
+package ocd {
+  sealed trait Language {
+    def name: String
+  }
+  case object JAVA extends Language {
+    val name = "java_client"
+    override val toString = name
   }
 }

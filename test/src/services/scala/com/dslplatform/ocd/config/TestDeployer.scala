@@ -1,8 +1,6 @@
 package com.dslplatform.ocd
 package config
 
-import java.util.Locale
-
 import test.javatest.{JavaInfo, TestSuiteCreator}
 
 class TestDeployer(
@@ -261,7 +259,7 @@ class TestDeployer(
       val expanded = (classpathWithTemplateProperties.split("\n") map {
         case JarExpansionPattern(before, path, after) =>
           val pathFix = path match {
-            case "test" => "../../../tools/test"
+            case "testing" => "../../../tools/testing"
             case "compile/java_client" => "temp/client/dependencies"
             case "compile/revenj.java" => "temp/server/dependencies"
             case other => sys.error("Unknown classpath reference: " + other)

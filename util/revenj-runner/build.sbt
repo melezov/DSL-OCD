@@ -18,6 +18,8 @@ libraryDependencies ++= Seq(
   "org.nanohttpd" % "nanohttpd" % "2.3.1"
 )
 
+assemblyJarName in assembly := s"${name.value.toLowerCase}-${version.value}.jar"
+
 // ### ECLIPSE ### //
 
 EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)

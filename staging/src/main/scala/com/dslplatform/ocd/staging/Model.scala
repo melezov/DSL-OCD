@@ -6,6 +6,7 @@ import java.util.Properties
 import Compile._
 
 object Model {
+  var Version = "0.2.2"
   val home = repositories / "model"
 
   private[this] def copyModel(): Unit = {
@@ -29,12 +30,13 @@ object Model {
   }
 
   private[this] def mutateVersions(): Unit = {
-    val (generatorVersion, version) = {
+    val version = {
       val generatorBuild = home / "generator" / "build.sbt"
       backup(generatorBuild)
       val globalFind = s"""(?s).*version := "([^"]+)".*""".r
       val globalFind(generatorVersion) = generatorBuild.string
-      (generatorVersion, generatorVersion + "-" + xkcd)
+      assert(generatorVersion == Version)
+      generatorVersion + "-" + xkcd
     }
 
     logger.info("--# Model version is: {}", version)

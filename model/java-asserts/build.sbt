@@ -16,8 +16,7 @@ autoScalaLibrary := false
 
 libraryDependencies ++= Seq(
   "com.dslplatform.ocd" % "dsl-ocd-util-testing" % "0.2.2"
-, "com.dslplatform" % "dsl-client-java" % "1.5.0"
-, "joda-time" % "joda-time" % "2.9.6"
+, "com.dslplatform" % "dsl-client-java" % "1.5.0" % Provided
 , "junit" % "junit" % "4.12"
 )
 

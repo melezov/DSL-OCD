@@ -42,13 +42,15 @@ object Compile {
       logger.debug(s"--> Starting ${this} @ {}/{}: {}", project, path, commands mkString " ")
       BuildTool.cleanPublishes(toClean)
 
-      val target = repositories / project / (path.replace('\\', '/'), '/')
-      Process((unixVsWindows()("cmd", "/c") ++ Seq(
+      val target = repositories / (project, '/') / (path.replace('\\', '/'), '/')
+
+      val result = Process((unixVsWindows()("cmd", "/c") ++ Seq(
         (tool / "bin" / "mvn").path
         , "-Dmaven.test.skip=true"
         , "-Dmaven.javadoc.skip=true"
         , s"-Duser.home=${userHome.path}"
       ) ++ commands), target.fileOption.get)! ProcessLogger(compilationLogger(this.toString, project, path), logger.warn(_))
+      require(result == 0, s"${this} exited with a non-zero result ($result), quitting!")
 
       logger.debug(s"<-- Finished with ${this} @ {}/{}: {}", project, path, commands mkString " ")
     }
@@ -78,20 +80,30 @@ object Compile {
       BuildTool.cleanPublishes(toClean)
 
       val target = path match {
-        case "" => repositories / project
-        case subproject => repositories / project / (subproject.replace('\\', '/'), '/')
+        case "" => repositories / (project, '/')
+        case subproject => repositories / (project, '/') / (subproject.replace('\\', '/'), '/')
       }
 
       val toolJar = (tool / "bin" / s"sbt-launch.jar").toAbsolute
-      Process((Seq(
+      val result = Process((Seq(
         "java"
       , "-Xmx2G", "-Xss4m", "-XX:ReservedCodeCacheSize=512m"
       , s"-Duser.home=${userHome.path}"
       , "-jar", toolJar.path
       ) ++ commands), target.fileOption.get)! ProcessLogger(compilationLogger(this.toString, project, path), logger.warn(_))
+      require(result == 0, s"${this} exited with a non-zero result ($result), quitting!")
+
       logger.debug(s"<-- Finished with ${this} @ {}/{}: {}", project, path, commandsNoSets mkString " ")
     }
   }
+/*
+  case object ANT extends BuildTool {
+    protected val version = "1.9.7"
+    protected val url = s"http://ftp.carnet.hr/misc/apache//ant/binaries/apache-ant-${version}-bin.zip"
+    protected val sha1 = "f6d3f9aa55661a5cb2dff3f1933ca9a59910206c"
+    protected val home = userHome / ".ant"
+  }
+*/
 
   object BuildTool {
     def cleanPublishes(toClean: Seq[String]): Unit = toClean foreach {
@@ -181,19 +193,21 @@ object Compile {
   object Dsl {
     val `assembly` = "assembly"
     val `clean` = "clean"
-    val `package` = "package"
+    val `compile` = "compile"
     val `install` = "install"
-    val `war:war` = "war:war"
+    val `package` = "package"
     val `publishLocal` = "publishLocal"
     val `publishM2` = "publishM2"
     val `+publishM2` = "+publishM2"
+    val `run` = "run"
     val `set no src` = "set publishArtifact in (Compile, packageSrc) := false"
     val `set no doc` = "set publishArtifact in (Compile, packageDoc) := false"
+    val `war:war` = "war:war"
   }
 
   import Dsl._
 
-  def apply(): Unit = block(
+  def apply(skipCompile: Boolean): Unit = if (!skipCompile) block(
     () => {
       MVN("dsl-compiler-client", "CommandLineClient", Nil, clean, `package`)
     }

@@ -1,32 +1,32 @@
 <project>
-    <macrodef name="get-revenj-stop-port">
-        <attribute name="port"/>
-        <attribute name="result"/>
-        <sequential>
-            <script language="javascript">
-                stopPort = 1000 + parseInt('@{port}'); // MaxNumberOfTestProjects = 1000
-                project.setProperty('@{result}', stopPort);
-            </script>
-        </sequential>
-    </macrodef>
+  <macrodef name="get-revenj-stop-port">
+      <attribute name="port"/>
+      <attribute name="result"/>
+      <sequential>
+          <script language="javascript">
+              stopPort = 1000 + parseInt('@{port}'); // MaxNumberOfTestProjects = 1000
+              project.setProperty('@{result}', stopPort);
+          </script>
+      </sequential>
+  </macrodef>
 
-    <macrodef name="get-revenj-stop-key">
-        <attribute name="host"/>
-        <attribute name="port"/>
-        <attribute name="result"/>
-        <sequential>
-            <script language="javascript">
-                stopKey = 'stopkey-' + '@{host}' + '-' + '@{port}';
-                project.setProperty('@{result}', stopKey);
-            </script>
-        </sequential>
-    </macrodef>
+  <macrodef name="get-revenj-stop-key">
+      <attribute name="host"/>
+      <attribute name="port"/>
+      <attribute name="result"/>
+      <sequential>
+          <script language="javascript">
+              stopKey = 'stopkey-' + '@{host}' + '-' + '@{port}';
+              project.setProperty('@{result}', stopKey);
+          </script>
+      </sequential>
+  </macrodef>
 
-    <macrodef name="sanitize-ports">
-        <sequential>
-            <java jar="${tools.port-corrector}" fork="true">
-                <arg value="namesAndPorts.properties" />
-            </java>
-        </sequential>
-    </macrodef>
+  <macrodef name="sanitize-ports">
+      <sequential>
+          <java jar="${tools.util-port-corrector}" fork="true">
+              <arg value="namesAndPorts.properties"/>
+          </java>
+      </sequential>
+  </macrodef>
 </project>

@@ -7,7 +7,7 @@
   <classpathentry kind="src" path="src/test/java"/>
   <classpathentry kind="src" path="src/test/resources"/>
 
-  <classpathentry kind="lib" path="test/**.jar"/>
+  <classpathentry kind="lib" path="testing/**.jar"/>
 
   <classpathentry kind="lib" path="compile/java_client/**.jar"/>
 

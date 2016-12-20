@@ -131,7 +131,7 @@ object Analyse {
         s"$$1${revenjCoreScalaVersion}-$xkcd$$3"
   )
 
-  def apply(): Unit = {
+  def apply(skipAnalyse: Boolean): Unit = if (!skipAnalyse) {
     logger.info("Analysed dsl-clc: {}", dslClcVersion)
     logger.info("Analysed dsl-json version: {}", dslJsonVersion)
     logger.info("Analysed dsl-json-java8 version: {}", dslJsonJava8Version)

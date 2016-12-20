@@ -21,22 +21,22 @@
   <property name="target.main" location="${target}/classes"/>
   <property name="target.test" location="${target}/test-classes"/>
 
-  <property name="dsl-clc" value="dsl-clc-1.8.3-161211-162809.jar"/>
-  <property name="dsl-compiler" value="dsl-compiler-1.7.6185.21662-161211-162809.exe"/>
+  <property name="dsl-clc" value="dsl-clc-1.8.4-161224-000735.jar"/>
+  <property name="dsl-compiler" value="dsl-compiler-1.7.6200.20202-161224-000735.exe"/>
 
   <property name="client" value="java_client"/>
   <property name="server" value="revenj.net"/>
 
-  <property name="tools.test" location="${tools}/test"/>
   <property name="tools.build" location="${tools}/build"/>
   <property name="tools.config" location="${tools}/config"/>
   <property name="tools.compile" location="${tools}/compile"/>
   <property name="tools.runtime" location="${tools}/runtime"/>
+  <property name="tools.testing" location="${tools}/testing"/>
 
-  <property name="tools.dsl-clc" location="${tools.build}/${dsl-clc}"/>
-  <property name="tools.dsl-compiler" location="${tools.build}/${dsl-compiler}"/>
+  <property name="tools.dsl-clc" location="${tools.build}/dsl-compiler/${dsl-clc}"/>
+  <property name="tools.dsl-compiler" location="${tools.build}/dsl-compiler/${dsl-compiler}"/>
 
-  <property name="tools.ping" location="${tools.build}/dsl-ocd-util-ping-0.2.2.jar"/>
+  <property name="tools.util-ping" location="${tools.build}/dsl-ocd-util/dsl-ocd-util-ping-0.2.2-161224-000735.jar"/>
 
   <property name="workspace.client" location="${temp.client}/workspace"/>
   <property name="workspace.server" location="${temp.server}/workspace"/>
@@ -65,7 +65,7 @@
   <property name="dbUser" value="${projectShortName}-user"/>
   <property name="dbPassword" value="${projectShortName}-password"/>
 
-  <path id="postgres.classpath" location="${tools.build}/postgresql-9.4.1212.jre6.jar"/>
+  <path id="postgres.classpath" location="${tools.build}/postgresql-jdbc/postgresql-9.4.1212.jre6.jar"/>
 
   <!-- ########### -->
   <!-- # FILTERS # -->
@@ -271,16 +271,16 @@
 
   <target name="server-start" description="Starts the server">
     <exec executable="mono" spawn="true" osfamily="unix">
-      <arg value="${server.runtime}/Revenj.Http.exe" />
+      <arg value="${server.runtime}/Revenj.Http.exe"/>
     </exec>
     <exec executable="cmd.exe" spawn="false" osfamily="windows">
-      <arg value="/C" />
-      <arg value="START" />
-      <arg value="/MIN" />
-      <arg value="&quot;Revenj.NET-${revenj-stop-key}&quot;" />
-      <arg value="${server.runtime}/Revenj.Http.exe" />
+      <arg value="/C"/>
+      <arg value="START"/>
+      <arg value="/MIN"/>
+      <arg value="&quot;Revenj.NET-${revenj-stop-key}&quot;"/>
+      <arg value="${server.runtime}/Revenj.Http.exe"/>
     </exec>
-    <java jar="${tools.ping}" fork="true">
+    <java jar="${tools.util-ping}" fork="true">
       <arg value="-t"/>
       <arg value="30000ms"/>
       <arg value="-i"/>
@@ -291,16 +291,16 @@
 
   <target name="server-stop" description="Stops the running server">
     <exec executable="bash" osfamily="unix">
-      <arg value="-c" />
-      <arg value="ps aux | grep 'Revenj.Http.exe' | grep -v grep | awk '{print $2;}' | xargs kill -9 " />
+      <arg value="-c"/>
+      <arg value="ps aux | grep 'Revenj.Http.exe' | grep -v grep | awk '{print $2;}' | xargs kill -9 "/>
     </exec>
     <exec executable="taskkill.exe" osfamily="windows">
-      <arg value="/F" />
-      <arg value="/T" />
-      <arg value="/IM" />
-      <arg value="Revenj.Http.exe" />
-      <arg value="/FI" />
-      <arg value="&quot;WINDOWTITLE eq Revenj.NET-${revenj-stop-key}&quot;" />
+      <arg value="/F"/>
+      <arg value="/T"/>
+      <arg value="/IM"/>
+      <arg value="Revenj.Http.exe"/>
+      <arg value="/FI"/>
+      <arg value="&quot;WINDOWTITLE eq Revenj.NET-${revenj-stop-key}&quot;"/>
     </exec>
   </target>
 
@@ -309,7 +309,7 @@
   <!-- ######## -->
 
   <path id="test.compile.classpath">
-    <fileset dir="${tools.test}">
+    <fileset dir="${tools.testing}">
       <include name="**/*.jar"/>
     </fileset>
   </path>

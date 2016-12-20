@@ -21,23 +21,24 @@
   <property name="target.main" location="${target}/classes"/>
   <property name="target.test" location="${target}/test-classes"/>
 
-  <property name="dsl-clc" value="dsl-clc-1.8.3-161211-162809.jar"/>
-  <property name="dsl-compiler" value="dsl-compiler-1.7.6185.21662-161211-162809.exe"/>
+  <property name="dsl-clc" value="dsl-clc-1.8.4-161224-000735.jar"/>
+  <property name="dsl-compiler" value="dsl-compiler-1.7.6200.20202-161224-000735.exe"/>
 
   <property name="client" value="java_client"/>
   <property name="server" value="revenj.scala"/>
+  <property name="serverVersion" value="_2.11"/>
 
-  <property name="tools.test" location="${tools}/test"/>
   <property name="tools.build" location="${tools}/build"/>
   <property name="tools.config" location="${tools}/config"/>
   <property name="tools.compile" location="${tools}/compile"/>
   <property name="tools.runtime" location="${tools}/runtime"/>
+  <property name="tools.testing" location="${tools}/testing"/>
 
-  <property name="tools.dsl-clc" location="${tools.build}/${dsl-clc}"/>
-  <property name="tools.dsl-compiler" location="${tools.build}/${dsl-compiler}"/>
+  <property name="tools.dsl-clc" location="${tools.build}/dsl-compiler/${dsl-clc}"/>
+  <property name="tools.dsl-compiler" location="${tools.build}/dsl-compiler/${dsl-compiler}"/>
 
-  <property name="tools.ping" location="${tools.build}/dsl-ocd-util-ping-0.2.2.jar"/>
-  <property name="tools.revenj-runner" location="${tools.runtime}/revenj-runner/dsl-ocd-util-revenj-runner-0.2.2.jar"/>
+  <property name="tools.util-ping" location="${tools.build}/dsl-ocd-util/dsl-ocd-util-ping-0.2.2-161224-000735.jar"/>
+  <property name="tools.util-revenj-runner" location="${tools.build}/dsl-ocd-util/dsl-ocd-util-revenj-runner-0.2.2-161224-000735.jar"/>
 
   <property name="workspace.client" location="${temp.client}/workspace"/>
   <property name="workspace.server" location="${temp.server}/workspace"/>
@@ -63,14 +64,14 @@
   <property name="dbUser" value="${projectShortName}-user"/>
   <property name="dbPassword" value="${projectShortName}-password"/>
 
-  <path id="postgres.classpath" location="${tools.build}/postgresql-9.4.1212.jre6.jar"/>
+  <path id="postgres.classpath" location="${tools.build}/postgresql-jdbc/postgresql-9.4.1212.jre6.jar"/>
 
   <!-- ########### -->
   <!-- # FILTERS # -->
   <!-- ########### -->
 
   <filter token="serverVersion" value="${serverVersion}"/>
-  
+
   <filter token="dbHost" value="${dbHost}"/>
   <filter token="dbPort" value="${dbPort}"/>
   <filter token="dbName" value="${dbName}"/>
@@ -80,10 +81,6 @@
   <!-- ############### -->
   <!-- # JDK16 CHECK # -->
   <!-- ############### -->
-
-  <target name="akka" description="aoesntuhoaeu">
-    <echo message="${serverVersion}"/>
-  </target>
 
   <property environment="env"/>
   <condition property="bootclasspath1" value="-bootclasspath" else="-g"><!-- find a better else="noop" variable, linux javac doesn't understand empty parameters -->
@@ -278,7 +275,7 @@
     <delete file="${server.log}"/>
     <java classname="com.dslplatform.ocd.test.RevenjRunner" dir="${server.runtime}" fork="true" spawn="true">
       <classpath>
-        <pathelement path="${tools.revenj-runner}"/>
+        <pathelement path="${tools.util-revenj-runner}"/>
         <pathelement path="${server.runtime}/*"/>
         <pathelement path="${server.runtime}/plugins/*"/>
       </classpath>
@@ -289,7 +286,7 @@
       <arg value="${revenj-stop-port}"/>
       <arg value="${revenj-stop-key}"/>
     </java>
-    <java jar="${tools.ping}" fork="true">
+    <java jar="${tools.util-ping}" fork="true">
       <arg value="-t"/>
       <arg value="30000ms"/>
       <arg value="-i"/>
@@ -299,7 +296,7 @@
   </target>
 
   <target name="server-stop" description="Stops the running server">
-    <java jar="${tools.ping}" fork="true">
+    <java jar="${tools.util-ping}" fork="true">
       <arg value="-t"/>
       <arg value="10000ms"/>
       <arg value="-i"/>
@@ -313,7 +310,7 @@
   <!-- ######## -->
 
   <path id="test.compile.classpath">
-    <fileset dir="${tools.test}">
+    <fileset dir="${tools.testing}">
       <include name="**/*.jar"/>
     </fileset>
   </path>

@@ -1,11 +1,9 @@
 package com.dslplatform.ocd.staging
 
-import java.io.ByteArrayOutputStream
-import java.util.Properties
-
-import com.dslplatform.ocd.staging.Compile._
+import Compile._
 
 object Util {
+  var Version = "0.2.2"
   val home = repositories / "util"
 
   private[this] def copyUtil(): Unit = {
@@ -22,11 +20,12 @@ object Util {
 
   private[this] def mutateVersions(): Unit = {
     val version = {
-      val generatorBuild = home / "testing" / "build.sbt"
-      backup(generatorBuild)
+      val testingBuild = home / "testing" / "build.sbt"
+      backup(testingBuild)
       val globalFind = s"""(?s).*version := "([^"]+)".*""".r
-      val globalFind(generatorVersion) = generatorBuild.string
-      generatorVersion + "-" + xkcd
+      val globalFind(testingVersion) = testingBuild.string
+      assert(testingVersion == Version)
+      testingVersion + "-" + xkcd
     }
 
     logger.info("--# Util version is: {}", version)

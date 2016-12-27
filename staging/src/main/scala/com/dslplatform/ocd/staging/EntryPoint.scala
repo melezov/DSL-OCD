@@ -12,18 +12,22 @@ object EntryPoint
     logger.info(s"### ${section} END (took: ${endAt - startAt} ms) ###")
   }
 
-  val skipSource = args contains "source:skip"
-  val skipAnalyse = args contains "analyse:skip"
-  val skipCompile = args contains "compile:skip"
-  val skipFetch = args contains "fetch:skip"
-  val skipDownload = args contains "download:skip"
-  val skipUtil = args contains "util:skip"
-  val skipModel = args contains "model:skip"
-  val skipDrivers = args contains "drivers:skip"
-  val skipGather = args contains "gather:skip"
-  val skipDeploy = args contains "deploy:skip"
-  val skipTest = args contains "test:skip"
-  val includePrereleases = args contains "fetch:include-prereleases"
+  val allArgs = args ++ Seq(
+  )
+
+  val skipSource = allArgs contains "source:skip"
+  val skipAnalyse = allArgs contains "analyse:skip"
+  val skipCompile = allArgs contains "compile:skip"
+  val skipFetch = allArgs contains "fetch:skip"
+  val skipDownload = allArgs contains "download:skip"
+  val skipUtil = allArgs contains "util:skip"
+  val skipModel = allArgs contains "model:skip"
+  val skipDrivers = allArgs contains "drivers:skip"
+  val skipLanguages = allArgs contains "languages:skip"
+  val skipGather = allArgs contains "gather:skip"
+  val skipDeploy = allArgs contains "deploy:skip"
+  val skipTest = allArgs contains "test:skip"
+  val includePrereleases = allArgs contains "fetch:include-prereleases"
 
   time("Staging",
     try {
@@ -35,9 +39,10 @@ object EntryPoint
       time("Util", Util(skipUtil))
       time("Model", Model(skipModel))
       time("Drivers", Drivers(skipDrivers))
+      time("Languages", Languages(skipLanguages))
       time("Gather", Gather(skipGather))
       time("Deploy", Deploy(skipDeploy))
-//      time("Test", Test(skipTest))
+      time("Test", Test(skipTest))
     } finally {
       pool.shutdown()
     }

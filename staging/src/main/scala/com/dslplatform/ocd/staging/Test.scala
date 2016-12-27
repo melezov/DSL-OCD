@@ -42,17 +42,22 @@ object Test {
     }
   }
 
-  private[this] def compileTest(): Unit = {
+  private[this] def deployTarget(): Unit = {
     import Dsl._
 
     SBT("test", "", Nil, clean, compile, run)
+  }
+
+  private[this] def runTarget(): Unit = {
+//    ANT("DSL-OCD-Target", "", Nil, "-p")
   }
 
   def apply(skipTest: Boolean): Unit = {
     if (!skipTest) {
       copyTest()
       mutateVersions()
-      compileTest()
+      deployTarget()
+      runTarget()
     }
   }
 }

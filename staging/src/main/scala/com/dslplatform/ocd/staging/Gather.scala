@@ -196,6 +196,12 @@ packCopyDependenciesTarget := file("dependencies")
     copy("postgresql-jdbc", src, target)
   }
 
+  private[this] def languages(): Unit = {
+    val src = repositories / "languages"
+    val target = home / "languages"
+    copy("languages", src, target)
+  }
+
   def apply(skipGather: Boolean): Unit = if (!skipGather) {
     clean()
     block(
@@ -217,6 +223,7 @@ packCopyDependenciesTarget := file("dependencies")
     , () => revenjCoreNet()
     , () => revenjServerNet()
     , () => postgreSqlJdbc()
+    , () => languages()
     )
   }
 }

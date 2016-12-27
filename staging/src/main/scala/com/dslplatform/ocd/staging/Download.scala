@@ -1,11 +1,10 @@
 package com.dslplatform.ocd
 package staging
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import java.io.ByteArrayInputStream
 
 import scala.sys.process._
 import scalax.io.JavaConverters._
-import scalax.io.Resource
 
 object Download {
   private[this] val CompilerUrl = "https://compiler.dsl-platform.com:8443/platform/download/dsl-compiler.zip"
@@ -20,21 +19,9 @@ object Download {
     }
   }
 
-  private[this] def download(): Array[Byte] = {
-    val downloader = Resource.fromURL(CompilerUrl).bytes.grouped(500000)
-    val baos = new ByteArrayOutputStream()
-    downloader.foldLeft(0L) { (last, buffer) =>
-      val soFar = last + buffer.length
-      logger.debug(s"--# Downloading compiler ({} bytes) ...", format(soFar))
-      baos.write(buffer.toArray)
-      soFar
-    }
-    baos.toByteArray
-  }
-
   private[this] def downloadAndUnzip(): (Path, Int) = {
     val zis = new java.util.zip.ZipInputStream(
-      new ByteArrayInputStream(download())
+      new ByteArrayInputStream(Helpers.downloadArchive(CompilerUrl, "compiler"))
     )
 
     val firstEntry = zis.getNextEntry

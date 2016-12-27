@@ -222,11 +222,11 @@ object Deploy {
     logger.info("Copied {} to tools/runtime", src.name)
   }
 
-  private[this] def buildPostgreSqlJdbc(): Unit = {
+  private[this] def buildJdbc(): Unit = {
     val src = Gather.home / "postgresql-jdbc"
-    val target = templates / "tools" / "build" / "postgresql-jdbc"
+    val target = templates / "tools" / "build" / "jdbc"
     if (target.exists) {
-      logger.debug("Cleaning previous postgresql-jdbc {}", target.path)
+      logger.debug("Cleaning previous jdbc {}", target.path)
       target.deleteRecursively(true, false)
     }
 
@@ -237,10 +237,10 @@ object Deploy {
     for (config <- (templates / "build-templates" ** "build-common-template-*.xml")) {
       lock synchronized {
         val body = config.string
-        val patchedVersion = body.replaceFirst("""(<path id="postgres.classpath" location="\$\{tools\.build\}/postgresql-jdbc/)[^"]+\.jar("/>)""", s"$$1${jre6Jdbc.name}$$2")
+        val patchedVersion = body.replaceFirst("""(<path id="postgres.classpath" location="\$\{tools\.build\}/jdbc/)[^"]+\.jar("/>)""", s"$$1${jre6Jdbc.name}$$2")
         if (body != patchedVersion) {
           config write patchedVersion
-          logger.debug("Patched postgresql-jdbc version in {}", config.name)
+          logger.debug("Patched postgresql JDBC version in {}", config.name)
         }
       }
     }
@@ -281,6 +281,19 @@ object Deploy {
     }
   }
 
+  private[this] def languages(): Unit = {
+    val src = Gather.home / "languages"
+
+    val target = templates / "tools" / "build" / "languages"
+    if (target.exists) {
+      logger.debug("Cleaning previous languages {}", target.path)
+      target.deleteRecursively(true, false)
+    }
+
+    src copyTo target
+    logger.info("Copied {} to tools/build/languages", src.name)
+  }
+
   def apply(skipDeploy: Boolean): Unit = if (!skipDeploy) block(
     () => deployUtil("util-report")
   , () => deployUtil("util-port-corrector")
@@ -298,7 +311,8 @@ object Deploy {
   , () => revenjScalaCompile("2.12")
   , () => revenjAkkaRuntime("2.11")
   , () => revenjAkkaRuntime("2.12")
-  , () => buildPostgreSqlJdbc()
+  , () => buildJdbc()
   , () => buildJettyRunner()
+  , () => languages()
   )
 }

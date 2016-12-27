@@ -1,14 +1,7 @@
 package com.dslplatform.ocd
 package staging
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
-import java.security.MessageDigest
-import java.util.zip.ZipInputStream
-
-import scala.annotation.tailrec
 import scala.sys.process._
-import scalax.io.JavaConverters._
-import scalax.io._
 
 object Compile {
   def compilationLogger(source: String, project: String, path: String) = {
@@ -44,11 +37,11 @@ object Compile {
 
       val target = repositories / (project, '/') / (path.replace('\\', '/'), '/')
 
-      val result = Process((unixVsWindows()("cmd", "/c") ++ Seq(
+      val result = Process((unixVsWindows("bash")("cmd", "/c") ++ Seq(
         (tool / "bin" / "mvn").path
-        , "-Dmaven.test.skip=true"
-        , "-Dmaven.javadoc.skip=true"
-        , s"-Duser.home=${userHome.path}"
+      , "-Dmaven.test.skip=true"
+      , "-Dmaven.javadoc.skip=true"
+      , s"-Duser.home=${userHome.path}"
       ) ++ commands), target.fileOption.get)! ProcessLogger(compilationLogger(this.toString, project, path), logger.warn(_))
       require(result == 0, s"${this} exited with a non-zero result ($result), quitting!")
 
@@ -96,14 +89,34 @@ object Compile {
       logger.debug(s"<-- Finished with ${this} @ {}/{}: {}", project, path, commandsNoSets mkString " ")
     }
   }
-/*
+
   case object ANT extends BuildTool {
     protected val version = "1.9.7"
     protected val url = s"http://ftp.carnet.hr/misc/apache//ant/binaries/apache-ant-${version}-bin.zip"
     protected val sha1 = "f6d3f9aa55661a5cb2dff3f1933ca9a59910206c"
     protected val home = userHome / ".ant"
+    protected val expectedChildFolder = s"apache-ant-${version}/"
+
+    def cleanPublishes(path: String): Unit = ()
+
+    def apply(project: String, path: String, toClean: Seq[String], commands: String*): Unit = {
+      ensureToolExists()
+      logger.debug(s"--> Starting ${this} @ {}/{}: {}", project, path, commands mkString " ")
+
+      val target = path match {
+        case "" => repositories / (project, '/')
+        case subproject => repositories / (project, '/') / (subproject.replace('\\', '/'), '/')
+      }
+
+      val result = Process((unixVsWindows("bash")("cmd", "/c") ++ Seq(
+        (tool / "bin" / "ant").path
+      , s"-Duser.home=${userHome.path}"
+      ) ++ commands), target.fileOption.get)! ProcessLogger(compilationLogger(this.toString, project, path), logger.warn(_))
+      require(result == 0, s"${this} exited with a non-zero result ($result), quitting!")
+
+      logger.debug(s"<-- Finished with ${this} @ {}/{}: {}", project, path, commands mkString " ")
+    }
   }
-*/
 
   object BuildTool {
     def cleanPublishes(toClean: Seq[String]): Unit = toClean foreach {
@@ -133,54 +146,11 @@ object Compile {
       }
     }
 
-    private[this] def downloadArchive(): Array[Byte] = {
-      logger.debug(s"--> Downloading ${this} @ {} ...", url)
-      val downloader = Resource.fromURL(url).bytes.grouped(500000)
-      val baos = new ByteArrayOutputStream()
-      downloader.foldLeft(0L) { (last, buffer) =>
-        val soFar = last + buffer.length
-        logger.debug(s"--# Downloading ${this}: {} bytes ...", format(soFar))
-        baos.write(buffer.toArray)
-        soFar
-      }
-      baos.toByteArray
-    }
-
-    private[this] def checkSha1(archive: Array[Byte]): Unit = {
-      val md = MessageDigest.getInstance("SHA-1")
-      val digest = md.digest(archive).map(_ formatted "%02x").mkString
-      assert(digest == sha1, s"SHA-1 mismatch in downloaded ${this} distribution!")
-    }
-
-    private[this] def extractTool(archive: Array[Byte]): Unit = {
-      logger.debug(s"--# Downloaded ${this}, extracting ...")
-      val zis = new ZipInputStream(new ByteArrayInputStream(archive))
-
-      @tailrec
-      def unzip(filesSoFar: Int, sizeSoFar: Long): (Int, Long) =
-        zis.getNextEntry match {
-          case null => (filesSoFar, sizeSoFar)
-          case ze if ze.isDirectory => unzip(filesSoFar, sizeSoFar)
-          case ze =>
-            val name = ze.getName
-            assert(name startsWith expectedChildFolder, s"Path mismatch, expected to start with ${expectedChildFolder}, but got: " + name)
-            val innerName = name.drop(expectedChildFolder.length)
-            val path = (tool / (innerName, '/'))
-            logger.trace(s"--# Unzipping ${this}: {}", path.path)
-            val body = zis.asUnmanagedInput.byteArray
-            path write body
-            unzip(filesSoFar + 1, sizeSoFar + body.length)
-        }
-
-      val (extractedFiles, extractedSize) = unzip(0, 0L)
-      logger.debug(s"<-- Downloaded ${this}: ${format(extractedSize)} bytes in ${extractedFiles} files")
-    }
-
     protected def downloadAndUnzip(): Unit = {
       cleanExisting()
-      val archive = downloadArchive()
-      checkSha1(archive)
-      extractTool(archive)
+      val archive = Helpers.downloadArchive(url, this.toString)
+      Helpers.checkSha1(archive, sha1)
+      Helpers.extractTool(archive, this.toString, Some(expectedChildFolder), tool)
     }
 
     protected def ensureToolExists(): Unit = synchronized {

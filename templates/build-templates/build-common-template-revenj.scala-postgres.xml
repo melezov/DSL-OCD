@@ -26,7 +26,6 @@
 
   <property name="client" value="java_client"/>
   <property name="server" value="revenj.scala"/>
-  <property name="serverVersion" value="_2.11"/>
 
   <property name="tools.build" location="${tools}/build"/>
   <property name="tools.config" location="${tools}/config"/>
@@ -43,6 +42,14 @@
   <property name="workspace.client" location="${temp.client}/workspace"/>
   <property name="workspace.server" location="${temp.server}/workspace"/>
   <property name="workspace.migration" location="${temp.migration}/workspace"/>
+
+  <property name="serverVersion" value="_2.11"/>
+  <condition property="scalac" value="${tools.build}/languages/scala${serverVersion}/bin/scalac.bat">
+    <os family="windows"/>
+  </condition>
+  <condition property="scalac" value="${tools.build}/languages/scala${serverVersion}/bin/scalac">
+    <os family="unix"/>
+  </condition>
 
   <property name="client.dependencies.template" location="${tools.compile}/${client}"/>
   <property name="server.dependencies.template" location="${tools.compile}/${server}${serverVersion}"/>
@@ -64,7 +71,7 @@
   <property name="dbUser" value="${projectShortName}-user"/>
   <property name="dbPassword" value="${projectShortName}-password"/>
 
-  <path id="postgres.classpath" location="${tools.build}/postgresql-jdbc/postgresql-9.4.1212.jre6.jar"/>
+  <path id="postgres.classpath" location="${tools.build}/jdbc/postgresql-9.4.1212.jre6.jar"/>
 
   <!-- ########### -->
   <!-- # FILTERS # -->
@@ -253,6 +260,7 @@
       <arg value="temp=${workspace.server}"/>
       <arg value="settings=${serverSettings}"/>
       <arg value="namespace=${namespace}"/>
+      <arg value="scalac=${scalac}"/>
     </java>
 
     <copy todir="${server.runtime}">

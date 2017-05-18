@@ -14,11 +14,11 @@ unmanagedSourceDirectories in Test := Nil
 resolvers += "repo.jenkins-ci.org" at "http://repo.jenkins-ci.org/public"
 libraryDependencies ++= Seq(
   "com.github.scala-incubator.io" %% "scala-io-file"    % "0.4.3-1"
-, "com.github.nscala-time"        %% "nscala-time"      % "2.14.0"
+, "com.github.nscala-time"        %% "nscala-time"      % "2.16.0"
 , "org.kohsuke"                   %  "github-api"       % "1.80"
 , "org.eclipse.jgit"              %  "org.eclipse.jgit" % "4.5.0.201609210915-r"
 , "com.typesafe.scala-logging"    %% "scala-logging"    % "3.5.0"
-, "ch.qos.logback"                %  "logback-classic"  % "1.1.8"
+, "ch.qos.logback"                %  "logback-classic"  % "1.2.3"
 )
 
 // ### ECLIPSE ### //

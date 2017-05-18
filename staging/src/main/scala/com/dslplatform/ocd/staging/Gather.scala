@@ -19,16 +19,16 @@ object Gather {
 
   private[this] def downloadDependencies(target: String, scalaVersion: String, dependencies: String*): Unit = {
     val fullScalaVersion = scalaVersion match {
-      case "2.12" => "2.12.1"
-      case "2.11" => "2.11.8"
+      case "2.12" => "2.12.2"
+      case "2.11" => "2.11.11"
       case _ => ???
     }
 
     val downloadFolder = home / target / "downloader"
 
-    (downloadFolder / "project" / "plugins.sbt") write """addSbtPlugin("org.xerial.sbt" % "sbt-pack" % "0.8.0")
+    (downloadFolder / "project" / "plugins.sbt") write """addSbtPlugin("org.xerial.sbt" % "sbt-pack" % "0.8.2")
 """
-    (downloadFolder / "project" / "build.properties") write """sbt.version=0.13.13
+    (downloadFolder / "project" / "build.properties") write """sbt.version=0.13.15
 """
     (downloadFolder / "build.sbt") write s"""
 scalaVersion := "$fullScalaVersion"
@@ -93,7 +93,7 @@ packCopyDependenciesTarget := file("dependencies")
   private[this] def utilTesting(): Unit = {
     downloadDependencies("util-testing", "2.11"
     , s""""com.dslplatform.ocd" % "dsl-ocd-model-java-asserts" % "${Util.Version}-$xkcd""""
-    , """"ch.qos.logback" % "logback-classic" % "1.1.8""""
+    , """"ch.qos.logback" % "logback-classic" % "1.2.3""""
     )
 
     (home / "util-testing" / "dsl-ocd-model-java-asserts.jar") moveTo

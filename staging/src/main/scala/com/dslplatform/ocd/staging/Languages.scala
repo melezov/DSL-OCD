@@ -45,6 +45,7 @@ object Languages {
       locally {
         val unix = target / "bin" / "scalac"
         backup(unix)
+        unix.fileOption.get.setExecutable(true)
         unix write unix.string.replaceFirst("(  \\$JAVA_OPTS)( \\\\)", "$1 " + JvmArguments + "$2")
         logger.debug("--# Tweaked JVM arguments in {}", unix.path)
       }

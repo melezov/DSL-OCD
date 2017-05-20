@@ -15,9 +15,9 @@ object Compile {
   }
 
   case object MVN extends BuildTool {
-    protected val version = "3.3.9"
+    protected val version = "3.5.0"
     protected val url = s"http://ftp.carnet.hr/misc/apache/maven/maven-3/${version}/binaries/apache-maven-${version}-bin.zip"
-    protected val sha1 = "2ddf9bb8c3b41bc2891832a6d6fc25f8bf41d77f"
+    protected val sha1 = "886393e7031d42c412a077c240af73d75e671d62"
     protected val home = userHome / ".m2"
     protected val expectedChildFolder = s"apache-maven-${version}/"
 
@@ -50,11 +50,11 @@ object Compile {
   }
 
   case object SBT extends BuildTool {
-    protected val version = "0.13.13"
-    protected val url = s"https://dl.bintray.com/sbt/native-packages/sbt/${version}/sbt-${version}.zip"
-    protected val sha1 = "42d1c1aed27b0997ab936af987d42d9eeb0d83e6"
+    protected val version = "0.13.15"
+    protected val url = s"https://github.com/sbt/sbt/releases/download/v${version}/sbt-${version}.zip"
+    protected val sha1 = "e98e689425bf950440a9659313389bd441adb49d"
     protected val home = userHome / ".sbt"
-    protected val expectedChildFolder = s"sbt-launcher-packaging-${version}/"
+    protected val expectedChildFolder = "sbt"
 
     def cleanPublishes(path: String): Unit =
       for (repo <- Seq("local", "cache")) {
@@ -91,9 +91,9 @@ object Compile {
   }
 
   case object ANT extends BuildTool {
-    protected val version = "1.9.7"
-    protected val url = s"http://ftp.carnet.hr/misc/apache//ant/binaries/apache-ant-${version}-bin.zip"
-    protected val sha1 = "f6d3f9aa55661a5cb2dff3f1933ca9a59910206c"
+    protected val version = "1.10.1"
+    protected val url = s"http://ftp.carnet.hr/misc/apache/ant/binaries/apache-ant-${version}-bin.zip"
+    protected val sha1 = "fa9acb3b1987f8acf2aa7a87894d1fd9da80e871"
     protected val home = userHome / ".ant"
     protected val expectedChildFolder = s"apache-ant-${version}/"
 

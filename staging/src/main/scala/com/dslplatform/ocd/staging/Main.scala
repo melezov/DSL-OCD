@@ -1,7 +1,7 @@
 package com.dslplatform.ocd
 package staging
 
-object EntryPoint
+object Main
     extends App {
 
   def time[R](section: String, runSection: => Unit): Unit = {

@@ -7,7 +7,7 @@ import scala.sys.process._
 import scalax.io.JavaConverters._
 
 object Download {
-  private[this] val CompilerUrl = "https://compiler.dsl-platform.com:8443/platform/download/dsl-compiler.zip"
+  private[this] val CompilerUrl = "https://tools.dsl-platform.com/dsl-compiler.zip"
   private[this] val home = repositories / "dsl-compiler"
 
   private[this] def clean(): Unit = {

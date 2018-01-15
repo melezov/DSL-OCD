@@ -30,13 +30,13 @@ scalacOptions := Seq(
 
 javacOptions in doc := Seq(
   "-encoding", "UTF-8"
-, "-source", "1.6"
-) ++ (sys.env.get("JDK16_HOME") match {
+, "-source", "1.7"
+) ++ (sys.env.get("JDK17_HOME") match {
   case Some(jdk16Home) => Seq("-bootclasspath", jdk16Home + "/jre/lib/rt.jar")
   case _ => Nil
 })
 javacOptions := Seq(
   "-deprecation"
 , "-Xlint"
-, "-target", "1.6"
+, "-target", "1.7"
 ) ++ (javacOptions in doc).value

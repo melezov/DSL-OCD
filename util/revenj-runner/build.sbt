@@ -2,7 +2,7 @@
 
 organization := "com.dslplatform.ocd"
 name := "DSL-OCD-Util-Revenj-Runner"
-version := "0.2.2"
+version := "0.3.0"
 
 unmanagedSourceDirectories in Compile := Seq(
   (javaSource in Compile).value
@@ -16,6 +16,7 @@ autoScalaLibrary := false
 
 libraryDependencies ++= Seq(
   "org.nanohttpd" % "nanohttpd" % "2.3.1"
+, "net.revenj" %% "revenj-akka" % "0.6.4" % Provided
 )
 
 assemblyJarName in assembly := s"${name.value.toLowerCase}-${version.value}.jar"

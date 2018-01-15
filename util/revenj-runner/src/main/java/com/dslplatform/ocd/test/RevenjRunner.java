@@ -1,6 +1,11 @@
 package com.dslplatform.ocd.test;
 
 import fi.iki.elonen.NanoHTTPD;
+import net.revenj.extensibility.Container;
+import net.revenj.server.WebServer;
+import scala.Option;
+
+import javax.sql.DataSource;
 
 public class RevenjRunner extends NanoHTTPD {
     private final String serverAddress;
@@ -18,26 +23,22 @@ public class RevenjRunner extends NanoHTTPD {
         this.serverPort = serverPort;
         this.stopUrl = stopUrl;
 
-        this.webServer = startBoth();
+        this.container = startBoth();
     }
 
-    private Object webServer;
+    private Container container;
 
-    private Object startBoth() throws Exception {
+    private Container startBoth() throws Exception {
         System.out.println("Starting Revenj runner ...");
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
 
         System.out.println("Starting Revenj ...");
-        final Class<?> clazz = Class.forName("net.revenj.server.WebServer");
-        final Object instance = clazz.getConstructor(String.class, int.class).newInstance(serverAddress, serverPort);
-        clazz.getMethod("start").invoke(instance);
-        return instance;
+        return WebServer.start(serverAddress, serverPort, Option.<DataSource>empty());
     }
 
     private void stopBoth() throws Exception {
         System.out.println("Stopping Revenj ...");
-        final Class<?> clazz = Class.forName("net.revenj.server.WebServer");
-        clazz.getMethod("shutdown").invoke(webServer);
+        container.close();
 
         System.out.println("Stopping Revenj runner ...");
         stop();

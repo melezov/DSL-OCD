@@ -15,7 +15,7 @@ object Drivers {
   private[this] def postgresqlJdbc(): Unit = {
     val web = "https://jdbc.postgresql.org/"
     val body = Resource.fromURL(web).string
-    val pattern = """<h1.*PostgreSQL JDBC Driver ([-\.\d]+) Released!</h1>""".r
+    val pattern = """PostgreSQL JDBC Driver ([-\.\d]+) Released""".r
 
     val lastRelease = pattern.findFirstMatchIn(body)
       .getOrElse(sys.error("Could not figure out the last PostgreSQL JDBC release"))
@@ -45,7 +45,7 @@ object Drivers {
 
   def apply(skipDrivers: Boolean): Unit = if (!skipDrivers) {
     clean()
-    block(
+    par(
       () => postgresqlJdbc()
     , () => oracleJdbc()
     )

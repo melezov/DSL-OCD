@@ -94,9 +94,9 @@ object Analyse {
       None ->
         """(\n\s+, )(EclipseKeys\.projectFlavor := EclipseProjectFlavor\.Java)""" ->
         "$1$2$1resolvers += Resolver.mavenLocal"
-      , Some(dslJsonVersion) ->
-        """(val dslJson = "com.dslplatform" % "dsl-json-joda" % ")([^"]+)(")""" ->
-        s"$$1${dslJsonVersion}-$xkcd$$3"
+//      , Some(dslJsonVersion) ->
+//        """(val dslJson = "com.dslplatform" % "dsl-json-joda" % ")([^"]+)(")""" ->
+//        s"$$1${dslJsonVersion}-$xkcd$$3"
     )
     version
   }

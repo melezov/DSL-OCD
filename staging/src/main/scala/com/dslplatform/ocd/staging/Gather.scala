@@ -204,7 +204,7 @@ packCopyDependenciesTarget := file("dependencies")
 
   def apply(skipGather: Boolean): Unit = if (!skipGather) {
     clean()
-    block(
+    par(
       () => utilPing()
     , () => utilPortCorrector()
     , () => utilReport()

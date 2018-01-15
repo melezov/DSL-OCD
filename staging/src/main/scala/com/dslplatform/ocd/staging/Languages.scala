@@ -23,7 +23,7 @@ object Languages {
 
     val majorToMinorMapping =
       (for (majorVersion <- majorVersions) yield {
-        majorVersion -> (versions find { version =>
+        majorVersion -> (versions.reverse find { version =>
           !(version matches ".*-(M|RC).*") && (version startsWith majorVersion)
         } getOrElse(sys.error(s"Could not locate Scala with major version ${majorVersion}")))
       }).toMap
@@ -54,7 +54,7 @@ object Languages {
 
   def apply(skipDrivers: Boolean): Unit = if (!skipDrivers) {
     clean()
-    block(
+    par(
       () => scala("2.11", "2.12")
     )
   }

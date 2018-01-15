@@ -31,7 +31,7 @@ object Deploy {
       }
     }
 
-    for (config <- (templates / "build-templates" ** "build-common-template-*.xml")) {
+    for (config <- templates / "build-templates" ** "build-common-template-*.xml") {
       lock synchronized {
         val body = config.string
         val patchedVersion = body.replaceFirst(s"""(\\Q<property name="tools.${name}" location="$${tools.build}/dsl-ocd-util/\\E)[^"]+\\.jar("/>)""", s"$$1${src.name}$$2")
@@ -65,7 +65,7 @@ object Deploy {
     val target = templates / "tools" / "build" / "dsl-compiler"
 
     if (target.isDirectory) {
-      for (old <- (target ** "dsl-compiler-*.exe")) {
+      for (old <- target ** "dsl-compiler-*.exe") {
         logger.debug("Cleaning previous dsl-complier: {}", old.name)
         old.delete(true)
       }
@@ -73,7 +73,7 @@ object Deploy {
       target.createDirectory()
     }
 
-    for (config <- (templates / "build-templates" ** "build-common-template-*.xml")) {
+    for (config <- templates / "build-templates" ** "build-common-template-*.xml") {
       lock synchronized {
         val body = config.string
         val patchedVersion = body.replaceFirst("""(<property name="dsl-compiler" value=")dsl-compiler-[^"]+\.exe("/>)""", s"$$1${src.name}$$2")
@@ -94,7 +94,7 @@ object Deploy {
     val target = templates / "tools" / "build" / "dsl-compiler"
 
     if (target.isDirectory) {
-      for (old <- (target ** "dsl-clc-*.jar")) {
+      for (old <- target ** "dsl-clc-*.jar") {
         logger.debug("Cleaning previous dsl-clc: {}", old.name)
         old.delete(true)
       }
@@ -102,7 +102,7 @@ object Deploy {
       target.createDirectory()
     }
 
-    for (config <- (templates / "build-templates" ** "build-common-template-*.xml")) {
+    for (config <- templates / "build-templates" ** "build-common-template-*.xml") {
       lock synchronized {
         val body = config.string
         val patchedVersion = body.replaceFirst("""(<property name="dsl-clc" value=")dsl-clc-[^"]+\.jar("/>)""", s"$$1${src.name}$$2")
@@ -155,7 +155,7 @@ object Deploy {
       }
     }
 
-    for (config <- (templates / "build-templates" ** "build-common-template-*.xml")) {
+    for (config <- templates / "build-templates" ** "build-common-template-*.xml") {
       lock synchronized {
         val body = config.string
         val patchedVersion = body.replaceFirst("""(<property name="revenj.war" value=")revenj-servlet-[^"]+\.war("/>)""", s"$$1${src.name}$$2")
@@ -234,7 +234,7 @@ object Deploy {
     logger.info("Copied {} to tools/build", src.name)
 
     val jre6Jdbc = src ** "*.jre6.jar" head;
-    for (config <- (templates / "build-templates" ** "build-common-template-*.xml")) {
+    for (config <- templates / "build-templates" ** "build-common-template-*.xml") {
       lock synchronized {
         val body = config.string
         val patchedVersion = body.replaceFirst("""(<path id="postgres.classpath" location="\$\{tools\.build\}/jdbc/)[^"]+\.jar("/>)""", s"$$1${jre6Jdbc.name}$$2")
@@ -263,7 +263,7 @@ object Deploy {
     )
 
     for {
-      config <- (templates / "build-templates" ** "build-common-template-*.xml")
+      config <- templates / "build-templates" ** "build-common-template-*.xml"
       (toolName, toolJar) <- tools
     } {
       val toolFilename = (src ** s"$toolJar-*.jar").headOption
@@ -294,7 +294,7 @@ object Deploy {
     logger.info("Copied {} to tools/build/languages", src.name)
   }
 
-  def apply(skipDeploy: Boolean): Unit = if (!skipDeploy) block(
+  def apply(skipDeploy: Boolean): Unit = if (!skipDeploy) par(
     () => deployUtil("util-report")
   , () => deployUtil("util-port-corrector")
   , () => deployUtil("util-ping")

@@ -38,7 +38,7 @@ object Source {
     logger.info("<-- Finished GIT @ {}/{}", project, branch)
   }
 
-  def apply(skipSource: Boolean): Unit = if (!skipSource) block(
+  def apply(skipSource: Boolean): Unit = if (!skipSource) par(
     () => git("dsl-platform", "dsl-json", "master")
   , () => git("dsl-platform", "dsl-client-java", "master")
   , () => git("dsl-platform", "revenj", "master")

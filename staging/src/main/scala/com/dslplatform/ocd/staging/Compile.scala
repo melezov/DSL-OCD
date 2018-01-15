@@ -15,9 +15,9 @@ object Compile {
   }
 
   case object MVN extends BuildTool {
-    protected val version = "3.5.0"
+    protected val version = "3.5.2"
     protected val url = s"http://ftp.carnet.hr/misc/apache/maven/maven-3/${version}/binaries/apache-maven-${version}-bin.zip"
-    protected val sha1 = "886393e7031d42c412a077c240af73d75e671d62"
+    protected val sha1 = "23adadc90b7f79ad84bd14574581d0145611bfda"
     protected val home = userHome / ".m2"
     protected val expectedChildFolder = s"apache-maven-${version}/"
 
@@ -37,12 +37,13 @@ object Compile {
 
       val target = repositories / (project, '/') / (path.replace('\\', '/'), '/')
 
-      val result = Process((unixVsWindows("bash")("cmd", "/c") ++ Seq(
+      val result = Process(unixVsWindows("bash")("cmd", "/c") ++ Seq(
         (tool / "bin" / "mvn").path
+      , "-Dsource.skip"
       , "-Dmaven.test.skip=true"
       , "-Dmaven.javadoc.skip=true"
       , s"-Duser.home=${userHome.path}"
-      ) ++ commands), target.fileOption.get)! ProcessLogger(compilationLogger(this.toString, project, path), logger.warn(_))
+      ) ++ commands, target.fileOption.get)! ProcessLogger(compilationLogger(this.toString, project, path), logger.warn(_))
       require(result == 0, s"${this} exited with a non-zero result ($result), quitting!")
 
       logger.debug(s"<-- Finished with ${this} @ {}/{}: {}", project, path, commands mkString " ")
@@ -78,12 +79,13 @@ object Compile {
       }
 
       val toolJar = (tool / "bin" / s"sbt-launch.jar").toAbsolute
-      val result = Process((Seq(
+      val result = Process(Seq(
         "java"
-      , "-Xmx2G", "-Xss4m", "-XX:ReservedCodeCacheSize=512m"
+      , "-Xmx2G"
+      , "-Xss4m"
       , s"-Duser.home=${userHome.path}"
       , "-jar", toolJar.path
-      ) ++ commands), target.fileOption.get)! ProcessLogger(compilationLogger(this.toString, project, path), logger.warn(_))
+      ) ++ commands, target.fileOption.get)! ProcessLogger(compilationLogger(this.toString, project, path), logger.warn(_))
       require(result == 0, s"${this} exited with a non-zero result ($result), quitting!")
 
       logger.debug(s"<-- Finished with ${this} @ {}/{}: {}", project, path, commandsNoSets mkString " ")
@@ -108,10 +110,10 @@ object Compile {
         case subproject => repositories / (project, '/') / (subproject.replace('\\', '/'), '/')
       }
 
-      val result = Process((unixVsWindows("bash")("cmd", "/c") ++ Seq(
+      val result = Process(unixVsWindows("bash")("cmd", "/c") ++ Seq(
         (tool / "bin" / "ant").path
       , s"-Duser.home=${userHome.path}"
-      ) ++ commands), target.fileOption.get)! ProcessLogger(compilationLogger(this.toString, project, path), logger.warn(_))
+      ) ++ commands, target.fileOption.get)! ProcessLogger(compilationLogger(this.toString, project, path), logger.warn(_))
       require(result == 0, s"${this} exited with a non-zero result ($result), quitting!")
 
       logger.debug(s"<-- Finished with ${this} @ {}/{}: {}", project, path, commands mkString " ")
@@ -177,13 +179,13 @@ object Compile {
 
   import Dsl._
 
-  def apply(skipCompile: Boolean): Unit = if (!skipCompile) block(
+  def apply(skipCompile: Boolean): Unit = if (!skipCompile) par(
     () => {
       MVN("dsl-compiler-client", "CommandLineClient", Nil, clean, `package`)
     }
   , () => {
       MVN("dsl-json", "library", Seq("com/dslplatform/dsl-json"), clean, install)
-      block(
+      par(
         () => {
           MVN("dsl-json", "java8", Seq("com/dslplatform/dsl-json-java8"), clean, install)
           MVN("revenj", "java/revenj-core", Seq("org/revenj/revenj-core"), clean, install)

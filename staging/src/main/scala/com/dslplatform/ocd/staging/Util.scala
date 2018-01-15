@@ -46,7 +46,7 @@ object Util {
   private[this] def compileUtil(): Unit = {
     import Dsl._
 
-    block(
+    par(
       () => SBT("util", "generator", Seq("com.dslplatform.ocd/dsl-ocd-util-generator_2.11"), clean, `set no src`, `set no doc`, publishLocal)
     , () => SBT("util", "ping", Nil, clean, `set no src`, `set no doc`, `package`)
     , () => SBT("util", "port-corrector", Nil, clean, `set no src`, `set no doc`, `package`)

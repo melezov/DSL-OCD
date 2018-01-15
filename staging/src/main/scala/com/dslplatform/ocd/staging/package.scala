@@ -43,7 +43,7 @@ package object staging
 
   implicit val executionContext = ExecutionContext.fromExecutor(pool)
 
-  def block(fs: (() => Unit)*): Unit = {
+  def par(fs: (() => Unit)*): Unit = {
     val futureSeq = Future.sequence(fs map (f => Future(f())))
     Await.result(futureSeq, scala.concurrent.duration.Duration.Inf)
   }

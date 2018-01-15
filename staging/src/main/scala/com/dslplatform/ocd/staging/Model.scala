@@ -59,15 +59,15 @@ object Model {
   private[this] def compileModel(): Unit = {
     import Dsl._
 
-    block(
+    par(
       () => SBT("model", "generator", Nil, "clean", "run")
     , () => SBT("model", "kinds", Seq("com.dslplatform.ocd/dsl-ocd-model-kinds_2.11"), clean, `set no src`, `set no doc`, publishLocal)
     )
-    block(
+    par(
       () => SBT("model", "boxes", Seq("com.dslplatform.ocd/dsl-ocd-model-boxes_2.11"), clean, `set no src`, `set no doc`, publishLocal)
     , () => SBT("model", "types", Seq("com.dslplatform.ocd/dsl-ocd-model-types_2.11"), clean, `set no src`, `set no doc`, publishLocal)
     )
-    block(
+    par(
       () => SBT("model", "dsls", Seq("com.dslplatform.ocd/dsl-ocd-model-dsls_2.11"), clean, `set no src`, `set no doc`, publishLocal)
     , () => SBT("model", "javas", Seq("com.dslplatform.ocd/dsl-ocd-model-javas_2.11"), clean, `set no src`, `set no doc`, publishLocal)
     , () => SBT("model", "scalas", Seq("com.dslplatform.ocd/dsl-ocd-model-scalas_2.11"), clean, `set no src`, `set no doc`, publishLocal)

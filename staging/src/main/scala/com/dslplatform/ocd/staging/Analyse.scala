@@ -105,9 +105,9 @@ object Analyse {
     None ->
       "(<version>)([^<]+)(</version>)" ->
       s"$$1$$2-$xkcd$$3"
-    , Some(dslJsonJava8Version) ->
-      """(<dependency>\s+<groupId>com.dslplatform</groupId>\s+<artifactId>dsl-json-java8</artifactId>\s+<version>)([^<]+)(</version>)""" ->
-      s"$$1${dslJsonJava8Version}-$xkcd$$3"
+//    , Some(dslJsonJava8Version) ->
+//      """(<dependency>\s+<groupId>com.dslplatform</groupId>\s+<artifactId>dsl-json-java8</artifactId>\s+<version>)([^<]+)(</version>)""" ->
+//      s"$$1${dslJsonJava8Version}-$xkcd$$3"
   )
   lazy val revenjServletJavaVersion = sed("revenj", "java/revenj-servlet/pom.xml",
     None ->

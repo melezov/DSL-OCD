@@ -16,8 +16,3 @@ libraryDependencies ++= Seq(
 , "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3-1"
 , "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 )
-
-// ### ECLIPSE ### //
-
-EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
-EclipseKeys.eclipseOutput := Some(".target")

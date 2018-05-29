@@ -16,8 +16,3 @@ libraryDependencies ++= Seq(
   "com.dslplatform.ocd" %% "dsl-ocd-model-types" % "0.2.2"
 , "com.dslplatform.ocd" %% "dsl-ocd-model-boxes" % "0.2.2"
 )
-
-// ### ECLIPSE ### //
-
-EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
-EclipseKeys.eclipseOutput := Some(".target")

@@ -11,9 +11,3 @@ unmanagedSourceDirectories in Test := Nil
 
 crossPaths := false
 autoScalaLibrary := false
-
-// ### ECLIPSE ### //
-
-EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE17)
-EclipseKeys.eclipseOutput := Some(".target")
-EclipseKeys.projectFlavor := EclipseProjectFlavor.Java

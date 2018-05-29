@@ -16,13 +16,7 @@ autoScalaLibrary := false
 
 libraryDependencies ++= Seq(
   "org.nanohttpd" % "nanohttpd" % "2.3.1"
-, "net.revenj" %% "revenj-akka" % "0.6.4" % Provided
+, "net.revenj" %% "revenj-akka" % "0.7.2" % Provided // TODO: sync with revenj version in staging
 )
 
 assemblyJarName in assembly := s"${name.value.toLowerCase}-${version.value}.jar"
-
-// ### ECLIPSE ### //
-
-EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
-EclipseKeys.eclipseOutput := Some(".target")
-EclipseKeys.projectFlavor := EclipseProjectFlavor.Java

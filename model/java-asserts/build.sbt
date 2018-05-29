@@ -21,9 +21,3 @@ libraryDependencies ++= Seq(
 )
 
 resolvers += Resolver.mavenLocal
-
-// ### ECLIPSE ### //
-
-EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
-EclipseKeys.eclipseOutput := Some(".target")
-EclipseKeys.projectFlavor := EclipseProjectFlavor.Java

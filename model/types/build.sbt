@@ -15,8 +15,3 @@ unmanagedSourceDirectories in Test := Nil
 libraryDependencies ++= Seq(
   "com.dslplatform.ocd" %% "dsl-ocd-model-kinds" % "0.2.2"
 )
-
-// ### ECLIPSE ### //
-
-EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
-EclipseKeys.eclipseOutput := Some(".target")

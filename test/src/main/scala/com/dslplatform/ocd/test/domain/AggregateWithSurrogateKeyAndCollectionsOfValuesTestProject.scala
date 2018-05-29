@@ -1,10 +1,10 @@
+/*
 package com.dslplatform.ocd
 package test
 package domain
 
 import config._
 import types._
-/*
 import boxes._
 import dsls._
 import javas._

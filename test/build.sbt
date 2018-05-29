@@ -27,12 +27,6 @@ libraryDependencies ++= Seq(
 
 resolvers += Resolver.mavenLocal
 
-// ### ECLIPSE ### //
-
-EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
-EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
-EclipseKeys.eclipseOutput := Some(".target")
-
 // ### MISC ### //
 
 fork in run := true

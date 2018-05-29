@@ -21,12 +21,6 @@ libraryDependencies ++= Seq(
 , "ch.qos.logback"                %  "logback-classic"  % "1.2.3"
 )
 
-// ### ECLIPSE ### //
-
-EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
-EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
-EclipseKeys.eclipseOutput := Some(".target")
-
 // ### MISC ### //
 
 fork in run := true

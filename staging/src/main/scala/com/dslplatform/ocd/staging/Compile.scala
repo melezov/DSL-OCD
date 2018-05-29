@@ -15,9 +15,9 @@ object Compile {
   }
 
   case object MVN extends BuildTool {
-    protected val version = "3.5.2"
+    protected val version = "3.5.3"
     protected val url = s"http://ftp.carnet.hr/misc/apache/maven/maven-3/${version}/binaries/apache-maven-${version}-bin.zip"
-    protected val sha1 = "23adadc90b7f79ad84bd14574581d0145611bfda"
+    protected val sha1 = "4a4844990333e2548540729ce9ab57f52a63148d"
     protected val home = userHome / ".m2"
     protected val expectedChildFolder = s"apache-maven-${version}/"
 
@@ -51,9 +51,9 @@ object Compile {
   }
 
   case object SBT extends BuildTool {
-    protected val version = "0.13.15"
+    protected val version = "1.1.6"
     protected val url = s"https://github.com/sbt/sbt/releases/download/v${version}/sbt-${version}.zip"
-    protected val sha1 = "e98e689425bf950440a9659313389bd441adb49d"
+    protected val sha1 = "0dc4d7397f16cfc6bb9b8c2ba1849b425b9e5774"
     protected val home = userHome / ".sbt"
     protected val expectedChildFolder = "sbt"
 
@@ -93,9 +93,9 @@ object Compile {
   }
 
   case object ANT extends BuildTool {
-    protected val version = "1.10.1"
+    protected val version = "1.10.3"
     protected val url = s"http://ftp.carnet.hr/misc/apache/ant/binaries/apache-ant-${version}-bin.zip"
-    protected val sha1 = "fa9acb3b1987f8acf2aa7a87894d1fd9da80e871"
+    protected val sha1 = "51c1fa936db7077dca952b9c8444209ab7e4226a"
     protected val home = userHome / ".ant"
     protected val expectedChildFolder = s"apache-ant-${version}/"
 

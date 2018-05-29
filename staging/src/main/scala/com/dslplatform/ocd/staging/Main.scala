@@ -27,7 +27,7 @@ object Main
   val skipGather = allArgs contains "gather:skip"
   val skipDeploy = allArgs contains "deploy:skip"
   val skipTest = allArgs contains "test:skip"
-  val includePrereleases = allArgs contains "fetch:include-prereleases"
+  val includePrereleases = true // allArgs contains "fetch:include-prereleases"
 
   time("Staging",
     try {

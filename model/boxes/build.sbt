@@ -9,8 +9,3 @@ unmanagedSourceDirectories in Compile := Seq(
 , sourceDirectory.value / "generated" / "scala"
 )
 unmanagedSourceDirectories in Test := Nil
-
-// ### ECLIPSE ### //
-
-EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
-EclipseKeys.eclipseOutput := Some(".target")

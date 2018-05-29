@@ -14,8 +14,3 @@ unmanagedSourceDirectories in Test := Nil
 libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-lang3" % "3.5"
 )
-
-// ### ECLIPSE ### //
-
-EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
-EclipseKeys.eclipseOutput := Some(".target")
